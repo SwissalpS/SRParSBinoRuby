@@ -326,7 +326,7 @@ class SssSappClass
 
 		# fallback to some default ports to try
 		aPorts ||= [
-			'/dev/ttys0', '/dev/ttys000', '/dev/ttys001', '/dev/ttys002',
+			'/dev/ttyAMA0', '/dev/ttys0', '/dev/ttys000', '/dev/ttys001', '/dev/ttys002',
 			'/dev/ttys003', '/dev/tty.Bluetooth-Modem', '/dev/tty.Bluetooth-PDA-Sync'
 		];
 
