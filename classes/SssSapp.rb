@@ -48,7 +48,7 @@ class SssSappClass
   protected
 
   public
-  
+
    attr_reader :oSerial
 
 	# create and read config settings from yaml-file.<br>
@@ -124,7 +124,7 @@ class SssSappClass
 	# start watching for activity from SkyTab and other
 	# called by #run() before entering #loop()
 	def initTriggers()
-		
+
 		@aPipes = []
 
 		begin
@@ -215,7 +215,7 @@ class SssSappClass
 
 			#sleep(0.00002) # 85%
 			#sleep(0.0002) # 47%
-			sleep(0.002) # 10% cpu usage on OSX MBP 8 core 
+			sleep(0.002) # 10% cpu usage on OSX MBP 8 core
 
 			# TODO: use a system select function or something else that uses less cpu
 #			# references may have changed due to truncation
@@ -369,7 +369,7 @@ class SssSappClass
 		# start File watcher(s)
 		self.dealloc() if self.initTriggers().nil?
 		puts 'OK:trigger files initiated'
-		
+
 		puts 'OK:entering run-loop'
 		begin
 
