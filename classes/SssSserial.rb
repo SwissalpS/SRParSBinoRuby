@@ -95,7 +95,12 @@ class SssSserialClass
 
 		@mPort = mPort;
 		# TODO: @mPortOptions = options;
-		@mPortOptions = {'baud' => 9600, 'data_bits' => 8, 'stop_bits' => 1, 'parity' => SerialPort::NONE};
+		@mPortOptions = {
+				'baud' => SssSapp.get(:serialBaud, 115200),
+				'data_bits' => SssSapp.get(:serialDataBits, 8),
+				'stop_bits' => SssSapp.get(:serialStopBits, 1),
+				'parity' => SssSapp.get(:serialParity, SerialPort::NONE)
+			};
 
 		@oFletcher = SssSfletcher16Class.new()
 

@@ -171,6 +171,7 @@ class SssSappClass
 	end # initTriggers
 	protected :initTriggers
 
+
 	# close all ports and remove pid
 	def dealloc()
 
@@ -210,12 +211,12 @@ class SssSappClass
 #puts 'wrote ' << iByteCount.to_s << ' byte(s) to serial'
 
 #	  iCount = 122;
-
+		fSleepFor = self.get(:loopSleepDuration, 0.002)
 		while (YES) do
 
 			#sleep(0.00002) # 85%
 			#sleep(0.0002) # 47%
-			sleep(0.002) # 10% cpu usage on OSX MBP 8 core
+			sleep(fSleepFor) # 10% cpu usage on OSX MBP 8 core
 
 			# TODO: use a system select function or something else that uses less cpu
 #			# references may have changed due to truncation
@@ -285,6 +286,10 @@ class SssSappClass
 
 		end # while forever
 
+		fSleepFor = nilOrNumberOfBytesReceived = nil
+
+		self
+
 	end # loop
 	protected :loop
 
@@ -326,8 +331,8 @@ class SssSappClass
 
 		# fallback to some default ports to try
 		aPorts ||= [
-			'/dev/ttyAMA0', '/dev/ttys0', '/dev/ttys000', '/dev/ttys001', '/dev/ttys002',
-			'/dev/ttys003', '/dev/tty.Bluetooth-Modem', '/dev/tty.Bluetooth-PDA-Sync'
+			'/dev/ttys0', '/dev/ttys000', '/dev/ttys001', '/dev/ttys002',
+			'/dev/ttys003', '/dev/tty.Bluetooth-Modem', '/dev/tty.Bluetooth-PDA-Sync', '/dev/ttyAMA0'
 		];
 
 		# use default config file location
