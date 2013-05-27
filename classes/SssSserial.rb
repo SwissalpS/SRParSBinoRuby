@@ -553,7 +553,7 @@ p 'error when connecting to ' << @mPort.to_s << ' options: ' << @mPortOptions.to
 
 			# first checksum byte
 
-			if (iByte != @oFletcher.checksum(:SssSf16firstByte))
+			if (iByte != @oFletcher.checksum(SssSf16firstByte))
 
 				# does not match
 
@@ -583,7 +583,7 @@ p 'error when connecting to ' << @mPort.to_s << ' options: ' << @mPortOptions.to
 
 			# second checksum byte
 
-			if (iByte != @oFletcher.checksum(:SssSf16secondByte))
+			if (iByte != @oFletcher.checksum(SssSf16secondByte))
 
 				self.requestResend(iSender, iFrameID);
 	# TODO: rewind if was loading to data buffer
