@@ -1,0 +1,397 @@
+#!/usr/bin/ruby
+
+# create a bunch of frame files ready to send to bus
+# set debug level to min or max
+#
+
+Dir.chdir('/gitSwissalpS/SRParSBinoRuby')
+
+$LOAD_PATH << '/gitSwissalpS/SRParSBinoRuby/classes'
+
+YES = true if !defined? YES
+NO = false if !defined? NO
+
+require('SssSserialFrame.rb')
+require('SssSfletcher16.rb')
+
+SBSerialSpaceLength = 29
+SssSNullSpacer = 0.chr * SBSerialSpaceLength
+# with trailing slash!
+SssSpathOut = '/gitSwissalpS/SRParSBinoRuby/frameBin/'
+SssSpathOutPermanent = SssSpathOut + 'permanent/'
+SssSpathOutTemporary = SssSpathOut + 'temporary/'
+
+
+def prepareDirs()
+
+	# make sure output path exists
+	`mkdir -p #{SssSpathOutPermanent}`
+	if !File.directory? SssSpathOutPermanent
+
+		puts 'Error: could not create target directory: ' << SssSpathOutPermanent
+
+		exit!(1)
+
+	end # if failed to create directory
+
+	# make sure output path exists
+	`mkdir -p #{SssSpathOutTemporary}`
+	if !File.directory? SssSpathOutTemporary
+
+		puts 'Error: could not create target directory: ' << SssSpathOutTemporary
+
+		exit!(1)
+
+	end # if failed to create directory
+
+end # prepareDirs
+
+
+def debugLevelsPermanent()
+
+	######################################################
+	# permanantly set debug level to 60 for id 0
+	oFrame = SssSserialFrame::new(0, 4, 33, 68, 2, [(60 << 2) + 3])
+	# write to file
+	writeFrameToFile(oFrame, SssSpathOutPermanent + '0_setDebugTo60.frame')
+
+	# adjust to other id's and write
+	for i in 1..3 do
+
+		oFrame.targetID = i
+		writeFrameToFile(oFrame, SssSpathOutPermanent + i.to_s + '_setDebugTo60.frame')
+
+	end # loop all targets
+
+	# permanantly set debug level to 30 for id 0
+	oFrame = SssSserialFrame::new(0, 4, 33, 68, 2, [(30 << 2) + 3])
+	# write to file
+	writeFrameToFile(oFrame, SssSpathOutPermanent + '0_setDebugTo30.frame')
+
+	# adjust to other id's and write
+	for i in 1..3 do
+
+		oFrame.targetID = i
+		writeFrameToFile(oFrame, SssSpathOutPermanent + i.to_s + '_setDebugTo30.frame')
+
+	end # loop all targets
+
+	# permanantly set debug level to 0 for id 0
+	oFrame = SssSserialFrame::new(0, 4, 33, 68, 2, [3])
+	# write to file
+	writeFrameToFile(oFrame, SssSpathOutPermanent + '0_setDebugTo00.frame')
+
+	# adjust to other id's and write
+	for i in 1..3 do
+
+		oFrame.targetID = i
+		writeFrameToFile(oFrame, SssSpathOutPermanent + i.to_s + '_setDebugTo00.frame')
+
+	end # loop all targets
+
+end # debugLevelsPermanent
+
+
+def debugLevelsTemporary()
+
+	######################################################
+	# permanantly set debug level to 60 for id 0
+	oFrame = SssSserialFrame::new(0, 4, 33, 68, 2, [(60 << 2)])
+	# write to file
+	writeFrameToFile(oFrame, SssSpathOutTemporary + '0_setDebugTo60.frame')
+
+	# adjust to other id's and write
+	for i in 1..3 do
+
+		oFrame.targetID = i
+		writeFrameToFile(oFrame, SssSpathOutTemporary + i.to_s + '_setDebugTo60.frame')
+
+	end # loop all targets
+
+	# permanantly set debug level to 30 for id 0
+	oFrame = SssSserialFrame::new(0, 4, 33, 68, 2, [(30 << 2)])
+	# write to file
+	writeFrameToFile(oFrame, SssSpathOutTemporary + '0_setDebugTo30.frame')
+
+	# adjust to other id's and write
+	for i in 1..3 do
+
+		oFrame.targetID = i
+		writeFrameToFile(oFrame, SssSpathOutTemporary + i.to_s + '_setDebugTo30.frame')
+
+	end # loop all targets
+
+	# permanantly set debug level to 0 for id 0
+	oFrame = SssSserialFrame::new(0, 4, 33, 68, 2, [0])
+	# write to file
+	writeFrameToFile(oFrame, SssSpathOutTemporary + '0_setDebugTo00.frame')
+
+	# adjust to other id's and write
+	for i in 1..3 do
+
+		oFrame.targetID = i
+		writeFrameToFile(oFrame, SssSpathOutTemporary + i.to_s + '_setDebugTo00.frame')
+
+	end # loop all targets
+
+end # debugLevelsPermanent
+
+
+def writeFrameToFile(oFrame, sPathOut)
+
+	oFrame.recalculateChecksum()
+	sOut = SssSNullSpacer + oFrame.to_s
+	File.open(sPathOut, 'wb') { |oF| oF.write(sOut) }
+
+end # writeFrameToFile
+
+
+def setIDs()
+
+	######################################################
+	# assign ID Permenantly by writting directly the first byte which holds the addresses of the different members
+	for iTarget in 0..3
+
+		for iNewID in 0..3
+
+			next if iTarget == iNewID
+
+			oFrame = SssSserialFrame::new(iTarget, 4, 44, 69, 5, [0, 0, 1, 180 + iNewID])
+			writeFrameToFile(oFrame, SssSpathOutPermanent + iTarget.to_s + '_setIDto' + iNewID.to_s + '.frame')
+
+		end # loop new id
+
+	end # loop target
+
+end # setIDs
+
+
+def pings()
+
+	#######################################################
+	# pings
+	oFrame = SssSserialFrame::new(0, 0, 55, 63, 1)
+	for iTarget in 0..3
+
+		oFrame.targetID = iTarget
+
+		for iSource in 0..3
+
+			next if iTarget == iSource
+
+			oFrame.senderID = iSource
+			writeFrameToFile(oFrame, SssSpathOut + iTarget.to_s + '_pingFrom_' + iSource.to_s + '.frame')
+
+		end # loop source
+
+	end # loop target
+
+end # pings
+
+
+def reboots()
+
+	oFrame = SssSserialFrame::new(0, 4, 77, 32, 1)
+	for iTarget in 0..3
+
+		oFrame.targetID = iTarget
+		writeFrameToFile(oFrame, SssSpathOut + iTarget.to_s + '_reboot.frame')
+
+	end # loop target
+
+end # reboots
+
+
+def resetLowerMemory()
+
+	oFrame = SssSserialFrame::new(0, 4, 88, 35, 1)
+	for iTarget in 0..3
+
+		oFrame.targetID = iTarget
+		writeFrameToFile(oFrame, SssSpathOutPermanent + iTarget.to_s + '_restoreDefaultsLowerMemory.frame')
+
+	end # loop target
+
+end # resetLowerMemory
+
+
+def activePortsPermanent()
+
+	# master assume id 0
+	# no debug but raspi
+	oFrame = SssSserialFrame::new(0, 4, 99, 40, 2, [0b110011])
+	writeFrameToFile(oFrame, SssSpathOutPermanent + '0_activePortsDebug0Raspi1p.frame')
+	# with debug and raspi
+	oFrame = SssSserialFrame::new(0, 4, 99, 40, 2, [0b110111])
+	writeFrameToFile(oFrame, SssSpathOutPermanent + '0_activePortsDebug1Raspi1p.frame')
+	# with debug no raspi
+	oFrame = SssSserialFrame::new(0, 4, 99, 40, 2, [0b010111])
+	writeFrameToFile(oFrame, SssSpathOutPermanent + '0_activePortsDebug1Raspi0p.frame')
+
+	# FDD
+	# no debug
+	oFrame = SssSserialFrame::new(0, 4, 99, 40, 2, [0b010011])
+	for iTarget in 1..3
+
+		oFrame.targetID = iTarget
+		writeFrameToFile(oFrame, SssSpathOutPermanent + iTarget.to_s + '_activePortsDebug0p.frame')
+
+	end # loop targets
+
+	# with debug
+	oFrame = SssSserialFrame::new(0, 4, 99, 40, 2, [0b010111])
+	for iTarget in 1..3
+
+		oFrame.targetID = iTarget
+		writeFrameToFile(oFrame, SssSpathOutPermanent + iTarget.to_s + '_activePortsDebug1p.frame')
+
+	end # loop targets
+
+end # activePortsPermanent
+
+
+def activePortsTemporary()
+
+	# master assume id 0
+	# no debug but raspi
+	oFrame = SssSserialFrame::new(0, 4, 99, 40, 2, [0b110000])
+	writeFrameToFile(oFrame, SssSpathOutTemporary + '0_activePortsDebug0Raspi1t.frame')
+	# with debug and raspi
+	oFrame = SssSserialFrame::new(0, 4, 99, 40, 2, [0b110100])
+	writeFrameToFile(oFrame, SssSpathOutTemporary + '0_activePortsDebug1Raspi1t.frame')
+	# with debug no raspi
+	oFrame = SssSserialFrame::new(0, 4, 99, 40, 2, [0b010100])
+	writeFrameToFile(oFrame, SssSpathOutTemporary + '0_activePortsDebug1Raspi0t.frame')
+
+	# FDD
+	# no debug
+	oFrame = SssSserialFrame::new(0, 4, 99, 40, 2, [0b010011])
+	for iTarget in 1..3
+
+		oFrame.targetID = iTarget
+		writeFrameToFile(oFrame, SssSpathOutTemporary + iTarget.to_s + '_activePortsDebug0t.frame')
+
+	end # loop targets
+
+	# with debug
+	oFrame = SssSserialFrame::new(0, 4, 99, 40, 2, [0b010111])
+	for iTarget in 1..3
+
+		oFrame.targetID = iTarget
+		writeFrameToFile(oFrame, SssSpathOutTemporary + iTarget.to_s + '_activePortsDebug1t.frame')
+
+	end # loop targets
+
+end # activePortsTemporary
+
+
+def printDebugInfo()
+
+	oFrame = SssSserialFrame::new(0, 4, 96, 62, 1)
+
+	for iTarget in 0..3
+
+		oFrame.targetID = iTarget
+		writeFrameToFile(oFrame, SssSpathOut + iTarget.to_s + '_printInfoOnDebugPort.frame')
+
+	end # loop targets
+
+end # printDebugInfo
+
+
+def starters()
+
+	for iBike in 0..1
+
+		oFrame = SssSserialFrame::new(0, 4, 95, 115, 2, [iBike])
+
+		for iTarget in 0..3
+
+			oFrame.targetID = iTarget
+			writeFrameToFile(oFrame, SssSpathOut + iTarget.to_s + '_startBike' + iBike.to_s + '.frame')
+
+		end # loop targets
+
+	end # loop bikes
+
+end # starters
+
+
+def stoppers()
+
+	for iBike in 0..1
+
+		oFrame = SssSserialFrame::new(0, 4, 94, 83, 2, [iBike])
+
+		for iTarget in 0..3
+
+			oFrame.targetID = iTarget
+			writeFrameToFile(oFrame, SssSpathOut + iTarget.to_s + '_stopBike' + iBike.to_s + '.frame')
+
+		end # loop targets
+
+	end # loop bikes
+
+end # sotppers
+
+
+def reseters()
+
+	for iBike in 0..1
+
+		oFrame = SssSserialFrame::new(0, 4, 93, 114, 2, [iBike])
+
+		for iTarget in 0..3
+
+			oFrame.targetID = iTarget
+			writeFrameToFile(oFrame, SssSpathOut + iTarget.to_s + '_resetBike' + iBike.to_s + '.frame')
+
+		end # loop targets
+
+	end # loop bikes
+
+end # reseters
+
+def showID()
+
+	oFrame = SssSserialFrame::new(0, 4, 92, 111, 1)
+
+	for iTarget in 1..3
+
+		oFrame.targetID = iTarget
+		writeFrameToFile(oFrame, SssSpathOut + iTarget.to_s + '_demoLoopStart.frame')
+
+	end # loop targets
+
+end # showID
+
+
+def stopDemoLoop()
+
+	oFrame = SssSserialFrame::new(0, 4, 91, 79, 1)
+
+	for iTarget in 1..3
+
+		oFrame.targetID = iTarget
+		writeFrameToFile(oFrame, SssSpathOut + iTarget.to_s + '_demoLoopStop.frame')
+
+	end # loop targets
+
+end # stopDemoLoop
+
+
+prepareDirs()
+debugLevelsPermanent()
+debugLevelsTemporary()
+setIDs()
+pings()
+resetLowerMemory()
+reboots()
+activePortsPermanent()
+activePortsTemporary()
+printDebugInfo()
+starters()
+stoppers()
+reseters()
+showID()
+stopDemoLoop()
