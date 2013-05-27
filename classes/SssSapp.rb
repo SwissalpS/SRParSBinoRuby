@@ -160,7 +160,7 @@ class SssSappClass
 
 		rescue Exception => e
 
-			puts 'ERROR: ' << e
+			puts 'ERROR: ' << e.to_s
 
 			return nil
 
