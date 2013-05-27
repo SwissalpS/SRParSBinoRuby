@@ -160,6 +160,8 @@ class SssSappClass
 
 		rescue Exception => e
 
+			puts 'ERROR: ' << e
+
 			return nil
 
 		end # catch errors
