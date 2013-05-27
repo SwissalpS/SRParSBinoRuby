@@ -1,0 +1,52 @@
+#!/usr/bin/ruby
+
+require 'fileutils'
+
+Dir.chdir('/gitSwissalpS/SRParSBinoRuby');
+
+##
+# disable tty
+sPathFile = '/boot/cmdline.txt'
+
+if (!File.exists? sPathFile)
+	
+	raise 'ERROR: File ' << sPathFile + ' does not exist'
+	exit
+
+end # if file does not exist
+
+# check if backup file already exists
+sPathBackup = sPathFile + '.orig'
+if (File.exists? sPathBackup)
+	raise 'ERROR: backup file already exists: ' << sPathBackup
+	exit
+end # if backup exists
+
+# backup
+FileUtils.cp(sPathFile, sPathBackup)
+
+sOut = ''
+
+# open file
+oF = File.open(sPathFile, 'rb')
+
+oF.each_line do |sLine|
+	
+	if (sLine.include? 'console=ttyAMA0,115200 kgdboc=ttyAMA0,115200')
+
+		sLine.sub! 'console=ttyAMA0,115200 kgdboc=ttyAMA0,115200 ', ''
+
+	end # if line to change found
+
+	sOut << sLine
+
+end # loop each line
+
+oF.close
+
+# output new version
+File.open(sPathFile, 'wb') { |oF| oF.write(sOut) }
+
+# that's all folks!
+exit
+

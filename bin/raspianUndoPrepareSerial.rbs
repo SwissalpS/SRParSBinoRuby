@@ -1,0 +1,41 @@
+#!/usr/bin/ruby
+
+Dir.chdir('/gitSwissalpS/SRParSBinoRuby');
+
+##
+# enable tty
+sPathFile = '/etc/inittab'
+
+if (!File.exists? sPathFile)
+	
+	raise 'ERROR: File ' << sPathFile + ' does not exist'
+	exit
+
+end # if file does not exist
+
+sOut = ''
+
+# open file
+oF = File.open(sPathFile, 'rb')
+
+oF.each_line do |sLine|
+	
+	if (sLine.include? '#T0:23:respawn:/sbin/getty -L ttyAMA0')
+
+		puts sLine
+		sLine = sLine[1..-1]
+
+	end # if line to comment out found
+
+	sOut << sLine
+
+end # loop each line
+
+oF.close
+
+# output new version
+File.open(sPathFile, 'wb') { |oF| oF.write(sOut) }
+
+# that's all folks!
+exit
+

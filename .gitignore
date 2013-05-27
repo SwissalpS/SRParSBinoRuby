@@ -1,0 +1,13 @@
+# nice tips and samples for different languages
+# http://sujee.net/tech/articles/gitignore/
+*~
+*.[oa]
+*.svn
+*.lock
+*.DS_Store
+*.swp
+*.out
+/builds/
+/doc/
+/doc_rake/
+/frameBin/
