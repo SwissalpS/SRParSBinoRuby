@@ -515,7 +515,7 @@ p 'error when connecting to ' << @mPort.to_s << ' options: ' << @mPortOptions.to
 				# header not yet parsed
 				@iStatus = self.bitClear(@iStatus, 7);
 				# clear out multi-byte-mode stuff
-				self.clearMultiByteFlags();
+				#self.clearMultiByteFlags();
 				# reset frame-buffer pointer
 			#	@iCountFrameBytes = 0;
 
