@@ -328,6 +328,8 @@ p 'error when connecting to ' << @mPort.to_s << ' options: ' << @mPortOptions.to
 
 	def disconnect()
 
+		puts 'OK: disconnecting serial'
+
 		@oPort.close() if self.connected?
 
 		@oPort = nil;
@@ -499,7 +501,7 @@ p 'error when connecting to ' << @mPort.to_s << ' options: ' << @mPortOptions.to
 	end # readSerial
 
 
-	def requestResend()
+	def requestResend(iSender, iFrameID)
 
 		puts 'TODO: SssSserial.requestResend()'
 
@@ -566,7 +568,7 @@ p 'error when connecting to ' << @mPort.to_s << ' options: ' << @mPortOptions.to
 
 				# does not match
 
-				self.requestResend(iSender, iFrameID);
+				self.requestResend(iSender, iFrameID)
 
 				if (0 < SssSdebugMode)
 
@@ -912,6 +914,29 @@ puts 'byte # 0x' << "%02X" % iCount << ' hex: 0x' << "%02X" % iChar << ' binary:
 			# for subclasses that implement a history
 			self.historyRemoveFrame(iFirstDataByte)
 
+		elsif (0x44 == iCommand)
+
+			# - 68 - D - set debug mode
+
+			# not required
+
+		elsif (0x45 == iCommand)
+
+			# - 69 - E - upload to EEPROM
+
+			# not required
+
+		elsif (0x52 == iCommand)
+
+			# - 82 - R repeat frame
+
+			self.historyResendFrame(iFirstDataByte)
+
+		elsif (0x53 == iCommand)
+
+			# - 83 - S - Stop Stopwatch
+			SssSapp.tellSkyTabStop(iFirstDataByte)
+
 		elsif (0x5C == iCommand)
 
 			# - 92 - \ - Set Date
@@ -924,17 +949,29 @@ puts 'byte # 0x' << "%02X" % iCount << ' hex: 0x' << "%02X" % iChar << ' binary:
 
 			# not required
 
-		elsif (0x44 == iCommand)
+		elsif (0x64 == iCommand)
 
-			# - 68 - D - set debug mode
+			# - 100 - d - Duration
 
-			# not required
+			# expecting 4 bytes with duration in milliseconds
+			# followed by 1 byte with the BIKE ID
+			if (5 == oFrame.data.count)
 
-		elsif (0x45 == iCommand)
+				ulDuration = iFirstDataByte << 24
+				ulDuration += oFrame.nextByte() << 16
+				ulDuration += oFrame.nextByte() << 8
+				ulDuration += oFrame.nextByte()
 
-			# - 69 - E - upload to EEPROM
+				iBike = oFrame.nextByte()
 
-			# not required
+				# tell database about the change
+				SssSapp.tellSkyTabDurationForBIKE(ulDuration, iBike)
+
+			else
+
+				puts 'ERROR: duration Frame with incorrect length. Should be 5 but is ' << oFrame.data.count.to_s
+
+			end # if data count correct or not
 
 		elsif (0x65 == iCommand)
 
@@ -949,11 +986,15 @@ puts 'byte # 0x' << "%02X" % iCount << ' hex: 0x' << "%02X" % iChar << ' binary:
 			# let event manager know what to do on next cycle
 			@oEventManager.responseDumpEEPROM(oFrame)
 
-		elsif (0x52 == iCommand)
+		elsif (0x72 == iCommand)
 
-			# - 82 - R repeat frame
+			# - 114 -  r - reset stopwatch
+			SssSapp.tellSkyTabReset(iFirstDataByte)
 
-			self.historyResendFrame(iFirstDataByte);
+		elsif (0x73 == iCommand)
+
+			# - 115 -  s - start stopwatch
+			SssSapp.tellSkyTabStart(iFirstDataByte)
 
 		elsif (0x74 == iCommand)
 

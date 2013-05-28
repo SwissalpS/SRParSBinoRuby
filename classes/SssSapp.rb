@@ -28,9 +28,13 @@ class SssSappClass
 
 	@@_defaultPathFileConfig = 'config/settings.yaml';
 
-	@@_sharedInstance = nil;
+	@@_sharedInstance = nil
 
-	@_initialized = nil;
+	@aCurrentRideIDs = [ 0, 0 ]; attr_reader :aCurrentRideIDs
+
+	@sPathSkyTabBin = '/gitSwissalpS/SkyTab/SkyTab/bin/SkyTab'
+
+	@_initialized = nil
 
 	# path to the configuration file
 	@_sPathFileConfigYAML;
@@ -56,17 +60,31 @@ class SssSappClass
 	# uses /var/tmp/SRParSBinoRuby.pid
 	def initialize(sPathFileConfigYAML = nil)
 
-		@_initialized = NO;
+		@_initialized = NO
 
-		@oSerial = nil;
-		@aPipes = [];
+		@oSerial = nil
+		@aPipes = []
+		@aCurrentRideIDs = [ 0, 0 ]
 
 		# fetch settings
-		self.readConfig(sPathFileConfigYAML);
+		self.readConfig(sPathFileConfigYAML)
 
 		# write pid to file
 		sPathFilePID = self.get(:pathFilePID, @@_defaultPathFilePID)
 		File.open(sPathFilePID, 'wb') { |oF| oF.write($$.to_s) }
+
+		@sPathSkyTabBin = self.get(:pathSkyTabBin, '/gitSwissalpS/SkyTab/SkyTab/bin/SkyTab')
+		if File.exists? @sPathSkyTabBin
+
+			puts 'OK:SkyTab.bin exists'
+
+		else
+
+			puts 'ERROR:SkyTab.bin not found at ' << @sPathSkyTabBin
+
+			@sPathSkyTabBin = nil
+
+		end # if SkyTab bin exists
 
 		@_initialized = YES;
 
@@ -203,10 +221,106 @@ class SssSappClass
 
 	end # dealloc
 
+	def tellSkyTab(sInvocationPath)
+
+		if @sPathSkyTabBin.nil?
+
+			puts 'ERROR: SkyTab bin was not present at init'
+			return nil
+
+		end # if no SkyTab
+
+		sCommand = @sPathSkyTabBin + ' '  + sInvocationPath + '?o=SRParSBinoCLIrelayArduino')
+
+		begin
+
+			`{sCommand}`
+
+			puts 'OK: told SkyTab ' << sInvocationPath
+			return true
+
+		rescue Exception => e
+
+			puts 'ERROR: could not tell SkyTab ' << sInvocationPath
+			puts e.to_s
+
+		end # catch
+
+		return nil
+
+	end # tellSkyTab
+
+
+	def tellSkyTabDurationForBIKE(ulDuration, iBike)
+
+p 'got duration in millisecondos: ' << ulDuration.to_s
+p 'for bike: ' << iBike.to_s
+
+		if !(0..1).member? iBike
+
+			puts 'ERROR: invalid BIKE ID'
+			return nil
+
+		end # if invalid iBike
+
+		sInvocationPath = '/cgi/hpi/end/' + ulDuration.to_s
+		sInvocationPath += '/' + @aCurrentRideIDs[iBike].to_s
+
+		return self.tellSkyTab(sInvocationPath)
+
+	end # tellSkyTabDurationForBIKE
+
+
+	def tellSkyTabReset(iBike)
+
+		if !(0..1).member? iBike
+
+			puts 'ERROR: invalid BIKE ID'
+			return nil
+
+		end # if invalid iBike
+
+		sInvocationPath = '/cgi/hpi/reset' + iBike.to_s
+
+		return self.tellSkyTab(sInvocationPath)
+
+	end # tellSkyTabReset
+
+
+	def tellSkyTabStart(iBike)
+
+		if !(0..1).member? iBike
+
+			puts 'ERROR: invalid BIKE ID'
+			return nil
+
+		end # if invalid iBike
+
+		sInvocationPath = '/cgi/hpi/start' + iBike.to_s
+
+		return self.tellSkyTab(sInvocationPath)
+
+	end # tellSkyTabStart
+
+
+	def tellSkyTabStop(iBike)
+
+		if !(0..1).member? iBike
+
+			puts 'ERROR: invalid BIKE ID'
+			return nil
+
+		end # if invalid iBike
+
+		sInvocationPath = '/cgi/hpi/stop' + iBike.to_s
+
+		return self.tellSkyTab(sInvocationPath)
+
+	end # tellSkyTabStop
+
 
 	# main run loop
 	def loop()
-
 		return nil if @oSerial.nil?
 
 #		iByteCount = @oSerial.writeRawFile('/Volumes/Users/luke/Documents/Arduino/SBmobitecSender/commands/nameSetPeter.bin');#
