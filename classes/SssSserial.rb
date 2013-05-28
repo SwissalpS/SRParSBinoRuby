@@ -766,11 +766,11 @@ p e if EOFError != e.class
 			# add checksum
 			aFrame << SssSf16.checksum(SssSf16firstByte);
 			aFrame << SssSf16.checksum(SssSf16secondByte);
-
+p 'about to write to serial'
 			# now write to serial
 			aFrame.each { |iByte| @oPort.putc(iByte); }
 			iCountSend += aFrame.length();
-
+p 'wrote to serial'
 			# store a copy in history (only what is unique)
 			self.historyAddFrame(iFrameID, aFrame.drop(iLengthSpace + 1))
 			#@hFrameHistory[iFrameID] = aFrame.drop(iLengthSpace + 1);
