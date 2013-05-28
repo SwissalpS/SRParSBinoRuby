@@ -7,6 +7,8 @@ require 'SssSEventManager.rb'
 YES = true if !defined? YES
 NO = false if !defined? NO
 
+SssSdebugMode = 7 if !defined? SssSdebugMode
+
 SBSerialSpaceLength = 29; # :doc:
 SBSerialMaxFrameLength = 35;
 SBSerialMaxDataLengthPerFrame = 28;

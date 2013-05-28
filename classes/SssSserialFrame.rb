@@ -96,6 +96,8 @@ class SssSserialFrame
 
 		@pointer = -1
 
+		self
+
 	end # resetPointer
 
 
