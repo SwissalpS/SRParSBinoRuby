@@ -52,8 +52,6 @@ class SssSserialFrame
 
 		@pointer = 0
 
-		self = nil
-
 	end # dealloc
 
 

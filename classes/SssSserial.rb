@@ -499,6 +499,13 @@ p 'error when connecting to ' << @mPort.to_s << ' options: ' << @mPortOptions.to
 	end # readSerial
 
 
+	def requestResend()
+
+		puts 'TODO: SssSserial.requestResend()'
+
+	end # requestResend
+
+
 	# count <0x00>s looking for <0xFF>
 	def scanForHeader(iByte)
 
