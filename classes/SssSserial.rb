@@ -623,8 +623,8 @@ p 'error when connecting to ' << @mPort.to_s << ' options: ' << @mPortOptions.to
 				# ok, check passed
 				@oIncomingFrame.checksumB= iByte
 
-				# at any rate, respond ack
-				self.pong(iSender, iFrameID)
+				# at any rate, respond ack unless this is already an ack
+				self.pong(iSender, iFrameID) if 64 != @oIncomingFrame.command
 
 				# all ok, now depending on the command we need to do something
 				self.executeFrame(@oIncomingFrame)
