@@ -503,7 +503,7 @@ p 'error when connecting to ' << @mPort.to_s << ' options: ' << @mPortOptions.to
 			sRead = @oPort.read_nonblock(@@bufferMaxLen);
 
 		rescue Exception => e #IO::WaitReadable # this is raised when there's no data in the stream
-p e
+p e if EOFError != e.class
 			# don't wait for data
 			return nil;
 
