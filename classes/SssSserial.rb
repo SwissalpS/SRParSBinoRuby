@@ -324,7 +324,8 @@ p 'error when connecting to ' << @mPort.to_s << ' options: ' << @mPortOptions.to
 		sOut = ''
 		mRead.each_byte do |iByte|
 
-			sOut += '  0x' << iByte.to_s(16)  << ' '
+			sOut += '.' if 0 == iByte
+			sOut += '  0x' << iByte.to_s(16)  << ' ' if 0 < iByte
 			sOut += iByte.chr if 32 <= iByte
 			sOut += '.' if 32 > iByte
 
