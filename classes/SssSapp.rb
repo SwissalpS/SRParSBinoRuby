@@ -234,7 +234,7 @@ class SssSappClass
 
 		begin
 
-			`{sCommand}`
+			`#{sCommand}`
 
 			puts 'OK: told SkyTab ' << sInvocationPath
 			return true
