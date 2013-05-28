@@ -234,9 +234,11 @@ class SssSappClass
 
 		begin
 
+			# TODO: make this detectable if failed or not
 			`#{sCommand}`
 
-			puts 'OK: told SkyTab ' << sInvocationPath
+			# this does not really work
+			#puts 'OK: told SkyTab ' << sInvocationPath
 			return true
 
 		rescue Exception => e

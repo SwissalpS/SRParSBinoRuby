@@ -321,7 +321,14 @@ p 'error when connecting to ' << @mPort.to_s << ' options: ' << @mPortOptions.to
 	# chance to filter debug messages: Raw view of byte-stream
 	def debugIncoming(mRead)
 
-		puts mRead;
+		sOut = ''
+		mRead.each_byte do |iByte|
+
+			sOut += '  0x' << iByte.to_s(16)
+
+		end # mRead
+
+		puts sOut
 
 	end # debugIncoming
 	protected :debugIncoming
