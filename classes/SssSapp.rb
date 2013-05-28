@@ -230,7 +230,7 @@ class SssSappClass
 
 		end # if no SkyTab
 
-		sCommand = @sPathSkyTabBin + ' '  + sInvocationPath + '?o=SRParSBinoCLIrelayArduino')
+		sCommand = @sPathSkyTabBin + ' '  + sInvocationPath + '?o=SRParSBinoCLIrelayArduino'
 
 		begin
 
