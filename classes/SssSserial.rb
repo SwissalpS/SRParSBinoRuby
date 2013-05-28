@@ -709,15 +709,35 @@ p 'error when connecting to ' << @mPort.to_s << ' options: ' << @mPortOptions.to
 			SssSf16.addByte(iLengthSub);
 			aFrame << iLengthSub;
 
-			for j in 0...iLengthSub do
+			# there seems to be different treatment on OSX (irb 0.9.5) and Debian (0.9.6) -Ruby: on OSX iByte is the byte-value while in Debian it's a String
+			mTest = mData[0]
+			if String == mTest.class
 
-				iByte = mData[iPointer];
-				iPointer += 1;
+				# debian
+				for j in 0...iLengthSub do
 
-				SssSf16.addByte(iByte);
-				aFrame << iByte;
+					iByte = mData[iPointer].ord
+					iPointer += 1
 
-			end # for loop data portion
+					SssSf16.addByte(iByte)
+					aFrame << iByte
+
+				end # for loop data portion
+
+			else
+
+				# osx
+				for j in 0...iLengthSub do
+
+					iByte = mData[iPointer]
+					iPointer += 1
+
+					SssSf16.addByte(iByte)
+					aFrame << iByte
+
+				end # for loop data portion
+
+			end # if on debian or darwin
 
 			# add checksum
 			aFrame << SssSf16.checksum(SssSf16firstByte);
