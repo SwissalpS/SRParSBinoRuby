@@ -38,6 +38,25 @@ class SssSserialFrame
 	end # addByte
 
 
+	def dealloc()
+
+		@command = nil
+		@dataLength = nil
+		@frameID = nil
+		@senderID = nil
+		@targetID = nil
+		@data = nil
+
+		@checksumA = nil
+		@checksumB = nil
+
+		@pointer = 0
+
+		self = nil
+
+	end # dealloc
+
+
 	# is everything here apart from checksum?
 	def filled?()
 
