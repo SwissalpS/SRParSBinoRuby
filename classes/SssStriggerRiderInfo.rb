@@ -67,9 +67,9 @@ class SssStriggerRiderInfo < SssStriggerBase
 
 	def serialIDofDisplay
 
-		return SssSapp.getSetting(:idSBAMFDDbike0, 1) if 0 == @iBike
+		return SssSapp.get(:idSBAMFDDbike0, 1) if 0 == @iBike
 
-		return SssSapp.getSetting(:idSBAMFDDbike1, 2);
+		return SssSapp.get(:idSBAMFDDbike1, 2);
 
 	end # serialIDofDisplay
 
@@ -198,7 +198,7 @@ class SssStriggerRiderInfo < SssStriggerBase
 					next
 
 				end # if ue
-				
+
 			else
 
 				# single or first byte
