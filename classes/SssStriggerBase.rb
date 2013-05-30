@@ -160,6 +160,9 @@ class SssStriggerBase
 			raise 'Can not create file: ' << @sPathFile;
 		end # if failed to create
 
+		# make it writeable for all (only owner may read)
+		File.chmod(622, @sPathFile)
+
 		# and open for reading
 		rF = IO.sysopen(sPathFile, 'rb');
 		@oFile = IO.new(rF, 'rb');
