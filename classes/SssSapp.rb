@@ -221,7 +221,7 @@ class SssSappClass
 
 	end # dealloc
 
-	def tellSkyTab(sInvocationPath)
+	def tellSkyTab(sInvocationPath, iBike)
 
 		if @sPathSkyTabBin.nil?
 
@@ -230,7 +230,10 @@ class SssSappClass
 
 		end # if no SkyTab
 
-		sCommand = @sPathSkyTabBin + ' '  + sInvocationPath + '?o=SRParSBinoCLIrelayArduino'
+		sCommand = @sPathSkyTabBin
+		sCommand += iBike.to_s if !iBike.nil?
+
+		sCommand += ' '  + sInvocationPath + '?o=SRParSBinoCLIrelayArduino'
 
 		begin
 
@@ -268,7 +271,7 @@ p 'for bike: ' << iBike.to_s
 		sInvocationPath = '/cgi/hpi/end/' + ulDuration.to_s
 		sInvocationPath += '/' + @aCurrentRideIDs[iBike].to_s
 
-		return self.tellSkyTab(sInvocationPath)
+		return self.tellSkyTab(sInvocationPath, iBike)
 
 	end # tellSkyTabDurationForBIKE
 
@@ -284,7 +287,7 @@ p 'for bike: ' << iBike.to_s
 
 		sInvocationPath = '/cgi/hpi/reset' + iBike.to_s
 
-		return self.tellSkyTab(sInvocationPath)
+		return self.tellSkyTab(sInvocationPath, iBike)
 
 	end # tellSkyTabReset
 
@@ -300,7 +303,7 @@ p 'for bike: ' << iBike.to_s
 
 		sInvocationPath = '/cgi/hpi/start' + iBike.to_s
 
-		return self.tellSkyTab(sInvocationPath)
+		return self.tellSkyTab(sInvocationPath, iBike)
 
 	end # tellSkyTabStart
 
@@ -316,7 +319,7 @@ p 'for bike: ' << iBike.to_s
 
 		sInvocationPath = '/cgi/hpi/stop' + iBike.to_s
 
-		return self.tellSkyTab(sInvocationPath)
+		return self.tellSkyTab(sInvocationPath, iBike)
 
 	end # tellSkyTabStop
 
