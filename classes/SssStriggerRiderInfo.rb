@@ -38,40 +38,20 @@ class SssStriggerRiderInfo < SssStriggerBase
 		return super if @sBuffer.nil?
 
 		# split by tab
-		sName, sCategory = @sBuffer.split("\t")
+		sName, sCategory, sID = @sBuffer.split("\t")
+		sName = '' if sName.nil?
+		sCategory = '' if sCategory.nil?
+		sID = '0' if sID.nil?
 
 		sName = self.translateName(sName)
 		sCategory = self.translateCategory(sCategory)
 
-		iFDD = self.serialIDofDisplay
-
-		if (!sName.nil?)
-
-			sData = 'n' << sName
-			SssSapp.oSerial.writeFramed(iFDD, sData)
-
-		end # if got name
-
-		if (!sCategory.nil?)
-
-			sData = 'c' << sCategory
-			SssSapp.oSerial.writeFramed(iFDD, sData)
-
-		end # if got category
+		SssSapp.setCurrentRiderInfo(sName, sCategory, sID.to_i, @iBike)
 
 		# clear buffer and return self
 		super
 
 	end # process
-
-
-	def serialIDofDisplay
-
-		return SssSapp.get(:idSBAMFDDbike0, 1) if 0 == @iBike
-
-		return SssSapp.get(:idSBAMFDDbike1, 2);
-
-	end # serialIDofDisplay
 
 
 	def translateCategory(sCategory = nil)

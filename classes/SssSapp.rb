@@ -532,6 +532,15 @@ p 'for bike: ' << iBike.to_s
 	end # saveConfig
 
 
+	def serialIDofDisplay(iBike)
+
+		return self.get(:idSBAMFDDbike0, 1) if 0 == iBike
+
+		return self.get(:idSBAMFDDbike1, 2);
+
+	end # serialIDofDisplay
+
+
 	# set a value in the config
 	def set(mKey, mValue)
 
@@ -540,6 +549,22 @@ p 'for bike: ' << iBike.to_s
 		self
 
 	end # set
+
+
+	def setCurrentRiderInfo(sName, sCategory, iID, iBike)
+
+		return if !(0..1).member? iBike
+		iFDD = self.serialIDofDisplay(iBike)
+
+		sData = 'n' << sName
+		self.oSerial.writeFramed(iFDD, sData)
+
+		sData = 'c' << sCategory
+		SssSapp.oSerial.writeFramed(iFDD, sData)
+
+		@aCurrentRideIDs[iBike] = iID
+
+	end # setCurrentRiderInfo
 
 
 	# shared instance of SssSapp with settings from default location
