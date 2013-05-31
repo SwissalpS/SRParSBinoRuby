@@ -426,6 +426,23 @@ def displayCategory()
 end # displayCategory
 
 
+def displayTime()
+
+	oFrame = SssSserialFrame::new(0, 4, 86, 84, 1)
+
+	for iTarget in 1..3
+
+		oFrame.targetID = iTarget
+		writeFrameToFile(oFrame, SssSpathOut + iTarget.to_s + '_displayTime.frame')
+
+	end # loop targets
+
+
+end # displayTime
+
+
+
+
 prepareDirs()
 debugLevelsPermanent()
 debugLevelsTemporary()
