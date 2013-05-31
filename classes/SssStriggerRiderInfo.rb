@@ -7,9 +7,9 @@ require 'SssSapp.rb'
 # instantiate seperate instance and filename for each BIKE
 #
 # Usage from cli :
-# 	echo -e 'name\tcategory' >> triggers/rider.info
+# 	echo -e 'name\tcategory\triderID\tduration' >> triggers/rider.info
 # Usage from php:
-#	sString = "name\tcategory";
+#	sString = "name\tcategory\triderID\tduration";
 #	or
 #	sString = 'name' . chr(9) . 'category'
 #	file_put_contents('triggers/rider.info', sString, FILE_APPEND);
@@ -38,15 +38,16 @@ class SssStriggerRiderInfo < SssStriggerBase
 		return super if @sBuffer.nil?
 
 		# split by tab
-		sName, sCategory, sID = @sBuffer.split("\t")
+		sName, sCategory, sID, sDuration = @sBuffer.split("\t")
 		sName = '' if sName.nil?
 		sCategory = '' if sCategory.nil?
 		sID = '0' if sID.nil?
+		sDuration = '-1' if sDuration.nil?
 
 		sName = self.translateName(sName)
 		sCategory = self.translateCategory(sCategory)
 
-		SssSapp.setCurrentRiderInfo(sName, sCategory, sID.to_i, @iBike)
+		SssSapp.setCurrentRiderInfo(sName, sCategory, sID.to_i, @iBike, sDuration.to_i)
 
 		# clear buffer and return self
 		super

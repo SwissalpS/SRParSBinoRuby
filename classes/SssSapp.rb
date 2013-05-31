@@ -551,10 +551,12 @@ p 'for bike: ' << iBike.to_s
 	end # set
 
 
-	def setCurrentRiderInfo(sName, sCategory, iID, iBike)
+	def setCurrentRiderInfo(sName, sCategory, iID, iBike, ulDuration)
 
 		return if !(0..1).member? iBike
 		iFDD = self.serialIDofDisplay(iBike)
+
+		@aCurrentRideIDs[iBike] = iID
 
 		sData = 'n' << sName
 		self.oSerial.writeFramed(iFDD, sData)
@@ -562,7 +564,17 @@ p 'for bike: ' << iBike.to_s
 		sData = 'c' << sCategory
 		SssSapp.oSerial.writeFramed(iFDD, sData)
 
-		@aCurrentRideIDs[iBike] = iID
+		if 0 <= ulDuration
+
+			sData = 'd' << ((ulDuration >> 24) & 0xFF).chr
+			sData += ((ulDuration >> 16) & 0xFF).chr
+			sData += ((ulDuration >> 8) & 0xFF).chr
+			sData += (ulDuration & 0xFF).chr
+			sData += iBike.chr
+
+			SssSapp.oSerial.writeFramed(iFDD, sData)
+
+		end # if got duration
 
 	end # setCurrentRiderInfo
 
