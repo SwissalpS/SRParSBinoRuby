@@ -442,7 +442,6 @@ end # displayTime
 
 
 
-
 prepareDirs()
 debugLevelsPermanent()
 debugLevelsTemporary()
@@ -461,3 +460,4 @@ stopDemoLoop()
 displayNameAndCategory()
 displayName()
 displayCategory()
+displayTime()
