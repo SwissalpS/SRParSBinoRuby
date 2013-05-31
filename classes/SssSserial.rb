@@ -766,17 +766,19 @@ p e if ![ EOFError, Errno::EAGAIN ].member? e.class
 			# add checksum
 			aFrame << SssSf16.checksum(SssSf16firstByte);
 			aFrame << SssSf16.checksum(SssSf16secondByte);
-p 'about to write to serial'
+p 'about to write to serial target: ' << iTo.to_s
 			# now write to serial
 			aFrame.each { |iByte| @oPort.putc(iByte); }
 			iCountSend += aFrame.length();
-p 'wrote to serial'
+p 'wrote to serial frame: 0x' << iFrameID.to_s(16)
 			# store a copy in history (only what is unique)
 			self.historyAddFrame(iFrameID, aFrame.drop(iLengthSpace + 1))
 			#@hFrameHistory[iFrameID] = aFrame.drop(iLengthSpace + 1);
 
 			# get next frame ID
 			iFrameID = self.nextFrameID();
+
+			sleep(@iMySerialID * @@fDelayBetweenFrames)
 
 		end # for loop frames
 
@@ -807,6 +809,8 @@ p 'wrote to serial'
 			iCountSent += 1;
 
 		end # loop each byte
+
+		sleep(@iMySerialID * @@fDelayBetweenFrames)
 
 		iCountSent;
 
@@ -847,6 +851,8 @@ puts 'byte # 0x' << "%02X" % iCount << ' hex: 0x' << "%02X" % iChar << ' binary:
 			end
 
 		end
+
+		sleep(@iMySerialID * @@fDelayBetweenFrames)
 
 		return iCount;
 
@@ -908,7 +914,7 @@ puts 'byte # 0x' << "%02X" % iCount << ' hex: 0x' << "%02X" % iChar << ' binary:
 
 			# respond delayed according to our ID to avoid a pile-up
 	# TODO: maybe we should not use delay() especially if we are currently in a race
-			sleep(@iMySerialID * @@fDelayBetweenFrames);
+			sleep(@iMySerialID * @@fDelayBetweenFrames)
 
 			self.pong(iSender, iFrameID);
 
