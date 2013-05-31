@@ -564,7 +564,11 @@ p 'for bike: ' << iBike.to_s
 		sData = 'c' << sCategory
 		SssSapp.oSerial.writeFramed(iFDD, sData)
 
+		sleep(0.1)
+
 		SssSapp.oSerial.writeFramed(iFDD, 'M')
+
+		sleep(0.1)
 
 		if 0 <= ulDuration
 
