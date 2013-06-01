@@ -580,6 +580,8 @@ p 'for bike: ' << iBike.to_s
 
 			SssSapp.oSerial.writeFramed(iFDD, sData)
 
+			sleep(0.1)
+
 		end # if got duration
 
 	end # setCurrentRiderInfo
