@@ -154,17 +154,17 @@ class SssStriggerBase
 		return self if (NO == bRecreate)
 
 		# attempt to create it
-		oF = File.new(sPathFile, 'wb'); oF.close;
+		oF = File.new(@sPathFile, 'wb'); oF.close;
 
 		if (!File.exists?(@sPathFile))
 			raise 'Can not create file: ' << @sPathFile;
 		end # if failed to create
 
 		# make it writeable for all (only owner may read)
-		File.chmod(622, @sPathFile)
+		File.chmod(0622, @sPathFile)
 
 		# and open for reading
-		rF = IO.sysopen(sPathFile, 'rb');
+		rF = IO.sysopen(@sPathFile, 'rb');
 		@oFile = IO.new(rF, 'rb');
 
 		self

@@ -1,20 +1,23 @@
-require 'rubygems';
-require 'serialport';
 require 'SssSfletcher16.rb'
 require 'SssSserialFrame.rb'
 require 'SssSEventManager.rb'
-
-YES = true if !defined? YES
-NO = false if !defined? NO
+require 'SssSbitMath.rb'
 
 SssSdebugMode = 7 if !defined? SssSdebugMode
 
+SBSerialSpaceLength = 29 if !defined? SBSerialSpaceLength # :doc:
+SBSerialMaxFrameLength = 35 if !defined? SBSerialMaxFrameLength
+SBSerialMaxDataLengthPerFrame = 28 if !defined? SBSerialMaxDataLengthPerFrame
+SBSerialBroadcastID = 254 if !defined? SBSerialBroadcastID
+
+SssSNullSpacer = 0.chr * SBSerialSpaceLength if !defined? SssSNullSpacer
+
 ##
-# Listen to serial connected to SBAMM and notifies SkyTab<br>
+# Listen to Ethernet messages and notifies SkyTab<br>
 # Also message SBAMM and SBAMFDDDs
 # Instantiated and controlled by SssSapp
 
-class SssSserialClass
+class SssSIOframeHandlerClass
 
   private
 
@@ -24,13 +27,9 @@ class SssSserialClass
 
   protected
 
-#	@aFrameBuffer; #[SBSerialMaxFrameLength];
-
 	@hFrameHistory = {}; attr_reader :hFrameHistory #[222];
 
-#	@iCountFrameBytes = 0;
-
-#	@iCountFrameDataBytes = 0;
+	@hOnlineClientHash = {}; attr_reader :hOnlineClientHash
 
 	@iCountSpace;
 
@@ -57,30 +56,20 @@ class SssSserialClass
 	# 14: SBF3DSerial: [third and fourth byte (in combo with bit 12) in 32-bit-mode] <-- --> 11
 	@iStatus; attr_reader :iStatus
 
-	@mPort;
-
  public
-
-	@mPortOptions; attr_accessor :mPortOptions
 
 	# for incoming traffic we use a seperate fletcher instance to avaid colusion
 	@oFletcher;
 
-	@oPort; attr_reader :oPort
-
 	@oIncomingFrame; attr_reader :oIncomingFrame
 
 
-	# create a serial connection on mPort with options<br>
-	# raises on failure<br>
-	# mPort may be a natural number (0 => com1:) or a POSIX path ('/dev/ttyS0')
-	def initialize(mPort = 0, *options)
-
-	#	@aFrameBuffer = Array.new(SBSerialMaxFrameLength);
+	def initialize(*options)
 
 		@hFrameHistory = {} #Array.new(222) { Array.new(SBSerialMaxFrameLength); }
-	#	@iCountFrameBytes = 0;
-	#	@iCountFrameDataBytes = 0;
+
+		@hOnlineClientHash = {}
+
 		@iCountSpace = 0;
 
 		@iMySerialID = 4;
@@ -90,15 +79,6 @@ class SssSserialClass
 
 		@iStatus = 0;
 
-		@mPort = mPort;
-		# TODO: @mPortOptions = options;
-		@mPortOptions = {
-				'baud' => SssSapp.get(:serialBaud, 115200),
-				'data_bits' => SssSapp.get(:serialDataBits, 8),
-				'stop_bits' => SssSapp.get(:serialStopBits, 1),
-				'parity' => SssSapp.get(:serialParity, SerialPort::NONE)
-			};
-
 		@oFletcher = SssSfletcher16Class.new()
 
 		@oIncomingFrame = nil
@@ -106,207 +86,11 @@ class SssSserialClass
 		@oEventManager = SssSEventManager.new()
 		#@oEventManager.addInitialSyncEvents()
 
-		@oPort = nil;
-
-		self.connect();
-
 	end # initialize
-
-
-	# set n-th bit of iHash to 0
-	def self.bitClear(iHash = 0, iShift = 0)
-
-		iShift = iShift.abs
-
-		# is set?
-		if (SssSserialClass::bitRead(iHash, iShift))
-
-			# it is, safe to simply subtract
-			return (iHash - (1 << iShift));
-
-		end # if set
-
-		# not set, so safe to simply return given value
-		return iHash;
-
-	end # bitClear
-	# set n-th bit of iHash to 0
-	def bitClear(iHash = 0, iShift = 0) # :nodoc:
-
-		return SssSserialClass::bitClear(iHash, iShift);
-
-	end # bitClear
-
-	# set n-th bit of iHash to 1
-	def self.bitSet(iHash = 0, iShift = 0)
-
-		iShift = iShift.abs
-
-		# already set?
-		if (SssSserialClass::bitRead(iHash, iShift))
-
-			return iHash;
-
-		end # if already set
-
-		# not yet set, so safe to simply add
-		return (iHash + (1 << iShift));
-
-	end # bitSet
-	# set n-th bit of iHash to 1
-	def bitSet(iHash = 0, iShift = 0) # :nodoc:
-
-		return SssSserialClass::bitSet(iHash, iShift);
-
-	end # bitSet
-
-	# return n-th bit of iHash
-	def self.bitRead(iHash = 0, iShift = 0)
-
-		iShift = iShift.abs
-
-		return (1 == ((iHash >> iShift) & 1)) ? YES : NO;
-
-	end # bitRead
-	def bitRead(iHash = 0, iShift = 0) # :nodoc:
-
-		return SssSserialClass::bitRead(iHash, iShift);
-
-	end # bitRead
-
-	# set n-th bit of iHash to bValue
-	def self.bitWrite(iHash = 0, iShift = 0, bValue = YES)
-
-		bValue = bValue.abs
-		bValue = YES if (1 < bValue)
-
-		# if set
-		return SssSserialClass::bitSet(iHash, iShift) if (bValue)
-
-		return SssSserialClass::bitClear(iHash, iShift);
-
-	end # bitWrite
-	# set n-th bit of iHash to bValue
-	def bitWrite(iHash = 0, iShift = 0, bValue = YES) # :nodoc:
-
-		return SssSserialClass::bitWrite(iHash, iShift, bValue);
-
-	end # bitWrite
-
-
-	# check if we have bytes comming in on serial<br>
-	# if not returns nil otherwise the count of bytes received after having
-	# filtered and loaded the bytes to the correct buffer
-	def checkIncoming()
-
-		mRead = self.readSerial();
-		return nil if mRead.nil?
-
-		self.debugIncoming(mRead);
-
-		mRead.each_byte() do |iByte|
-
-			if (self.bitRead(@iStatus, 6))
-
-				# header has been detected, has address been detected too?
-
-				if (self.bitRead(@iStatus, 7))
-
-					# header is parsed, and frame is for us (or to be relayed)
-					# we are reading frame-data
-
-					# check first if end reached!
-				#	if (0 == @iCountFrameDataBytes)
-					if @oIncomingFrame.filled?
-
-						# validate checksum and conclude command
-						self.validateChecksum(iByte);
-
-					elsif @oIncomingFrame.command.nil?
-
-						# first data byte = command
-						@oFletcher.addByte(iByte)
-
-						@oIncomingFrame.command = iByte
-
-					else
-
-						#self.eventsStage2(iByte)
-
-					#	@iCountFrameDataBytes -= 1
-
-					#	@aFrameBuffer[iCountFrameBytes] = iByte
-						@oFletcher.addByte(iByte)
-
-						@oIncomingFrame.addByte(iByte)
-
-					#	iCountFrameBytes += 1
-
-					end # if done or doing data
-
-				else
-
-					# parsing header
-					self.parseHeader(iByte);
-
-				end # if header parsed or still at it
-
-			else
-
-				# scanning for header
-				self.scanForHeader(iByte);
-
-			end # if header found or looking for one
-
-		end # loop each byte
-
-		return mRead.length;
-
-	end # checkIncoming
-
-
-	# called by ::new()<br>
-	# raises on error causing SssSapp to exit
-	def connect()
-
-		# if already connected
-		return nil if self.connected?
-
-		# TODO: start settings synchronizer, event manager? We need to read or at least write settings to Arduinos and provide information to SkyTab
-		puts 'TODO: settings synchronizer'
-
-		begin
-
-			@oPort = SerialPort.new(@mPort, @mPortOptions)
-
-			# seems to work better than only using read_nonblock
-			# set the timeout to a negative number is essentially read_nonblock
-#			@oPort.read_timeout = -3
-
-		rescue Exception => e
-
-			self.disconnect()
-p 'error when connecting to ' << @mPort.to_s << ' options: ' << @mPortOptions.to_s
-			raise e
-
-		ensure;
-
-		end
-
-	end # connect
-
-
-	def connected?()
-
-		return !@oPort.nil?
-
-	end # connected?
 
 
 	# destroy this object cleanly
 	def dealloc()
-
-		self.disconnect();
 
 		nil;
 
@@ -334,24 +118,6 @@ p 'error when connecting to ' << @mPort.to_s << ' options: ' << @mPortOptions.to
 	end # debugIncoming
 	protected :debugIncoming
 
-	def disconnect()
-
-		puts 'OK: disconnecting serial'
-
-		@oPort.close() if self.connected?
-
-		@oPort = nil;
-
-	end # disconnect
-
-
-	def disconnected?()
-
-		return @oPort.nil?
-
-	end # disconnected?
-
-  protected
 
 	# invalidate incoming frame
 	def invalidate()
@@ -359,16 +125,41 @@ p 'error when connecting to ' << @mPort.to_s << ' options: ' << @mPortOptions.to
 		@iCountSpace = 0;
 	#	@iCountFrameBytes = 0;
 		# not for us
-		@iStatus = self.bitClear(@iStatus, 5);
+		@iStatus = SssSbitMath.bitClear(@iStatus, 5);
 		# header not detected -> look for next header
-		@iStatus = self.bitClear(@iStatus, 6);
+		@iStatus = SssSbitMath.bitClear(@iStatus, 6);
 		# header not parsed
-		@iStatus = self.bitClear(@iStatus, 7);
+		@iStatus = SssSbitMath.bitClear(@iStatus, 7);
 
 		@oIncomingFrame.dealloc()
 		@oIncomingFrame = nil;
 
 	end # invalidate
+
+
+	def markOnline(iID, sIP)
+
+		sID = 'id' << iID.to_s
+		iNow = 12345 # Date.new()
+
+		# do we already have this?
+		if (@hOnlineClientHash[sID].nil?)
+			# new client
+			@hOnlineClientHash[sID] = { :ethernetIP => sIP, :serialID => iID, :lastSeen => iNow, :marker => SssSonlineMarkerFile.new(iID, sIP) }
+		else
+			# update entry
+			if (!sIP.nil?)
+				if (@hOnlineClientHash[sID][:ethernetIP].nil?)
+					@hOnlineClientHash[sID][:ethernetIP] = sIP
+					@hOnlineClientHash[sID][:marker].goOnlineEthernet(sIP)
+				end # if got IP now
+			else
+				@hOnlineClientHash[sID][:marker].goOnlineSerial()
+			end # if got an IP
+
+		end # if already seen
+
+	end # markOnline
 
 
 	# Returns the next frame-id to use
@@ -385,7 +176,7 @@ p 'error when connecting to ' << @mPort.to_s << ' options: ' << @mPortOptions.to
 
 
 	# Check the first four bytes after <0xFF> and determine if frame is for us
-	def parseHeader(iByte)
+	def parseHeader(iByte, sIP)
 
 	#	if (0 == @iCountFrameBytes)
 		if @oIncomingFrame.targetID.nil?
@@ -395,16 +186,15 @@ p 'error when connecting to ' << @mPort.to_s << ' options: ' << @mPortOptions.to
 			if (iMySerialID == iByte || SBSerialBroadcastID == iByte)
 
 				# this is for us
-				@iStatus = self.bitSet(@iStatus, 5);
+				@iStatus = SssSbitMath.bitSet(@iStatus, 5);
 				# we are busy?
-				#@iStatus = self.bitSet(@iStatus, iMySerialID);
+				#@iStatus = SssSbitMath.bitSet(@iStatus, iMySerialID);
 
 				@oFletcher.reset();
-			#	@aFrameBuffer[@iCountFrameBytes] = iByte;
 				@oFletcher.addByte(iByte);
 				@oIncomingFrame.targetID= iByte
 
-			#	@iCountFrameBytes += 1;
+				self.markOnline(iByte, sIP)
 
 			else
 
@@ -413,7 +203,6 @@ p 'error when connecting to ' << @mPort.to_s << ' options: ' << @mPortOptions.to
 
 			end # if for this Arduino, another or error
 
-	#	elsif (1 == @iCountFrameBytes)
 		elsif @oIncomingFrame.senderID.nil?
 
 			# sender ID
@@ -422,11 +211,10 @@ p 'error when connecting to ' << @mPort.to_s << ' options: ' << @mPortOptions.to
 
 				# valid sender ID
 
-			#	@aFrameBuffer[@iCountFrameBytes] = iByte;
 				@oFletcher.addByte(iByte)
 				@oIncomingFrame.senderID= iByte
 
-			#	@iCountFrameBytes += 1
+				self.markOnline(iByte, sIP)
 
 			else
 
@@ -436,36 +224,85 @@ p 'error when connecting to ' << @mPort.to_s << ' options: ' << @mPortOptions.to
 
 			end # valid sender or not
 
-	#	elsif (2 == @iCountFrameBytes)
 		elsif @oIncomingFrame.frameID.nil?
 
 			# frame ID
 
-		#	@aFrameBuffer[@iCountFrameBytes] = iByte;
 			@oFletcher.addByte(iByte)
 			@oIncomingFrame.frameID= iByte
 
-		#	@iCountFrameBytes += 1
-
-	#	elsif (3 == @iCountFrameBytes)
 		elsif @oIncomingFrame.dataLength.nil?
 
 			# data length
 
-		#	@iCountFrameDataBytes = iByte
-
-		#	@aFrameBuffer[@iCountFrameBytes] = iByte;
 			@oFletcher.addByte(iByte)
 			@oIncomingFrame.dataLength= iByte
 
-		#	@iCountFrameBytes += 1
-
 			# header is parsed now
-			@iStatus = self.bitSet(@iStatus, 7);
+			@iStatus = SssSbitMath.bitSet(@iStatus, 7);
 
 		end # if target ID, sender ID, frame ID or data length
 
 	end # parseHeader
+
+
+	def parseIncoming(mRead, sIP = nil)
+
+		return 0 if mRead.nil?
+
+		self.debugIncoming(mRead);
+
+		mRead.each_byte() do |iByte|
+
+			if (SssSbitMath.bitRead(@iStatus, 6))
+
+				# header has been detected, has address been detected too?
+
+				if (SssSbitMath.bitRead(@iStatus, 7))
+
+					# header is parsed, and frame is for us (or to be relayed)
+					# we are reading frame-data
+
+					# check first if end reached!
+					if @oIncomingFrame.filled?
+
+						# validate checksum and conclude command
+						self.validateChecksum(iByte);
+
+					elsif @oIncomingFrame.command.nil?
+
+						# first data byte = command
+						@oFletcher.addByte(iByte)
+						@oIncomingFrame.command = iByte
+
+					else
+
+						#self.eventsStage2(iByte)
+
+						@oFletcher.addByte(iByte)
+						@oIncomingFrame.addByte(iByte)
+
+					end # if done or doing data
+
+				else
+
+					# parsing header
+					self.parseHeader(iByte, sIP);
+
+				end # if header parsed or still at it
+
+			else
+
+				# scanning for header
+				self.scanForHeader(iByte);
+
+			end # if header found or looking for one
+
+		end # loop each byte
+
+		return mRead.length;
+		
+	end # parseIncoming
 
 
 	def ping(iTarget)
@@ -486,32 +323,9 @@ p 'error when connecting to ' << @mPort.to_s << ' options: ' << @mPortOptions.to
 	end # pong
 
 
-	# read nonblocking from serial port. Returns nil or a string of bytes<br>
-	# called by #checkIncoming()
-	def readSerial()
-
-		# if not connected
-		return nil if self.disconnected?
-
-		begin
-
-			sRead = @oPort.read_nonblock(@@bufferMaxLen);
-
-		rescue Exception => e #IO::WaitReadable # this is raised when there's no data in the stream
-p e if ![ EOFError, Errno::EAGAIN ].member? e.class
-			# don't wait for data
-			return nil;
-
-		end
-
-		return sRead;
-
-	end # readSerial
-
-
 	def requestResend(iSender, iFrameID)
 
-		puts 'TODO: SssSserial.requestResend()'
+		puts 'TODO: SssSIOframeHandlerClass.requestResend()'
 
 	end # requestResend
 
@@ -530,9 +344,9 @@ p e if ![ EOFError, Errno::EAGAIN ].member? e.class
 			if (SBSerialSpaceLength <= @iCountSpace)
 
 				# definitely a header
-				@iStatus = self.bitSet(@iStatus, 6);
+				@iStatus = SssSbitMath.bitSet(@iStatus, 6);
 				# header not yet parsed
-				@iStatus = self.bitClear(@iStatus, 7);
+				@iStatus = SssSbitMath.bitClear(@iStatus, 7);
 				# clear out multi-byte-mode stuff
 				#self.clearMultiByteFlags();
 				# reset frame-buffer pointer
@@ -559,15 +373,11 @@ p e if ![ EOFError, Errno::EAGAIN ].member? e.class
 	def validateChecksum(iByte)
 
 		# who is it from
-	#	iSender = self.incomingSenderID();
-	#	iFrameID = self.incomingFrameID();
-	#	iLengthIncomming = self.incomingDataLength()
 
 		iSender = @oIncomingFrame.senderID
 		iFrameID = @oIncomingFrame.frameID
 
 		# first, second checksum or done?
-	#	if ((iLengthIncomming + 4) == @iCountFrameBytes)
 		if @oIncomingFrame.checksumA.nil?
 
 			# first checksum byte
@@ -593,11 +403,8 @@ p e if ![ EOFError, Errno::EAGAIN ].member? e.class
 				# so far so good
 				@oIncomingFrame.checksumA= iByte
 
-			#	@iCountFrameBytes += 1;
-
 			end # if first checksum matches or not
 
-	#	elsif ((iLengthIncomming + 5) == @iCountFrameBytes)
 		elsif @oIncomingFrame.checksumB.nil?
 
 			# second checksum byte
@@ -761,14 +568,20 @@ p e if ![ EOFError, Errno::EAGAIN ].member? e.class
 			# add checksum
 			aFrame << SssSf16.checksum(SssSf16firstByte);
 			aFrame << SssSf16.checksum(SssSf16secondByte);
+
+			# send over Ethernet or Serial
+			if (!SssSethernet.nil? && SssSethernet.isOnline?(iTo))
+				SssSethernet.sendTo(iTo, aFrame.drop(iLengthSpace))
+			elsif (!SssSserial.nil? && SssSserial.isOnline?(iTo))
 p 'about to write to serial target: ' << iTo.to_s
-			# now write to serial
-			aFrame.each { |iByte| @oPort.putc(iByte); }
-			iCountSend += aFrame.length();
+				SssSserial.send(aFrame)
 p 'wrote to serial frame: 0x' << iFrameID.to_s(16)
+			end
+
+			iCountSend += aFrame.length();
+
 			# store a copy in history (only what is unique)
 			self.historyAddFrame(iFrameID, aFrame.drop(iLengthSpace + 1))
-			#@hFrameHistory[iFrameID] = aFrame.drop(iLengthSpace + 1);
 
 			# get next frame ID
 			iFrameID = self.nextFrameID();
@@ -782,88 +595,17 @@ p 'wrote to serial frame: 0x' << iFrameID.to_s(16)
 	end # writeFramed
 	public :writeFramed
 
-	# write a string of bytes over serial without modification or envelopement
-	# returns byte-count (mData.bytesize)
-	def writeRawBytes(mData = nil)
-
-		if (self.disconnected?)
-			return nil;
-		end # if not connected
-
-		# TODO: allow arrays too
-		if (String != mData.class)
-			return nil;
-		end # if invalid dada format
-
-		iCountSent = 0;
-
-		mData.each_byte do |iByte|
-
-			@oPort.putc(iByte);
-
-			iCountSent += 1;
-
-		end # loop each byte
-
-		sleep(@iMySerialID * @@fDelayBetweenFrames)
-
-		iCountSent;
-
-	end # writeRawBytes
-	public :writeRawBytes
-
-	# write contents of a file byte-by-byte as-is
-	# returns byte-count
-	def writeRawFile(sPathFile = nil)
-
-		if nil == sPathFile
-			return nil;
-		end
-
-		iCount = 0;
-
-		begin
-
-			oF = File.new(sPathFile);
-			while(nil != (iChar = oF.getbyte())) do
-
-puts 'byte # 0x' << "%02X" % iCount << ' hex: 0x' << "%02X" % iChar << ' binary: ' << iChar.to_s(2);
-
-				@oPort.putc(iChar);
-
-				iCount += 1;
-
-			end
-
-		rescue Exception => e
-
-			# anything ?
-
-		ensure
-
-			if (nil != oF)
-				oF.close();
-			end
-
-		end
-
-		sleep(@iMySerialID * @@fDelayBetweenFrames)
-
-		return iCount;
-
-	end # writeRawFile
-	public :writeRawFile
 
 	def executeFrame(oFrame)
 
 		# analyze command
 		# the first command byte
-		iCommand = oFrame.command #self.incomingCommand();
+		iCommand = oFrame.command
 		# who is it from
-		iSender = oFrame.senderID #self.incomingSenderID();
-		iFrameID = oFrame.frameID #self.incomingFrameID();
+		iSender = oFrame.senderID
+		iFrameID = oFrame.frameID
 
-		iFirstDataByte = oFrame.resetPointer().nextByte() #@aFrameBuffer[iDataPos];
+		iFirstDataByte = oFrame.resetPointer().nextByte()
 
 		if (0x29 == iCommand)
 
@@ -905,7 +647,7 @@ puts 'byte # 0x' << "%02X" % iCount << ' hex: 0x' << "%02X" % iChar << ' binary:
 			# - 63 - ? - PING
 
 			# mark sender as not busy
-			@iStatus = self.bitClear(@iStatus, iSender);
+			@iStatus = SssSbitMath.bitClear(@iStatus, iSender);
 
 			# respond delayed according to our ID to avoid a pile-up
 	# TODO: maybe we should not use delay() especially if we are currently in a race
@@ -1099,11 +841,16 @@ puts 'byte # 0x' << "%02X" % iCount << ' hex: 0x' << "%02X" % iChar << ' binary:
 		aFrame << 0xFF
 		aFrame += @hFrameHistory[sIndex]
 
-		# now send the frame
-		aFrame.each { |iByte| @oPort.putc(iByte) }
+		# send over Ethernet or Serial?
+		iTo = @hFrameHistory[sIndex][0].to_i
+		if (!SssSethernet.nil? && SssSethernet.isOnline(iTo))
+			SssSethernet.sendTo(iTo, aFrame.drop(SBSerialSpaceLength))
+		elsif (!SssSserial.nil? && SssSserial.isOnline(iTo))
+			SssSserial.send(aFrame)
+		end
 
 		aFrame.count
 
 	end # historyResendFrame
 
-end # SssSserialClass
+end # SssSIOframeHandlerClass

@@ -1,5 +1,6 @@
 
-
+require 'SssSethernet.rb'
+require 'SssSIOframeHandler.rb'
 require 'SssSserial.rb'
 require 'SssStriggerCommandMe.rb'
 require 'SssStriggerCurrentTime.rb'
@@ -42,12 +43,25 @@ class SssSappClass
 	# hash holding config settings
 	@hS = {}; attr_reader :hS
 
-	## #SssSserialClass object connected to SBAMM
-	@oSerial = nil;
-
 	##
 	# SssStriggerClass objects listening to files
 	@aPipes = nil; attr_reader :aPipes
+
+	# shared SssSethernetClass object
+	@oEthernet = nil; attr_reader :oEthernet
+
+	# shared SssSIOframeHandlerClass object
+	@oIOframeHandler = nil; attr_reader :oIOframeHandler
+
+	# shared SssSserialClass object
+	@oSerial = nil; attr_reader :oSerial
+
+	#
+	@bUseEthernet = YES; attr_accessor :bUseEthernet
+	@bUseSerial = NO; attr_accessor :bUseSerial
+
+	## frame handler
+	@oIOframeHandler = nil
 
   protected
 
@@ -62,9 +76,12 @@ class SssSappClass
 
 		@_initialized = NO
 
-		@oSerial = nil
 		@aPipes = []
 		@aCurrentRideIDs = [ 0, 0 ]
+
+		@oEthernet = nil
+		@oIOframeHandler = nil
+		@oSerial = nil
 
 		# fetch settings
 		self.readConfig(sPathFileConfigYAML)
@@ -86,6 +103,10 @@ class SssSappClass
 
 		end # if SkyTab bin exists
 
+		@bUseEthernet = self.get(:useEthernet, YES)
+
+		@bUseSerial = self.get(:useSerial, NO)
+
 		@_initialized = YES;
 
 		self
@@ -93,13 +114,49 @@ class SssSappClass
 	end # initialize
 
 
+	def initEthernet()
+
+		if (!@bUseEthernet)
+			puts 'SKIP:Ethernet'
+			return YES
+		end # if use Ethernet
+
+		@oEthernet = SssSethernetClass.new()
+		
+		if (NO)
+			puts 'FAIL:Ethernet BAD'
+			return nil
+		else
+			puts 'OK:Ethernet OK'
+			return YES
+		end # if init Ethernet ok
+
+	end # initEthernet
+	protected :initEthernet
+
+
+	def initIOframeHandler()
+
+		@oIOframeHandler = SssSIOframeHandlerClass.new()
+
+		self
+
+	end # initIOframeHandler
+	protected :initIOframeHandler
+
+
 	# start serial connection
 	# colled by #run() before entering #loop()
 	def initSerial()
 
+		if (!@bUseSerial)
+			puts 'SKIP:Serial'
+			return YES
+		end # if use serial
+
 		# if connected, disconnect
 		if !@oSerial.nil?
-			@oSerial.disconnect if @oSerial.connected?
+			@oSerial.disconnect() if @oSerial.connected?
 		end # if serial has been initiated previously
 
 		aPorts = self.get(:serialPortsToTry, [])
@@ -129,9 +186,11 @@ class SssSappClass
 
 			raise 'KO: failed to connect to any serial port';
 
-			return NO;
+			return nil;
 
 		end # catch connection errors
+
+		puts 'OK:Serial OK'
 
 		return YES;
 
@@ -200,6 +259,11 @@ class SssSappClass
 		@oSerial = nil
 
 		puts 'OK:Serial disconnected'
+
+		@oEthernet.dealloc() if !@oEthernet.nil?
+		@oEthernet = nil
+
+		puts 'OK:Ethernet disconnected'
 
 		@aPipes.each { |oPipe| oPipe.dealloc() } if !@aPipes.nil?
 		@aPipes = nil
@@ -326,7 +390,7 @@ p 'for bike: ' << iBike.to_s
 
 	# main run loop
 	def loop()
-		return nil if @oSerial.nil?
+		#return nil if @oSerial.nil?
 
 #		iByteCount = @oSerial.writeRawFile('/Volumes/Users/luke/Documents/Arduino/SBmobitecSender/commands/nameSetPeter.bin');#
 #puts 'wrote ' << iByteCount.to_s << ' byte(s) to serial'
@@ -375,8 +439,15 @@ p 'for bike: ' << iBike.to_s
 
 
 
-			# listen to serial
-			nilOrNumberOfBytesReceived = @oSerial.checkIncoming()
+			# listen to serial if it's up
+			if (!@oSerial.nil?)
+				nilOrNumberOfBytesReceived = @oSerial.checkIncoming()
+			end # if serial up
+
+			# listen to Ethernet if it's up
+			if (!@oEthernet.nil?)
+				nilOrNumberOfBytesReceived = @oEthernet.checkIncoming()
+			end # if Ethernet up
 
 			# check incomming commands from SkyTab or other scripts
 			@aPipes.each { |oPipe| oPipe.process if oPipe.hasData? }
@@ -488,13 +559,24 @@ p 'for bike: ' << iBike.to_s
 		# output welcome
 		printInfo()
 
+		#
+		self.initIOframeHandler()
+		
 		# open serial port (first one that works)
-		self.dealloc() if self.initSerial().nil?
-		puts 'OK:Serial OK'
+		#self.dealloc() if self.initSerial().nil?
+		self.initSerial()
+
+		# start listening to Ethernet messages
+		self.initEthernet()
 
 		# start File watcher(s)
 		self.dealloc() if self.initTriggers().nil?
 		puts 'OK:trigger files initiated'
+
+		if (@oSerial.nil? && @oEthernet.nil?)
+			puts 'Have neither Serial nor Ethernet connection!'
+			self.dealloc()
+		end # if have no connection
 
 		puts 'OK:entering run-loop'
 		begin
@@ -559,14 +641,14 @@ p 'for bike: ' << iBike.to_s
 		@aCurrentRideIDs[iBike] = iID
 
 		sData = 'n' << sName
-		self.oSerial.writeFramed(iFDD, sData)
+		SssSIOframeHandler.writeFramed(iFDD, sData)
 
 		sData = 'c' << sCategory
-		SssSapp.oSerial.writeFramed(iFDD, sData)
+		SssSIOframeHandler.writeFramed(iFDD, sData)
 
 		sleep(0.1)
 
-		SssSapp.oSerial.writeFramed(iFDD, 'M')
+		SssSIOframeHandler.writeFramed(iFDD, 'M')
 
 		sleep(0.1)
 
@@ -578,7 +660,7 @@ p 'for bike: ' << iBike.to_s
 			sData += (ulDuration & 0xFF).chr
 			sData += iBike.chr
 
-			SssSapp.oSerial.writeFramed(iFDD, sData)
+			SssSIOframeHandler.writeFramed(iFDD, sData)
 
 			sleep(0.1)
 
