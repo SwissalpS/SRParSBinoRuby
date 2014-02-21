@@ -1,6 +1,5 @@
 require 'socket';
-require 'SssSfletcher16.rb'
-require 'SssSserialFrame.rb'
+require 'SssSapp.rb'
 require 'SssSEventManager.rb'
 require 'SssSIOframeHandler.rb'
 
@@ -23,42 +22,46 @@ class SssSethernetClass
 	# raises on failure<br>
 	def initialize(*options)
 
-
-		@hFrameHistory = {} #Array.new(222) { Array.new(SBSerialMaxFrameLength); }
-
-		@iCountSpace = 0;
-
-		@iMySerialID = 4;
-
-		# frame ids 7...222
-		@iNextFrameID = 7 + rand(215);
-
-		@iStatus = 0;
-
 		# not all ruby versions support ip_address_list
-		sIPdefault = (Socket.methods.member? :ip_address_list) ? Socket.ip_address_list.detect{ |intf| intf.ipv4? and !intf.ipv4_loopback? and !intf.ipv4_multicast? and !intf.ipv4_private? }.ip_address() : '192.168.123.40'
+		sIPdefault = (Socket.methods.member? :ip_address_list) ? Socket.ip_address_list.detect{ |intf| intf.ipv4? and !intf.ipv4_loopback? and !intf.ipv4_multicast? and !intf.ipv4_private? }.ip_address() : SBethernetDefaultIP
 
 		# TODO: @mPortOptions = options;
 		@mPortOptions = {
 				:ethernetIP => SssSapp.get(:ethernetIP, sIPdefault),
-				:ethernetIPbroadcast => SssSapp.get(:ethernetIPbroadcast, '224.0.0.1'),
-				:ethernetIPgateway => SssSapp.get(:ethernetIPgateway, '192.168.123.123'),
-				:ethernetIPsubnet => SssSapp.get(:ethernetIPsubnet, '255.255.255.0'),
-				:ethernetPort => SssSapp.get(:ethernetPort, 12345)
+				:ethernetIPbroadcast => SssSapp.get(:ethernetIPbroadcast, SBethernetDefaultIPbroadcast),
+				:ethernetIPgateway => SssSapp.get(:ethernetIPgateway, SBethernetDefaultIPgateway),
+				:ethernetIPsubnet => SssSapp.get(:ethernetIPsubnet, SBethernetDefaultIPsubnet),
+				:ethernetPort => SssSapp.get(:ethernetPort, SBethernetDefaultPort)
 			};
-
-		@oFletcher = SssSfletcher16Class.new()
-
-		@oIncomingFrame = nil
-
-		@oEventManager = SssSEventManager.new()
-		#@oEventManager.addInitialSyncEvents()
 
 		@oPort = nil;
 
 		self.connect();
 
+		# make sure we can broadcast as long as we are connected
+		# TODO: get serial broadcast ID
+		$oSssSapp.oIOframeHandler.markOnline(SBSerialBroadcastID, @mPortOptions[:ethernetIPbroadcast])
+
 	end # initialize
+
+
+	def broadcastTo(sIP = nil, sData)
+
+		if (self.disconnected?)
+			return nil;
+		end # if not connected
+
+		sIP = @mPortOptions[:ethernetIPbroadcast] if sIP.nil?
+		iPort = @mPortOptions[:ethernetPort]
+
+		oUDPSock = UDPsocket.new
+		oUDPSock.setsockopt(Socket::SOL_SOCKET, Socket::SO_BROADCAST, true)
+		oUDPSock.send(sData, sIP, iPort)
+		oUDPSock.close()
+
+		self
+
+	end # broadcastTo
 
 
 	# check if we have bytes comming in on ethernet<br>
@@ -69,10 +72,10 @@ class SssSethernetClass
 		iCount = 0
 
 		sData, sIP = self.readEthernetBroadcast()
-		iCount += SssSIOframeHandler.parseIncoming(sData, sIP) if !sData.nil?
+		iCount += $oSssSapp.oIOframeHandler.parseIncoming(sData, sIP) if !sData.nil?
 
 		sData, sIP = self.readEthernetToMe()
-		iCount += SssSIOframeHandler.parseIncoming(sData, sIP) if !sData.nil?
+		iCount += $oSssSapp.oIOframeHandler.parseIncoming(sData, sIP) if !sData.nil?
 
 		return iCount
 
@@ -133,6 +136,8 @@ p 'error when binding to ' << @mPortOptions[:ethernetIP] << ':' << @mPortOptions
 	def dealloc()
 
 		self.disconnect();
+
+		@mPortOptions  nil;
 
 		nil;
 
@@ -202,7 +207,17 @@ p e if ![ EOFError, Errno::EAGAIN ].member? e.class
 	end # readEthernetToMe
 
 
-# change these to broadcast versions
+	def sendTo(sIP, sData)
+
+		if (self.disconnected?)
+			return nil;
+		end # if not connected
+
+		return self.broadcastTo(sIP, sData)
+
+	end # sendTo
+
+
 	# write a string of bytes over serial without modification or envelopement
 	# returns byte-count (mData.bytesize)
 	def writeRawBytes(mData = nil)
@@ -216,19 +231,37 @@ p e if ![ EOFError, Errno::EAGAIN ].member? e.class
 			return nil;
 		end # if invalid dada format
 
-		iCountSent = 0;
+		iCountSent = 0
+		iTargetID = nil
+		bHeaderFound = NO
+		sData = ''
 
 		mData.each_byte do |iByte|
 
-			@oPort.putc(iByte);
+			if (bHeaderFound)
+				if (iTargetID.nil?)
+					iTargetID = iByte.chr
+				end # if not yet read target ID
+			else
 
-			iCountSent += 1;
+				continue if 0x00 == iByte.chr
+
+				bHeaderFound = YES if 0xFF == iByte.chr
+
+			end # if no header found yet
+
+			sData << iByte
+
+			iCountSent += 1
 
 		end # loop each byte
 
-		sleep(@iMySerialID * @@fDelayBetweenFrames)
+		sIP = $oSssSapp.oIOframeHandler.getIPstringForID(iTargetID)
 
-		iCountSent;
+		# send the payload
+		self.sendTo(sIP, sData)
+
+		iCountSent
 
 	end # writeRawBytes
 	public :writeRawBytes
@@ -241,7 +274,10 @@ p e if ![ EOFError, Errno::EAGAIN ].member? e.class
 			return nil;
 		end
 
-		iCount = 0;
+		iCountSent = 0
+		iTargetID = nil
+		bHeaderFound = NO
+		sData = ''
 
 		begin
 
@@ -250,11 +286,23 @@ p e if ![ EOFError, Errno::EAGAIN ].member? e.class
 
 puts 'byte # 0x' << "%02X" % iCount << ' hex: 0x' << "%02X" % iChar << ' binary: ' << iChar.to_s(2);
 
-				@oPort.putc(iChar);
+				if (bHeaderFound)
+					if (iTargetID.nil?)
+						iTargetID = iByte.chr
+					end # if not yet read target ID
+				else
 
-				iCount += 1;
+					continue if 0x00 == iByte.chr
 
-			end
+					bHeaderFound = YES if 0xFF == iByte.chr
+
+				end # if no header found yet
+
+				sData << iByte
+
+				iCountSent += 1
+
+			end # loop all bytes in file
 
 		rescue Exception => e
 
@@ -268,9 +316,14 @@ puts 'byte # 0x' << "%02X" % iCount << ' hex: 0x' << "%02X" % iChar << ' binary:
 
 		end
 
-		sleep(@iMySerialID * @@fDelayBetweenFrames)
+		sIP = $oSssSapp.oIOframeHandler.getIPstringForID(iTargetID)
 
-		return iCount;
+		# if no IP
+		sIP = @mPortOptions[:ethernetIPbroadcast] if sIP.nil?
+
+		self.sendTo(sIP, sData)
+
+		return iCountSent;
 
 	end # writeRawFile
 	public :writeRawFile

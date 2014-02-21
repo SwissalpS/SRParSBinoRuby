@@ -4,7 +4,9 @@ class SssSserialFrame
 	@dataLength = nil; attr_accessor :dataLength
 	@frameID = nil; attr_accessor :frameID
 	@senderID = nil; attr_accessor :senderID
+	@senderIP = nil; attr_accessor :senderIP
 	@targetID = nil; attr_accessor :targetID
+	#@targetIP = nil; attr_accessor :targetIP
 	@data = nil; attr_reader :data
 
 	@checksumA = nil; attr_accessor :checksumA
@@ -18,7 +20,9 @@ class SssSserialFrame
 		@dataLength = iLen
 		@frameID = iFrame
 		@senderID = iSender
+		@senderIP = nil
 		@targetID = iTarget
+		#@targetIP = nil
 		@data = (aData.nil?) ? [] : aData
 
 		@checksumA = iChecksumA

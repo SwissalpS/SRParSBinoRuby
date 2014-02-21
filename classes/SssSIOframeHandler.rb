@@ -1,6 +1,7 @@
+require 'SssSapp.rb'
 require 'SssSfletcher16.rb'
-require 'SssSserialFrame.rb'
 require 'SssSEventManager.rb'
+require 'SssSserialFrame.rb'
 require 'SssSbitMath.rb'
 
 SssSdebugMode = 7 if !defined? SssSdebugMode
@@ -10,11 +11,18 @@ SBSerialMaxFrameLength = 35 if !defined? SBSerialMaxFrameLength
 SBSerialMaxDataLengthPerFrame = 28 if !defined? SBSerialMaxDataLengthPerFrame
 SBSerialBroadcastID = 254 if !defined? SBSerialBroadcastID
 
+SBSerialRaspberryPiID = 0xDD if !defined? SBSerialRaspberryPiID
 SssSNullSpacer = 0.chr * SBSerialSpaceLength if !defined? SssSNullSpacer
 
+SBethernetDefaultIP = '192.168.123.40' if !defined? SBethernetDefaultIP
+SBethernetDefaultIPbroadcast = '224.0.0.1' if !defined? SBethernetDefaultIPbroadcast
+SBethernetDefaultIPgateway = '192.168.123.123' if !defined? SBethernetDefaultIPgateway
+SBethernetDefaultIPsubnet = '255.255.255.0' if !defined? SBethernetDefaultIPsubnet
+SBethernetDefaultPort = 12345 if !defined? SBethernetDefaultPort
+
 ##
-# Listen to Ethernet messages and notifies SkyTab<br>
-# Also message SBAMM and SBAMFDDDs
+# intermediates communication and controls who sends what
+# also manages the SssSEventManager instance
 # Instantiated and controlled by SssSapp
 
 class SssSIOframeHandlerClass
@@ -23,7 +31,7 @@ class SssSIOframeHandlerClass
 
 	@@bufferMaxLen = SBSerialMaxFrameLength + SBSerialSpaceLength;
 
-	@@fDelayBetweenFrames = 0.004;
+	@@fDelayBetweenFrames = 0.004; attr_reader :fDelayBetweenFrames
 
   protected
 
@@ -58,10 +66,12 @@ class SssSIOframeHandlerClass
 
  public
 
-	# for incoming traffic we use a seperate fletcher instance to avaid colusion
-	@oFletcher;
+	@oEventManager = nil
 
-	@oIncomingFrame; attr_reader :oIncomingFrame
+	# for incoming traffic we use a seperate fletcher instance to avaid colusion
+	@oFletcher = nil
+
+	@oIncomingFrame = nil; attr_reader :oIncomingFrame
 
 
 	def initialize(*options)
@@ -70,9 +80,9 @@ class SssSIOframeHandlerClass
 
 		@hOnlineClientHash = {}
 
-		@iCountSpace = 0;
+		@iCountSpace = 0
 
-		@iMySerialID = 4;
+		@iMySerialID = SssSapp.get(:serialID, SBSerialRaspberryPiID)
 
 		# frame ids 7...222
 		@iNextFrameID = 7 + rand(215);
@@ -84,6 +94,7 @@ class SssSIOframeHandlerClass
 		@oIncomingFrame = nil
 
 		@oEventManager = SssSEventManager.new()
+
 		#@oEventManager.addInitialSyncEvents()
 
 	end # initialize
@@ -91,6 +102,22 @@ class SssSIOframeHandlerClass
 
 	# destroy this object cleanly
 	def dealloc()
+
+		@oEventManager.dealloc if !@oEventManager.nil?
+		@oEventManager = nil
+
+		@oFletcher.dealloc if !@oFletcher.nil?
+		@oFletcher = nil
+
+		@oIncomingFrame.dealloc if !@oIncomingFrame.nil?
+		@oIncomingFrame = nil
+
+		@hFrameHistory = nil
+
+		@hOnlineClientHash.each do |hClient|
+			hClient[:marker].dealloc if !hClient[:marker].nil?
+		end # loop all markers
+		@hOnlineClientHash = nil
 
 		nil;
 
@@ -119,6 +146,21 @@ class SssSIOframeHandlerClass
 	protected :debugIncoming
 
 
+	def getIPstringForID(iID)
+
+		sID = 'id' << iID.to_s
+
+		# is it a known ID?
+		return nil if @hOnlineClientHash[sID].nil?
+
+		# has it talked to us over Ethernet?
+		return nil @hOnlineClientHash[sID][:ethernetIP].nil?
+
+		@hOnlineClientHash[sID][:ethernetIP]
+
+	end # getIPstringForID
+
+
 	# invalidate incoming frame
 	def invalidate()
 
@@ -137,23 +179,56 @@ class SssSIOframeHandlerClass
 	end # invalidate
 
 
+	def isOnlineEthernet?(iID)
+
+		return NO if $oSssSapp.oEthernet.nil?
+		return NO if $oSssSapp.oEthernet.disconected?
+
+		sID = 'id' << iID.to_s
+		return NO if @hOnlineClientHash[sID].nil?
+
+		return @hOnlineClientHash[sID][:marker].isOnlineEthernet?
+		# or to avoid disk access
+		return !@hOnlineClientHash[sID][:ethernetIP].nil?
+
+	end # isOnlineEthernet?
+
+
+	def isOnlineSerial?(iID)
+
+		# NO if no serial connection at all
+		return NO if $oSssSapp.oSerial.nil?
+		return NO if $oSssSapp.oSerial.disconected?
+
+		sID = 'id' << iID.to_s
+		return NO if @hOnlineClientHash[sID].nil?
+
+		return @hOnlineClientHash[sID][:marker].isOnlineSerial?
+		# or to avoid disk access
+		return @hOnlineClientHash[sID][:ethernetIP].nil?
+
+	end # isOnlineSerial?
+
+
 	def markOnline(iID, sIP)
 
 		sID = 'id' << iID.to_s
-		iNow = 12345 # Date.new()
+		iNow = Time.now.to_i
 
 		# do we already have this?
 		if (@hOnlineClientHash[sID].nil?)
 			# new client
-			@hOnlineClientHash[sID] = { :ethernetIP => sIP, :serialID => iID, :lastSeen => iNow, :marker => SssSonlineMarkerFile.new(iID, sIP) }
+			@hOnlineClientHash[sID] = { :ethernetIP => sIP, :serialID => iID, :firstSeen => iNow, :marker => SssSonlineMarkerFile.new(iID, sIP) }
 		else
 			# update entry
 			if (!sIP.nil?)
 				if (@hOnlineClientHash[sID][:ethernetIP].nil?)
 					@hOnlineClientHash[sID][:ethernetIP] = sIP
+					@hOnlineClientHash[sID][:ethernetLastSeen] = iNow
 					@hOnlineClientHash[sID][:marker].goOnlineEthernet(sIP)
 				end # if got IP now
 			else
+				@hOnlineClientHash[sID][:serialLastSeen] = iNow
 				@hOnlineClientHash[sID][:marker].goOnlineSerial()
 			end # if got an IP
 
@@ -195,6 +270,7 @@ class SssSIOframeHandlerClass
 				@oIncomingFrame.targetID= iByte
 
 				self.markOnline(iByte, sIP)
+				@oIncomingFrame.targetIP= sIP if !sIP.nil?
 
 			else
 
@@ -448,7 +524,7 @@ class SssSIOframeHandlerClass
 
 	# envelope data into frames and send to serial bus
 	# returns byte-count
-	def writeFramed(iTo = 1, mData = nil, iFrameID = 0, mSubsequentFrameDataPrefix = nil, iFrom = 4)
+	def writeFramed(iTo = 1, mData = nil, iFrameID = 0, mSubsequentFrameDataPrefix = nil, iFrom = SBSerialRaspberryPiID)
 
 		# TODO: allow arrays too
 		if (String != mData.class)
@@ -461,14 +537,23 @@ class SssSIOframeHandlerClass
 			iFrameID = self.nextFrameID();
 		end # if auto-frame-number
 
+		# send over Ethernet or Serial
+		bEthernet = self.isOnlineEthernet?(iTo)
+		bSerial = self.isOnlineSerial?(iTo)
+
+		if (!(bEthernet || bSerial))
+			p 'can not reach ID: ' << iTo.to_s << ' over Ethernet nor Serial because it has not yet pinged me on either. Or some other reason'
+			return nil
+		end # if Ethernet or serial
+
 		# how many frames will we need? more than one?
 		iTotalFrames = 1;
 		iLengthData = mData.length();
 		if (SBSerialMaxDataLengthPerFrame < iLengthData)
 
 			# more than one frame
-
-			if (nil == mSubsequentFrameDataPrefix)
+# TODO: add prefix...
+			if (mSubsequentFrameDataPrefix.nil?)
 
 				iLengthPrefix = 0;
 
@@ -522,18 +607,49 @@ class SssSIOframeHandlerClass
 			if (0 == iCountFrames || 0 == iLengthPrefix)
 
 				# first frame or subsequent without prefix
+				iLengthSub = (iDelta > SBSerialMaxDataLengthPerFrame) ? SBSerialMaxDataLengthPerFrame : iDelta;
+				SssSf16.addByte(iLengthSub);
+				aFrame << iLengthSub;
 
 			else
 
 				# subsequent frame with prefix
+				iDelta += iLengthPrefix
+				iLengthSub = (iDelta > SBSerialMaxDataLengthPerFrame) ? SBSerialMaxDataLengthPerFrame : iDelta
+				SssSf16.addByte(iLengthSub)
+				aFrame << iLengthSub
 
-				iDelta -= iLengthPrefix;
+			# there seems to be different treatment on OSX (irb 0.9.5) and Debian (0.9.6) -Ruby: on OSX iByte is the byte-value while in Debian it's a String
+				mTest = mSubsequentFrameDataPrefix[0]
+				if String == mTest.class
+
+					# debian
+					for j in 0...iLengthPrefix do
+
+						iByte = mSubsequentFrameDataPrefix[j].ord
+
+						SssSf16.addByte(iByte)
+						aFrame << iByte
+
+					end # for loop data portion
+
+				else
+
+					# osx
+					for j in 0...iLengthPrefix do
+
+						iByte = mSubsequentFrameDataPrefix[j]
+
+						SssSf16.addByte(iByte)
+						aFrame << iByte
+
+					end # for loop data portion
+
+				end # if on debian or darwin
+
+				iLengthSub -= iLengthPrefix
 
 			end # if first frame or subsequent with prefix
-
-			iLengthSub = (iDelta > SBSerialMaxDataLengthPerFrame) ? SBSerialMaxDataLengthPerFrame : iDelta;
-			SssSf16.addByte(iLengthSub);
-			aFrame << iLengthSub;
 
 			# there seems to be different treatment on OSX (irb 0.9.5) and Debian (0.9.6) -Ruby: on OSX iByte is the byte-value while in Debian it's a String
 			mTest = mData[0]
@@ -570,13 +686,13 @@ class SssSIOframeHandlerClass
 			aFrame << SssSf16.checksum(SssSf16secondByte);
 
 			# send over Ethernet or Serial
-			if (!SssSethernet.nil? && SssSethernet.isOnline?(iTo))
-				SssSethernet.sendTo(iTo, aFrame.drop(iLengthSpace))
-			elsif (!SssSserial.nil? && SssSserial.isOnline?(iTo))
+			if bEthernet
+				$oSssSapp.oEthernet.sendTo(iTo, aFrame.drop(iLengthSpace))
+			elsif bSerial
 p 'about to write to serial target: ' << iTo.to_s
-				SssSserial.send(aFrame)
+				$oSssSapp.oSerial.writeRawBytes(aFrame)
 p 'wrote to serial frame: 0x' << iFrameID.to_s(16)
-			end
+			end # if Ethernet and/or serial
 
 			iCountSend += aFrame.length();
 
@@ -594,6 +710,48 @@ p 'wrote to serial frame: 0x' << iFrameID.to_s(16)
 
 	end # writeFramed
 	public :writeFramed
+
+
+	# write a string of bytes over serial without modification or envelopement
+	# returns byte-count (mData.bytesize)
+	def writeRawBytes(mData = nil)
+
+		if (self.isOnlineEthernet?(SBSerialBroadcastID))
+			iCountSent = $oSssSapp.oEthernet.writeRawBytes(mData)
+		elsif (self.isOnlineSerial?(SBSerialBroadcastID))
+			iCountSent = $oSssSapp.oSerial.writeRawBytes(mData)
+		else
+			p ' can not send raw bytes to either Ethernet nor Serial'
+			return nil
+		end # if Ethernet or serial or neither
+
+		sleep(@iMySerialID * @@fDelayBetweenFrames)
+
+		iCountSent
+
+	end # writeRawBytes
+	public :writeRawBytes
+
+
+	# write contents of a file byte-by-byte as-is
+	# returns byte-count
+	def writeRawFile(sPathFile = nil)
+
+		if (self.isOnlineEthernet?(SBSerialBroadcastID))
+			iCountSent = $oSssSapp.oEthernet.writeRawFile(sPathFile)
+		elsif (self.isOnlineSerial?(SBSerialBroadcastID))
+			iCountSent = $oSssSapp.oSerial.writeRawFile(sPathFile)
+		else
+			p 'can not send raw file to either Ethernet nor Serial'
+			return nil
+		end # if Ethernet or serial or neither
+
+		sleep(@iMySerialID * @@fDelayBetweenFrames)
+
+		iCountSent;
+
+	end # writeRawFile
+	public :writeRawFile
 
 
 	def executeFrame(oFrame)
@@ -648,6 +806,8 @@ p 'wrote to serial frame: 0x' << iFrameID.to_s(16)
 
 			# mark sender as not busy
 			@iStatus = SssSbitMath.bitClear(@iStatus, iSender);
+			# also mark for POSIX clients
+			self.markOnline(iSender, oFrame.senderIP)
 
 			# respond delayed according to our ID to avoid a pile-up
 	# TODO: maybe we should not use delay() especially if we are currently in a race
@@ -691,7 +851,7 @@ p 'wrote to serial frame: 0x' << iFrameID.to_s(16)
 		elsif (0x53 == iCommand)
 
 			# - 83 - S - Stop Stopwatch
-			SssSapp.tellSkyTabStop(iFirstDataByte)
+			$oSssSapp.tellSkyTabStop(iFirstDataByte)
 
 		elsif (0x5C == iCommand)
 
@@ -721,7 +881,7 @@ p 'wrote to serial frame: 0x' << iFrameID.to_s(16)
 				iBike = oFrame.nextByte()
 
 				# tell database about the change
-				SssSapp.tellSkyTabDurationForBIKE(ulDuration, iBike)
+				$oSssSapp.tellSkyTabDurationForBIKE(ulDuration, iBike)
 
 			else
 
@@ -745,12 +905,12 @@ p 'wrote to serial frame: 0x' << iFrameID.to_s(16)
 		elsif (0x72 == iCommand)
 
 			# - 114 -  r - reset stopwatch
-			SssSapp.tellSkyTabReset(iFirstDataByte)
+			$oSssSapp.tellSkyTabReset(iFirstDataByte)
 
 		elsif (0x73 == iCommand)
 
 			# - 115 -  s - start stopwatch
-			SssSapp.tellSkyTabStart(iFirstDataByte)
+			$oSssSapp.tellSkyTabStart(iFirstDataByte)
 
 		elsif (0x74 == iCommand)
 

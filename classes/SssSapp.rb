@@ -1,7 +1,7 @@
 
-require 'SssSethernet.rb'
 require 'SssSIOframeHandler.rb'
 require 'SssSserial.rb'
+require 'SssSethernet.rb'
 require 'SssStriggerCommandMe.rb'
 require 'SssStriggerCurrentTime.rb'
 require 'SssStriggerDemoID.rb'
@@ -11,6 +11,9 @@ require 'SssStriggerRiderInfo.rb'
 require 'SssStriggerStart.rb'
 require 'SssStriggerStop.rb'
 require 'SssStriggerTimer.rb'
+
+YES = true if !defined? YES
+NO = false if !defined? NO
 
 ##
 # Main application class<br>
@@ -59,9 +62,6 @@ class SssSappClass
 	#
 	@bUseEthernet = YES; attr_accessor :bUseEthernet
 	@bUseSerial = NO; attr_accessor :bUseSerial
-
-	## frame handler
-	@oIOframeHandler = nil
 
   protected
 
@@ -262,6 +262,9 @@ class SssSappClass
 
 		@oEthernet.dealloc() if !@oEthernet.nil?
 		@oEthernet = nil
+
+		@oIOframeHandler.dealloc() if !@oIOframeHandler.nil?
+		@oIOframeHandler = nil
 
 		puts 'OK:Ethernet disconnected'
 
@@ -618,7 +621,9 @@ p 'for bike: ' << iBike.to_s
 
 		return self.get(:idSBAMFDDbike0, 1) if 0 == iBike
 
-		return self.get(:idSBAMFDDbike1, 2);
+		return self.get(:idSBAMFDDbike1, 2) if 1 == iBike
+
+		return self.get(:idSBAMFDDbike2, 3)
 
 	end # serialIDofDisplay
 
@@ -635,20 +640,20 @@ p 'for bike: ' << iBike.to_s
 
 	def setCurrentRiderInfo(sName, sCategory, iID, iBike, ulDuration)
 
-		return if !(0..1).member? iBike
+		return if !(0..2).member? iBike
 		iFDD = self.serialIDofDisplay(iBike)
 
 		@aCurrentRideIDs[iBike] = iID
 
 		sData = 'n' << sName
-		SssSIOframeHandler.writeFramed(iFDD, sData)
+		@oIOframeHandler.writeFramed(iFDD, sData)
 
 		sData = 'c' << sCategory
-		SssSIOframeHandler.writeFramed(iFDD, sData)
+		@oIOframeHandler.writeFramed(iFDD, sData)
 
 		sleep(0.1)
 
-		SssSIOframeHandler.writeFramed(iFDD, 'M')
+		@oIOframeHandler.writeFramed(iFDD, 'M')
 
 		sleep(0.1)
 
@@ -660,7 +665,7 @@ p 'for bike: ' << iBike.to_s
 			sData += (ulDuration & 0xFF).chr
 			sData += iBike.chr
 
-			SssSIOframeHandler.writeFramed(iFDD, sData)
+			@oIOframeHandler.writeFramed(iFDD, sData)
 
 			sleep(0.1)
 
@@ -680,5 +685,5 @@ p 'for bike: ' << iBike.to_s
 end # SssSappClass
 
 
-# Global constant singleton instance of SssSapp
-SssSapp = SssSappClass::sharedInstance();
+# Global singleton instance of SssSapp
+$oSssSapp = SssSappClass::sharedInstance() if $oSssSapp.nil?

@@ -100,8 +100,6 @@ class SssSbitMathClass
 
 	end # dealloc
 
-
-
 end # SssSbitMathClass
 
 SssSbitMath = SssSbitMathClass.new
