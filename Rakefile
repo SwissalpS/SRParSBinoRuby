@@ -4,6 +4,7 @@ require 'rdoc/task'
 
 SssSdocDirAlt = 'doc_rake'
 SssSdocDir = 'doc'
+SssSdocAssetsDir = 'docAssets'
 SssSdebianDocInstallDir = '/var/www/doc/SRParSBinoRuby'
 
 task :default => [:SssSrebuildDoc, :SssSgoodbye]
@@ -17,8 +18,16 @@ task :SssSremoveDoc do |t|
 end;
 
 task :SssSbuildDoc do |t|
-	`rdoc --all -E rbs=rb -t SRParSBinoRuby -m README -o #{SssSdocDir} -x #{SssSdocDirAlt} -x Rakefile -x created.rid -x docAssets`;
-	FileUtils::cp('docAssets/rdoc.css', SssSdocDir + '/');
+	`rdoc --all -E rbs=rb -t SRParSBinoRuby -m README -o #{SssSdocDir} -x #{SssSdocDirAlt} -x Rakefile -x created.rid -x #{SssSdocAssetsDir}`
+	#FileUtils::cp(SssSdocAssetsDir + '/', SssSdocDir + '/')
+	`cp #{SssSdocAssetsDir}/* #{SssSdocDir}/;`
+end
+
+task :SssSbuildAndUpdload => [:SssSrebuildDoc, :SssSupload, :SssSgoodbye]
+
+task :SssSupload do |t|
+	puts `rsync -avvxz --del #{SssSdocDir}/ swissnet@digialp.com:/home/swissnet/public_html/SkyBIKE/SRParSBinoRubyDoc/;`
+	puts `rsync -avvxz --del .git/ swissnet@digialp.com:/home/swissnet/public_html/SkyBIKE/SRParSBinoRuby.git/;`
 end
 
 task :installDocDebian => [:SssSrebuildDoc, :SssSinstallDocDebian]
@@ -49,4 +58,3 @@ RDoc::Task.new(:buildDoc) do |t|
 	t.rdoc_files.exclude(SssSdocDir) # + '/*')
 #	t.rdoc_files.exclude('**/*.html')
 end
-
