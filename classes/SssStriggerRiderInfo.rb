@@ -1,6 +1,6 @@
 
-require 'SssStriggerBase.rb'
 require 'SssSapp.rb'
+require 'SssStriggerBase.rb'
 
 # Sets name 'n' and category 'c'.
 # read SssStriggerBase for ruby-side-usage.
@@ -22,6 +22,7 @@ class SssStriggerRiderInfo < SssStriggerBase
 
 		sPathFile = 'triggers/rider.info' if sPathFile.nil?
 		iBike = 0 if iBike.nil?
+		iBike = 2 if (2 < iBike)
 
 		super(sPathFile)
 
@@ -47,7 +48,7 @@ class SssStriggerRiderInfo < SssStriggerBase
 		sName = self.translateName(sName)
 		sCategory = self.translateCategory(sCategory)
 
-		SssSapp.setCurrentRiderInfo(sName, sCategory, sID.to_i, @iBike, sDuration.to_i)
+		$oSssSapp.setCurrentRiderInfo(sName, sCategory, sID.to_i, @iBike, sDuration.to_i)
 
 		# clear buffer and return self
 		super

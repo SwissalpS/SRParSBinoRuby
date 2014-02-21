@@ -1,6 +1,6 @@
 
-require 'SssStriggerBase.rb'
 require 'SssSapp.rb'
+require 'SssStriggerBase.rb'
 
 # responds to 'q', 'r' or 's' commands: 'quit', 'restart system' or 'shutdown system'
 # read SssStriggerBase for ruby-side-usage.
@@ -62,19 +62,19 @@ class SssStriggerCommandMe < SssStriggerBase
 			when 'q'
 				# quit
 				puts 'Got quit-signal from Trigger ' << sBasename
-				SssSapp.dealloc()
+				$oSssSapp.dealloc()
 
 			when 'r'
 				# restart system
 				puts 'Got restart-signal from Trigger ' << sBasename
 				self.deployTriggerSystemRestart()
-				SssSapp.dealloc()
+				$oSssSapp.dealloc()
 
 			when 's'
 				# shutdown system
 				puts 'Got shutdown-signal from Trigger ' << sBasename
 				self.deployTriggerSystemShutdown()
-				SssSapp.dealloc()
+				$oSssSapp.dealloc()
 
 			else
 

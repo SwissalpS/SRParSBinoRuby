@@ -1,6 +1,6 @@
 
-require 'SssStriggerBase.rb'
 require 'SssSapp.rb'
+require 'SssStriggerBase.rb'
 
 # Sends 'u', 'v' or 'V' command to SBAMM optionally with duration attached
 # read SssStriggerBase for ruby-side-usage.
@@ -49,7 +49,8 @@ class SssStriggerTimer < SssStriggerBase
 
 		# no broadcast possible as we are using natural chars instead of byte-value
 		# abort if not a valid ID
-		return super if !((1..3).member?(i)) # if invalid ID
+# TODO: why? really?
+		#return super if !((1..3).member?(i)) # if invalid ID
 
 		# target serial ID
 		iFDD = i
@@ -95,7 +96,7 @@ class SssStriggerTimer < SssStriggerBase
 
 		end # switch case
 
-		SssSapp.oSerial.writeFramed(iFDD, sData)
+		$oSssSapp.oIOframeHandler.writeFramed(iFDD, sData)
 
 		# clear buffer and return self
 		super

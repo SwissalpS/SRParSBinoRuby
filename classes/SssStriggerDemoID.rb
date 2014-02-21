@@ -1,6 +1,6 @@
 
-require 'SssStriggerBase.rb'
 require 'SssSapp.rb'
+require 'SssStriggerBase.rb'
 
 # Sends 'o' or 'O' command to all SBAMFDDDs
 # read SssStriggerBase for ruby-side-usage.
@@ -52,7 +52,7 @@ class SssStriggerDemoID < SssStriggerBase
 		# target serial ID
 		iFDD = SssSapp.get(:serialBroadcastID, SBSerialBroadcastID);
 
-		SssSapp.oSerial.writeFramed(iFDD, sData)
+		$oSssSapp.oIOframeHandler.writeFramed(iFDD, sData)
 
 		# clear buffer and return self
 		super

@@ -1,6 +1,6 @@
 
-require 'SssStriggerBase.rb'
 require 'SssSapp.rb'
+require 'SssStriggerBase.rb'
 
 # Sends incoming bytes as-is to SBAMM
 # read SssStriggerBase for ruby-side-usage.
@@ -25,7 +25,7 @@ class SssStriggerRaw < SssStriggerBase
 	# controller calls hasData? if yes controller calls process
 	def process()
 
-		SssSapp.oSerial.writeRawBytes(@sBuffer)
+		$oSssSapp.oIOframeHandler.writeRawBytes(@sBuffer)
 
 		# clear buffer and return self
 		super()

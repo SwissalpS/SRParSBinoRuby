@@ -1,6 +1,6 @@
 
-require 'SssStriggerBase.rb'
 require 'SssSapp.rb'
+require 'SssStriggerBase.rb'
 
 # Sends 't' command then sends 'T' command
 # read SssStriggerBase for ruby-side-usage.
@@ -33,14 +33,15 @@ class SssStriggerCurrentTime < SssStriggerBase
 		return super if i.nil?
 
 		# convert byte-value to natural-value
-		i = i.chr.to_i;
+		iID = i.chr.to_i;
 
 		# no broadcast possible as we are using natural chars instead of byte-value
 		# abort if not a valid ID
-		return super if !((1..3).member?(i)) # if invalid ID
+#really? why?
+#		return super if !((1..3).member?(i)) # if invalid ID
 
 		# target serial ID
-		iFDD = i;
+		iFDD = iID;
 
 		# current time is (since midnight localtime)
 		# convert to seconds since midnight: 86400 = (24*60*60)
@@ -54,11 +55,11 @@ class SssStriggerCurrentTime < SssStriggerBase
 		sData << ((i >> 24) & 0xFF) << ((i >> 16) & 0xFF)
 		sData << ((i >> 8) & 0xFF) << (i & 0xFF)
 
-		SssSapp.oSerial.writeFramed(iFDD, sData)
+		$oSssSapp.oIOframeHandler.writeFramed(iFDD, sData)
 
 		# start displaying time
 		sData = 'T'
-		SssSapp.oSerial.writeFramed(iFDD, sData)
+		$oSssSapp.oIOframeHandler.writeFramed(iFDD, sData)
 
 		# clear buffer and return self
 		super
