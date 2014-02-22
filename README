@@ -1,7 +1,10 @@
 SRParSBinoRuby.git/README
-author: Luke aka SwissalpS@LukeZimmermann.com
-licence: Creative Commons where not specified otherwise.
-group: developers tools
-version(date): 20130416_005110
+author: Luke aka SwissalpS@LukeZimmermann.com<br />
+licence: Creative Commons where not specified otherwise.<br />
+group: developers tools<br />
+version(date): 20140222_015405<br /><br />
 
-Serial Interface Arduino <=> SkyTab
+Serial Interface Arduino <=> SkyTab<br />
+Ethernet Interface Arduino <=> SkyTab<br /><br />
+
+you may want to read http://digialp.com/SkyBIKE/SBMSerialProtocol/4a958da7-0c89-4b05-bb76-a65fc8b49905.note.html

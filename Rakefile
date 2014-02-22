@@ -18,7 +18,8 @@ task :SssSremoveDoc do |t|
 end;
 
 task :SssSbuildDoc do |t|
-	`rdoc --all -E rbs=rb -t SRParSBinoRuby -m README -o #{SssSdocDir} -x #{SssSdocDirAlt} -x Rakefile -x created.rid -x #{SssSdocAssetsDir}`
+	`rdoc --all -E rbs=rb -t SRParSBinoRuby -m README -o #{SssSdocDir} -x #{SssSdocDirAlt} -x Rakefile -x created.rid -x #{SssSdocAssetsDir} -x triggers -x onlineIDs -x frameBin`
+	
 	#FileUtils::cp(SssSdocAssetsDir + '/', SssSdocDir + '/')
 	`cp #{SssSdocAssetsDir}/* #{SssSdocDir}/;`
 end
