@@ -24,7 +24,7 @@ task :SssSbuildDoc do |t|
 	`cp #{SssSdocAssetsDir}/* #{SssSdocDir}/;`
 end
 
-task :SssSbuildAndUpdload => [:SssSrebuildDoc, :SssSupload, :SssSgoodbye]
+task :SssSbuildAndUpload => [:SssSrebuildDoc, :SssSupload, :SssSgoodbye]
 
 task :SssSupload do |t|
 	puts `rsync -avvxz --del #{SssSdocDir}/ swissnet@digialp.com:/home/swissnet/public_html/SkyBIKE/SRParSBinoRubyDoc/;`
