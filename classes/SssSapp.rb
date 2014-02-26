@@ -15,6 +15,9 @@ require 'SssStriggerTimer.rb'
 YES = true if !defined? YES
 NO = false if !defined? NO
 
+# interval in seconds..
+SBBroadcastDateIntervalDefault = 5 * 60
+
 ##
 # Main application class<br>
 # Use global *SssSapp* to access the singleton
@@ -52,6 +55,8 @@ class SssSappClass
 
   protected
 
+	@oTnextBroadcastDate = nil; attr_accessor :oTnextBroadcastDate
+
   public
 
 	# shared SssSethernetClass object
@@ -80,6 +85,9 @@ class SssSappClass
 		@oEthernet = nil
 		@oIOframeHandler = nil
 		@oSerial = nil
+
+		# set next broadcast date into the past
+		@oTnextBroadcastDate = Time.now.utc - 23
 
 		# fetch settings
 		self.readConfig(sPathFileConfigYAML)
@@ -286,6 +294,23 @@ class SssSappClass
 
 	end # dealloc
 
+
+	def broadcastDate()
+
+		oT = Time.now.utc
+		return if @oTnextBroadcastDate > oT
+
+p 'broadcasting date'
+
+		sData = 0x5C.chr << (((oT.day() - 1) << 2) + 0).chr << (oT.month() - 1).chr << (oT.year() - 2000).chr
+
+		@oIOframeHandler.writeFramed(SBSerialBroadcastID, sData)
+
+		@oTnextBroadcastDate = @oTnextBroadcastDate = Time.now.utc + get(:iBroadcastDateInterval, SBBroadcastDateIntervalDefault)
+
+	end # broadcastDate
+
+
 	def tellSkyTab(sInvocationPath, iBike)
 
 		if @sPathSkyTabBin.nil?
@@ -456,6 +481,8 @@ p 'for bike: ' << iBike.to_s
 			@aPipes.each { |oPipe| oPipe.process if oPipe.hasData? }
 
 
+			# broadcast the date from time to time
+			broadcastDate()
 
 
 #
