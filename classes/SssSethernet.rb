@@ -173,13 +173,15 @@ p 'error when binding to ' << @mPortOptions[:ethernetIP] << ':' << @mPortOptions
 	# read nonblocking from Ethernet. Returns nil or a string of bytes<br>
 	# called by #checkIncoming()
 	def readEthernetBroadcast()
-#puts 'readEthernetBroadcast'
 		# if not connected
 		return [nil, nil] if @oUDPsocketBroadcast.nil?
 
 		begin
 
 			sRead, aRemote = @oUDPsocketBroadcast.recvfrom_nonblock(1024); # @@bufferMaxLen);
+
+			// filter out any from own IP (may be sent by other daemon or itself)
+			return [nil, nil] if (@mPortOptions[:ethernetIP] == aRemote[3])
 
 			return [SssSNullSpacer << sRead, aRemote[3]];
 

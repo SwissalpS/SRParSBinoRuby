@@ -128,13 +128,15 @@ class SssSIOframeHandlerClass
 	# chance to filter debug messages: Raw view of byte-stream
 	def debugIncoming(mRead)
 
-		sOut = ''
+		sOut = 'received: '
 		mRead.each_byte do |iByte|
 
 			if 0 == iByte
 				sOut += '.'
 			else
-				sOut += ' 0x' << iByte.to_s(16)  << ' '
+				sOut += ' 0x'
+				sOut += '0' if 0x10 > iByte
+				sOut << iByte.to_s(16)  << ' '
 				sOut += iByte.chr if 32 <= iByte
 				sOut += '.' if 32 > iByte
 			end # if
