@@ -179,7 +179,7 @@ puts 'readEthernetBroadcast'
 
 		begin
 
-			sRead, aRemote = @oUDPsocketBroadcast.recvfrom(1024); # @@bufferMaxLen);
+			sRead, aRemote = @oUDPsocketBroadcast.recvfrom_nonblock(1024); # @@bufferMaxLen);
 
 			return [SssSNullSpacer << sRead, aRemote[3]];
 
@@ -198,7 +198,7 @@ puts 'readEthernetToMe'
 
 		begin
 
-			sRead, aRemote = @oUDPsocketToMe.recvfrom(1024); # @@bufferMaxLen);
+			sRead, aRemote = @oUDPsocketToMe.recvfrom_nonblock(1024); # @@bufferMaxLen);
 
 			return [SssSNullSpacer << sRead, aRemote[3]];
 
