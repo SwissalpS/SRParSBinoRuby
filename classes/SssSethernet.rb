@@ -254,7 +254,8 @@ p 'found target ID'
 				end # if not yet read target ID
 			else
 
-				continue if 0x00 == iByte
+				# ruby respects perl (next) over C (continue), and pearls are found under the sea ;)
+				next if 0x00 == iByte
 
 				bHeaderFound = YES if 0xFF == iByte
 
@@ -302,9 +303,9 @@ puts 'byte # 0x' << "%02X" % iCount << ' hex: 0x' << "%02X" % iChar << ' binary:
 					end # if not yet read target ID
 				else
 
-					continue if 0x00 == iByte.chr
+					next if 0x00 == iByte
 
-					bHeaderFound = YES if 0xFF == iByte.chr
+					bHeaderFound = YES if 0xFF == iByte
 
 				end # if no header found yet
 
