@@ -6,4 +6,4 @@ $LOAD_PATH << '/gitSwissalpS/SRParSBinoRuby/classes'
 
 require('SssSapp.rb')
 
-SssSapp.run()
+$oSssSapp.run()

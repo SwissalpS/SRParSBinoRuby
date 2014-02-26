@@ -23,15 +23,20 @@ class SssSethernetClass
 	def initialize(*options)
 
 		# not all ruby versions support ip_address_list
-		sIPdefault = (Socket.methods.member? :ip_address_list) ? Socket.ip_address_list.detect{ |intf| intf.ipv4? and !intf.ipv4_loopback? and !intf.ipv4_multicast? and !intf.ipv4_private? }.ip_address() : SBethernetDefaultIP
+		begin
+
+			sIPdefault = (Socket.methods.member? :ip_address_list) ? Socket.ip_address_list.detect{ |intf| intf.ipv4? and !intf.ipv4_loopback? and !intf.ipv4_multicast? and !intf.ipv4_private? }.ip_address() : SBethernetDefaultIP
+		rescue
+			sIPdefault = SBethernetDefaultIP
+		end # try catch my own IP address
 
 		# TODO: @mPortOptions = options;
 		@mPortOptions = {
-				:ethernetIP => SssSapp.get(:ethernetIP, sIPdefault),
-				:ethernetIPbroadcast => SssSapp.get(:ethernetIPbroadcast, SBethernetDefaultIPbroadcast),
-				:ethernetIPgateway => SssSapp.get(:ethernetIPgateway, SBethernetDefaultIPgateway),
-				:ethernetIPsubnet => SssSapp.get(:ethernetIPsubnet, SBethernetDefaultIPsubnet),
-				:ethernetPort => SssSapp.get(:ethernetPort, SBethernetDefaultPort)
+				:ethernetIP => $oSssSapp.get(:ethernetIP, sIPdefault),
+				:ethernetIPbroadcast => $oSssSapp.get(:ethernetIPbroadcast, SBethernetDefaultIPbroadcast),
+				:ethernetIPgateway => $oSssSapp.get(:ethernetIPgateway, SBethernetDefaultIPgateway),
+				:ethernetIPsubnet => $oSssSapp.get(:ethernetIPsubnet, SBethernetDefaultIPsubnet),
+				:ethernetPort => $oSssSapp.get(:ethernetPort, SBethernetDefaultPort)
 			};
 
 		@oPort = nil;
@@ -137,7 +142,7 @@ p 'error when binding to ' << @mPortOptions[:ethernetIP] << ':' << @mPortOptions
 
 		self.disconnect();
 
-		@mPortOptions  nil;
+		@mPortOptions = nil;
 
 		nil;
 

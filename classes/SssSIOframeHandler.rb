@@ -82,7 +82,7 @@ class SssSIOframeHandlerClass
 
 		@iCountSpace = 0
 
-		@iMySerialID = SssSapp.get(:serialID, SBSerialRaspberryPiID)
+		@iMySerialID = $oSssSapp.get(:serialID, SBSerialRaspberryPiID)
 
 		# frame ids 7...222
 		@iNextFrameID = 7 + rand(215);
@@ -154,7 +154,7 @@ class SssSIOframeHandlerClass
 		return nil if @hOnlineClientHash[sID].nil?
 
 		# has it talked to us over Ethernet?
-		return nil @hOnlineClientHash[sID][:ethernetIP].nil?
+		return nil if @hOnlineClientHash[sID][:ethernetIP].nil?
 
 		@hOnlineClientHash[sID][:ethernetIP]
 
