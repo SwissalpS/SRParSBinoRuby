@@ -59,7 +59,7 @@ class SssSethernetClass
 		sIP = @mPortOptions[:ethernetIPbroadcast] if sIP.nil?
 		iPort = @mPortOptions[:ethernetPort]
 
-		oUDPSock = UDPsocket.new
+		oUDPSock = UDPSocket.new
 		oUDPSock.setsockopt(Socket::SOL_SOCKET, Socket::SO_BROADCAST, true)
 		oUDPSock.send(sData, sIP, iPort)
 		oUDPSock.close()
