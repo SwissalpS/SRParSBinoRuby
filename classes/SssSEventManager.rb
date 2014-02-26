@@ -201,6 +201,11 @@ class SssSEventManager
 	end # checksumForRange
 
 
+	def dealloc()
+		# TODO:
+	end
+
+
 	def defaultEEPROMstringForID(iID)
 
 		# NOTE: read SBEEPROMSettings.h and .cpp for exact address mapping!!!!
