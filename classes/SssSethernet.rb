@@ -73,7 +73,7 @@ class SssSethernetClass
 	# if not returns nil otherwise the count of bytes received after having
 	# filtered and loaded the bytes to the correct buffer
 	def checkIncoming()
-
+puts 'ethernet::checkIncoming'
 		iCount = 0
 
 		sData, sIP = self.readEthernetBroadcast()
@@ -173,7 +173,7 @@ p 'error when binding to ' << @mPortOptions[:ethernetIP] << ':' << @mPortOptions
 	# read nonblocking from Ethernet. Returns nil or a string of bytes<br>
 	# called by #checkIncoming()
 	def readEthernetBroadcast()
-
+puts 'readEthernetBroadcast'
 		# if not connected
 		return [nil, nil] if @oUDPsocketBroadcast.nil?
 
@@ -192,7 +192,7 @@ p e if ![ EOFError, Errno::EAGAIN ].member? e.class
 
 	end # readEthernetBroadcast
 	def readEthernetToMe()
-
+puts 'readEthernetToMe'
 		# if not connected
 		return [nil, nil] if @oUDPsocketToMe.nil?
 
