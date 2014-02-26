@@ -256,9 +256,9 @@ p 'got string data'
 					if (iTargetID.nil?)
 	p 'found target ID'
 						iTargetID = iByte.chr
-					elseif (iSenderID.nil?)
+					elsif (iSenderID.nil?)
 						iSenderID = iByte
-					elseif (iFrameID.nil?)
+					elsif (iFrameID.nil?)
 						iFrameID = iByte
 					elsif (iDataLength.nil?)
 						iDataLength = iByte
