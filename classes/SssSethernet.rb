@@ -243,8 +243,10 @@ p 'got string data'
 
 		mData.each_byte do |iByte|
 p iByte.to_s(16)
+p 'NULL' if iByte.nil?
 			if (bHeaderFound)
 				if (iTargetID.nil?)
+p 'found target ID'
 					iTargetID = iByte.chr
 				end # if not yet read target ID
 			else
