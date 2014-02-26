@@ -180,8 +180,8 @@ p 'error when binding to ' << @mPortOptions[:ethernetIP] << ':' << @mPortOptions
 
 			sRead, aRemote = @oUDPsocketBroadcast.recvfrom_nonblock(1024); # @@bufferMaxLen);
 
-			// filter out any from own IP (may be sent by other daemon or itself)
-			return [nil, nil] if (@mPortOptions[:ethernetIP] == aRemote[3])
+			# filter out any from own IP (may be sent by other daemon or itself)
+			return [nil, nil] if @mPortOptions[:ethernetIP] == aRemote[3]
 
 			return [SssSNullSpacer << sRead, aRemote[3]];
 
@@ -223,6 +223,7 @@ p e if ![ EOFError, Errno::EAGAIN ].member? e.class
 		return self.broadcastTo(sIP, sData)
 
 	end # sendTo
+	public :sendTo
 
 
 	# write a string of bytes over serial without modification or envelopement
