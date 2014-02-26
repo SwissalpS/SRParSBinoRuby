@@ -16,8 +16,8 @@ class SssSonlineMarkerFile
 	# create a new marker object
 	def initialize(iID, sIP = nil)
 
-		@sEthernetPathFile = SssSapp.get(:pathFileOnlineEthernetBase, '/gitSwissalpS/SRParSBinoRuby/onlineIDs/eth/') << iID.to_s
-		@sSerialPathFile = SssSapp.get(:pathFileOnlineEthernetBase, '/gitSwissalpS/SRParSBinoRuby/onlineIDs/com/') << iID.to_s
+		@sEthernetPathFile = $oSssSapp.get(:pathFileOnlineEthernetBase, '/gitSwissalpS/SRParSBinoRuby/onlineIDs/eth/') << iID.to_s
+		@sSerialPathFile = $oSssSapp.get(:pathFileOnlineEthernetBase, '/gitSwissalpS/SRParSBinoRuby/onlineIDs/com/') << iID.to_s
 
 		if (sIP.nil?)
 			# no IP, must be serial message
