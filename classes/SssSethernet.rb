@@ -254,9 +254,9 @@ p 'found target ID'
 				end # if not yet read target ID
 			else
 
-				continue if 0x00 == iByte.chr
+				continue if 0x00 == iByte
 
-				bHeaderFound = YES if 0xFF == iByte.chr
+				bHeaderFound = YES if 0xFF == iByte
 
 			end # if no header found yet
 

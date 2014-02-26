@@ -114,10 +114,10 @@ class SssSIOframeHandlerClass
 		@oIncomingFrame = nil
 
 		@hFrameHistory = nil
-
-		@hOnlineClientHash.each do |hClient|
-			hClient[:marker].dealloc if !hClient[:marker].nil?
-		end # loop all markers
+# TOFIX: prio 9
+		#@hOnlineClientHash.each do |hClient|
+		#	hClient[:marker].dealloc if !hClient[:marker].nil?
+		#end # loop all markers
 		@hOnlineClientHash = nil
 
 		nil;
