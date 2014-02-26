@@ -3,6 +3,7 @@ require 'SssSfletcher16.rb'
 require 'SssSEventManager.rb'
 require 'SssSserialFrame.rb'
 require 'SssSbitMath.rb'
+require 'SssSonlineMarkerFile.rb'
 
 SssSdebugMode = 7 if !defined? SssSdebugMode
 
