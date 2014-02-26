@@ -61,7 +61,7 @@ class SssSethernetClass
 
 		oUDPSock = UDPSocket.new
 		oUDPSock.setsockopt(Socket::SOL_SOCKET, Socket::SO_BROADCAST, true)
-		oUDPSock.send(sData, sIP, iPort)
+		oUDPSock.send(sData, 0, sIP, iPort)
 		oUDPSock.close()
 
 		self
