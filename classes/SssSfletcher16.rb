@@ -64,6 +64,13 @@ class SssSfletcher16Class
 	end # checksum
 
 
+	def dealloc()
+
+		@aChecksum = nil
+
+	end # dealloc
+
+
 	# if you only need one at a time, this one will do
 	def self.sharedInstance()
 

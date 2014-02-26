@@ -203,6 +203,10 @@ class SssSEventManager
 
 	def dealloc()
 		# TODO:
+
+		@oFletcher.dealloc if !@oFletcher.nil?
+		@oFletcher = nil
+		
 	end
 
 
