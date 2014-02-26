@@ -590,21 +590,21 @@ class SssSIOframeHandlerClass
 
 			# prepend space
 			iLengthSpace = SBSerialSpaceLength;
-			aFrame = Array.new(iLengthSpace, 0x0);
+			aFrame = String.new(); #Array.new(iLengthSpace, 0x0);
 
 			# init fletcher 16 calculator
 			SssSf16.reset();
 
-			aFrame << 0xFF;
+			aFrame << 0xFF.chr;
 
 			SssSf16.addByte(iTo);
-			aFrame << iTo;
+			aFrame << iTo.chr;
 
 			SssSf16.addByte(iFrom);
-			aFrame << iFrom;
+			aFrame << iFrom.chr;
 
 			SssSf16.addByte(iFrameID);
-			aFrame << iFrameID;
+			aFrame << iFrameID.chr;
 
 			iDelta = iLengthData - iPointer;
 			if (0 == iCountFrames || 0 == iLengthPrefix)
@@ -612,7 +612,7 @@ class SssSIOframeHandlerClass
 				# first frame or subsequent without prefix
 				iLengthSub = (iDelta > SBSerialMaxDataLengthPerFrame) ? SBSerialMaxDataLengthPerFrame : iDelta;
 				SssSf16.addByte(iLengthSub);
-				aFrame << iLengthSub;
+				aFrame << iLengthSub.chr;
 
 			else
 
@@ -620,7 +620,7 @@ class SssSIOframeHandlerClass
 				iDelta += iLengthPrefix
 				iLengthSub = (iDelta > SBSerialMaxDataLengthPerFrame) ? SBSerialMaxDataLengthPerFrame : iDelta
 				SssSf16.addByte(iLengthSub)
-				aFrame << iLengthSub
+				aFrame << iLengthSub.chr
 
 			# there seems to be different treatment on OSX (irb 0.9.5) and Debian (0.9.6) -Ruby: on OSX iByte is the byte-value while in Debian it's a String
 				mTest = mSubsequentFrameDataPrefix[0]
@@ -632,7 +632,7 @@ class SssSIOframeHandlerClass
 						iByte = mSubsequentFrameDataPrefix[j].ord
 
 						SssSf16.addByte(iByte)
-						aFrame << iByte
+						aFrame << iByte.chr
 
 					end # for loop data portion
 
@@ -644,7 +644,7 @@ class SssSIOframeHandlerClass
 						iByte = mSubsequentFrameDataPrefix[j]
 
 						SssSf16.addByte(iByte)
-						aFrame << iByte
+						aFrame << iByte.chr
 
 					end # for loop data portion
 
@@ -665,7 +665,7 @@ class SssSIOframeHandlerClass
 					iPointer += 1
 
 					SssSf16.addByte(iByte)
-					aFrame << iByte
+					aFrame << iByte.chr
 
 				end # for loop data portion
 
@@ -685,22 +685,22 @@ class SssSIOframeHandlerClass
 			end # if on debian or darwin
 
 			# add checksum
-			aFrame << SssSf16.checksum(SssSf16firstByte);
-			aFrame << SssSf16.checksum(SssSf16secondByte);
+			aFrame << SssSf16.checksum(SssSf16firstByte).chr;
+			aFrame << SssSf16.checksum(SssSf16secondByte).chr;
 
 			# send over Ethernet or Serial
 			if bEthernet
-				$oSssSapp.oEthernet.sendTo(iTo, aFrame.drop(iLengthSpace))
+				$oSssSapp.oEthernet.sendTo(iTo, aFrame)
 			elsif bSerial
 p 'about to write to serial target: ' << iTo.to_s
-				$oSssSapp.oSerial.writeRawBytes(aFrame)
+				$oSssSapp.oSerial.writeRawBytes(SssSNullSpacer << aFrame)
 p 'wrote to serial frame: 0x' << iFrameID.to_s(16)
 			end # if Ethernet and/or serial
 
 			iCountSend += aFrame.length();
 
 			# store a copy in history (only what is unique)
-			self.historyAddFrame(iFrameID, aFrame.drop(iLengthSpace + 1))
+			self.historyAddFrame(iFrameID, aFrame.slice(1..-1))
 
 			# get next frame ID
 			iFrameID = self.nextFrameID();
