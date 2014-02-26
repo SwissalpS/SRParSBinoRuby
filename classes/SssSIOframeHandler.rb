@@ -183,7 +183,7 @@ class SssSIOframeHandlerClass
 	def isOnlineEthernet?(iID)
 
 		return NO if $oSssSapp.oEthernet.nil?
-		return NO if $oSssSapp.oEthernet.disconected?
+		return NO if $oSssSapp.oEthernet.disconnected?
 
 		sID = 'id' << iID.to_s
 		return NO if @hOnlineClientHash[sID].nil?
@@ -199,7 +199,7 @@ class SssSIOframeHandlerClass
 
 		# NO if no serial connection at all
 		return NO if $oSssSapp.oSerial.nil?
-		return NO if $oSssSapp.oSerial.disconected?
+		return NO if $oSssSapp.oSerial.disconnected?
 
 		sID = 'id' << iID.to_s
 		return NO if @hOnlineClientHash[sID].nil?

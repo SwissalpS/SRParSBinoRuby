@@ -447,9 +447,9 @@ p 'for bike: ' << iBike.to_s
 
 			# listen to Ethernet if it's up
 			if (!@oEthernet.nil?)
-puts 'about to check ethernet'
+#puts 'about to check ethernet'
 				nilOrNumberOfBytesReceived = @oEthernet.checkIncoming()
-puts 'checked ethernet'
+#puts 'checked ethernet'
 			end # if Ethernet up
 
 			# check incomming commands from SkyTab or other scripts

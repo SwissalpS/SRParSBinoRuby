@@ -173,7 +173,7 @@ p 'error when binding to ' << @mPortOptions[:ethernetIP] << ':' << @mPortOptions
 	# read nonblocking from Ethernet. Returns nil or a string of bytes<br>
 	# called by #checkIncoming()
 	def readEthernetBroadcast()
-puts 'readEthernetBroadcast'
+#puts 'readEthernetBroadcast'
 		# if not connected
 		return [nil, nil] if @oUDPsocketBroadcast.nil?
 
@@ -192,7 +192,7 @@ p e if ![ EOFError, Errno::EAGAIN ].member? e.class
 
 	end # readEthernetBroadcast
 	def readEthernetToMe()
-puts 'readEthernetToMe'
+#puts 'readEthernetToMe'
 		# if not connected
 		return [nil, nil] if @oUDPsocketToMe.nil?
 
