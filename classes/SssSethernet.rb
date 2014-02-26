@@ -268,7 +268,7 @@ p 'got string data'
 
 				end # if no header found yet
 
-				sData << iByte
+				sData << iByte.chr
 
 				iCountSent += 1
 
@@ -285,9 +285,7 @@ p e
 		end # try catch
 p 'got passed with id: ' << iTargetID.to_s
 		sIP = $oSssSapp.oIOframeHandler.getIPstringForID(iTargetID)
-		# if the IP is not yet known, broadcast the data
-		sIP = @mPortOptions[:ethernetIPbroadcast] if sIP.nil?
-p 'sending to IP: ' << sIP
+		# sIP could be nil at this point
 		# send the payload
 		self.sendTo(sIP, sData)
 
