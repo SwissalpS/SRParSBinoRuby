@@ -50,6 +50,8 @@ class SssSappClass
 	# SssStriggerClass objects listening to files
 	@aPipes = nil; attr_reader :aPipes
 
+  protected
+
 	# shared SssSethernetClass object
 	@oEthernet = nil; attr_reader :oEthernet
 
@@ -62,9 +64,7 @@ class SssSappClass
 	#
 	@bUseEthernet = YES; attr_accessor :bUseEthernet
 	@bUseSerial = NO; attr_accessor :bUseSerial
-
-  protected
-
+	
   public
 
    attr_reader :oSerial
