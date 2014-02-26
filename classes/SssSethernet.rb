@@ -73,7 +73,7 @@ class SssSethernetClass
 	# if not returns nil otherwise the count of bytes received after having
 	# filtered and loaded the bytes to the correct buffer
 	def checkIncoming()
-puts 'ethernet::checkIncoming'
+#puts 'ethernet::checkIncoming'
 		iCount = 0
 
 		sData, sIP = self.readEthernetBroadcast()

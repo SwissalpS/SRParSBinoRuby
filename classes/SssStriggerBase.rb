@@ -60,7 +60,7 @@ class SssStriggerBase
 	# returns bool<br>
 	# calls #observeSize()
 	def hasData?()
-puts 'hasData?'
+#puts 'hasData?'
 		begin
 
 			sRead = @oFile.read_nonblock(1024);
