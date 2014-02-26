@@ -242,7 +242,7 @@ p 'got string data'
 		sData = ''
 
 		mData.each_byte do |iByte|
-
+p iByte.to_s(16)
 			if (bHeaderFound)
 				if (iTargetID.nil?)
 					iTargetID = iByte.chr
