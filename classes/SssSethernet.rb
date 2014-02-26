@@ -226,16 +226,16 @@ p e if ![ EOFError, Errno::EAGAIN ].member? e.class
 	# write a string of bytes over serial without modification or envelopement
 	# returns byte-count (mData.bytesize)
 	def writeRawBytes(mData = nil)
-
+p 'writeRawBytes'
 		if (self.disconnected?)
 			return nil;
 		end # if not connected
-
+p 'am connected'
 		# TODO: allow arrays too
 		if (String != mData.class)
 			return nil;
 		end # if invalid dada format
-
+p 'got string data'
 		iCountSent = 0
 		iTargetID = nil
 		bHeaderFound = NO
@@ -262,7 +262,7 @@ p e if ![ EOFError, Errno::EAGAIN ].member? e.class
 		end # loop each byte
 
 		sIP = $oSssSapp.oIOframeHandler.getIPstringForID(iTargetID)
-
+p 'sending to IP: ' << sIP
 		# send the payload
 		self.sendTo(sIP, sData)
 
