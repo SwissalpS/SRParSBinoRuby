@@ -237,35 +237,57 @@ p 'am connected'
 		end # if invalid dada format
 p 'got string data'
 		iCountSent = 0
+		iDataLength = nil
+		iFrameID = nil
+		iCountExpected = -1
+		iSenderID = nil
 		iTargetID = nil
 		bHeaderFound = NO
 		sData = ''
 
-		mData.each_byte do |iByte|
-p iByte.to_s(16)
-p iByte
-p iByte.chr
-p 'NULL' if iByte.nil?
-p '-'
-			if (bHeaderFound)
-				if (iTargetID.nil?)
-p 'found target ID'
-					iTargetID = iByte.chr
-				end # if not yet read target ID
-			else
+		begin
+			mData.each_byte do |iByte|
+	p 'NULL' if iByte.nil?
+	p iByte.to_s(16)
+	p iByte
+	p iByte.chr
+	p '-'
+				if (bHeaderFound)
+					if (iTargetID.nil?)
+	p 'found target ID'
+						iTargetID = iByte.chr
+					elseif (iSenderID.nil?)
+						iSenderID = iByte
+					elseif (iFrameID.nil?)
+						iFrameID = iByte
+					elsif (iDataLength.nil?)
+						iDataLength = iByte
+						iCountExpected = 5 + iDataLength + 2
+					end # if not yet read target ID
+				else
 
-				# ruby respects perl (next) over C (continue), and pearls are found under the sea ;)
-				next if 0x00 == iByte
+					# ruby respects perl (next) over C (continue), and pearls are found under the sea ;)
+					next if 0x00 == iByte
 
-				bHeaderFound = YES if 0xFF == iByte
+					bHeaderFound = YES if 0xFF == iByte
 
-			end # if no header found yet
+				end # if no header found yet
 
-			sData << iByte
+				sData << iByte
 
-			iCountSent += 1
+				iCountSent += 1
 
-		end # loop each byte
+				break if (iCountSent == iCountExpected)
+
+			end # loop each byte
+
+		rescue Exception => e
+
+			p 'KO: error in frame'
+p e
+			return 0
+
+		end # try catch
 
 		sIP = $oSssSapp.oIOframeHandler.getIPstringForID(iTargetID)
 p 'sending to IP: ' << sIP
