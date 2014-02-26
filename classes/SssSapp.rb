@@ -52,6 +52,8 @@ class SssSappClass
 
   protected
 
+  public
+
 	# shared SssSethernetClass object
 	@oEthernet = nil; attr_reader :oEthernet
 
@@ -64,10 +66,6 @@ class SssSappClass
 	#
 	@bUseEthernet = YES; attr_accessor :bUseEthernet
 	@bUseSerial = NO; attr_accessor :bUseSerial
-	
-  public
-
-   attr_reader :oSerial
 
 	# create and read config settings from yaml-file.<br>
 	# writes PID to file defined in settings as :pathFilePID or if not available
