@@ -247,14 +247,9 @@ p 'got string data'
 
 		begin
 			mData.each_byte do |iByte|
-	p 'NULL' if iByte.nil?
-	p iByte.to_s(16)
-	p iByte
-	p iByte.chr
-	p '-'
+
 				if (bHeaderFound)
 					if (iTargetID.nil?)
-	p 'found target ID'
 						iTargetID = iByte.chr
 					elsif (iSenderID.nil?)
 						iSenderID = iByte
@@ -288,8 +283,10 @@ p e
 			return 0
 
 		end # try catch
-
+p 'got passed with id: ' << iTargetID.to_s
 		sIP = $oSssSapp.oIOframeHandler.getIPstringForID(iTargetID)
+		# if the IP is not yet known, broadcast the data
+		sIP = @mPortOptions[:ethernetIPbroadcast] if sIP.nil?
 p 'sending to IP: ' << sIP
 		# send the payload
 		self.sendTo(sIP, sData)
