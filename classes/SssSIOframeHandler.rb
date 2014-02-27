@@ -263,7 +263,7 @@ class SssSIOframeHandlerClass
 			# target ID
 
 			if (iMySerialID == iByte || SBSerialBroadcastID == iByte)
-
+puts ' for me'
 				# this is for us
 				@iStatus = SssSbitMath.bitSet(@iStatus, 5);
 				# we are busy?
@@ -277,7 +277,7 @@ class SssSIOframeHandlerClass
 				@oIncomingFrame.targetIP= sIP if !sIP.nil?
 
 			else
-
+puts ' not for me, for: ' << iByte.to_s(10)
 				# not for us --> look for next frame
 				self.invalidate();
 
@@ -288,7 +288,7 @@ class SssSIOframeHandlerClass
 			# sender ID
 
 			if (@iMySerialID > iByte)
-
+puts ' valid sender: ' << iByte.to_s(10)
 				# valid sender ID
 
 				@oFletcher.addByte(iByte)
@@ -297,7 +297,7 @@ class SssSIOframeHandlerClass
 				self.markOnline(iByte, sIP)
 
 			else
-
+puts ' invalid sender: ' << iByte.to_s(10)
 				# invalid sender ID --> look for next frame
 	# TODO: debug
 				self.invalidate()
@@ -307,6 +307,7 @@ class SssSIOframeHandlerClass
 		elsif @oIncomingFrame.frameID.nil?
 
 			# frame ID
+puts ' frame ID: ' << iByte.to_s(10)
 
 			@oFletcher.addByte(iByte)
 			@oIncomingFrame.frameID= iByte
@@ -314,6 +315,7 @@ class SssSIOframeHandlerClass
 		elsif @oIncomingFrame.dataLength.nil?
 
 			# data length
+puts ' data length: ' << iByte.to_s(10)
 
 			@oFletcher.addByte(iByte)
 			@oIncomingFrame.dataLength= iByte
@@ -330,7 +332,7 @@ class SssSIOframeHandlerClass
 
 		return 0 if mRead.nil?
 
-		self.debugIncoming(mRead);
+		self.debugIncoming(mRead)
 
 		mRead.each_byte() do |iByte|
 
@@ -345,17 +347,20 @@ class SssSIOframeHandlerClass
 
 					# check first if end reached!
 					if @oIncomingFrame.filled?
+puts ' checksum byte 0x' << iByte.to_s(16)
 
 						# validate checksum and conclude command
 						self.validateChecksum(iByte);
 
 					elsif @oIncomingFrame.command.nil?
+puts ' command byte 0x' << iByte.to_s(16)
 
 						# first data byte = command
 						@oFletcher.addByte(iByte)
 						@oIncomingFrame.command = iByte
 
 					else
+puts ' data byte 0x' << iByte.to_s(16)
 
 						#self.eventsStage2(iByte)
 
@@ -422,7 +427,7 @@ class SssSIOframeHandlerClass
 
 			# possibly found a header
 			if (SBSerialSpaceLength <= @iCountSpace)
-
+puts 'found header'
 				# definitely a header
 				@iStatus = SssSbitMath.bitSet(@iStatus, 6);
 				# header not yet parsed
@@ -465,6 +470,7 @@ class SssSIOframeHandlerClass
 			if (iByte != @oFletcher.checksum(SssSf16firstByte))
 
 				# does not match
+puts ' vc:byte one FAIL 0x' << iByte.to_s(16)
 
 				self.requestResend(iSender, iFrameID)
 
@@ -479,6 +485,7 @@ class SssSIOframeHandlerClass
 				self.invalidate();
 
 			else
+puts ' vc:byte one OK 0x' << iByte.to_s(16)
 
 				# so far so good
 				@oIncomingFrame.checksumA= iByte
@@ -490,6 +497,7 @@ class SssSIOframeHandlerClass
 			# second checksum byte
 
 			if (iByte != @oFletcher.checksum(SssSf16secondByte))
+puts ' vc:byte two FAIL 0x' << iByte.to_s(16)
 
 				self.requestResend(iSender, iFrameID);
 	# TODO: rewind if was loading to data buffer
@@ -501,6 +509,7 @@ class SssSIOframeHandlerClass
 				end # if debugging
 
 			else
+puts ' vc:byte two OK 0x' << iByte.to_s(16)
 
 				# ok, check passed
 				@oIncomingFrame.checksumB= iByte
@@ -516,6 +525,7 @@ class SssSIOframeHandlerClass
 			self.invalidate();
 
 		else
+puts ' vc:spacer?  0x' << iByte.to_s(16)
 
 			# this byte should be 0x0 --> first spacer
 			self.invalidate();
@@ -766,6 +776,7 @@ p 'wrote to serial frame: 0x' << iFrameID.to_s(16)
 		# who is it from
 		iSender = oFrame.senderID
 		iFrameID = oFrame.frameID
+puts ' execute command 0x' << iCommand.to_s(16)
 
 		iFirstDataByte = oFrame.resetPointer().nextByte()
 
@@ -807,6 +818,7 @@ p 'wrote to serial frame: 0x' << iFrameID.to_s(16)
 		elsif (0x3F == iCommand)
 
 			# - 63 - ? - PING
+puts ' - 63 - ? - PING'
 
 			# mark sender as not busy
 			@iStatus = SssSbitMath.bitClear(@iStatus, iSender);
@@ -822,6 +834,7 @@ p 'wrote to serial frame: 0x' << iFrameID.to_s(16)
 		elsif (0x40 == iCommand)
 
 			# - 64 - @ - PONG
+puts ' - 64 - @ - PONG'
 
 			#@aLatency[iSender] = millis() - @aLatency[iSender];
 
@@ -855,6 +868,7 @@ p 'wrote to serial frame: 0x' << iFrameID.to_s(16)
 		elsif (0x53 == iCommand)
 
 			# - 83 - S - Stop Stopwatch
+puts ' - 83 - S - Stop Stopwatch'
 			$oSssSapp.tellSkyTabStop(iFirstDataByte)
 
 		elsif (0x5C == iCommand)
@@ -872,6 +886,7 @@ p 'wrote to serial frame: 0x' << iFrameID.to_s(16)
 		elsif (0x64 == iCommand)
 
 			# - 100 - d - Duration
+puts ' - 100 - d - Duration'
 
 			# expecting 4 bytes with duration in milliseconds
 			# followed by 1 byte with the BIKE ID
@@ -902,6 +917,7 @@ p 'wrote to serial frame: 0x' << iFrameID.to_s(16)
 		elsif (0x66 == iCommand)
 
 			# - 102 - f - EEPROM dump frame
+puts ' - 102 - f - EEPROM dump frame'
 
 			# let event manager know what to do on next cycle
 			@oEventManager.responseDumpEEPROM(oFrame)
@@ -909,11 +925,13 @@ p 'wrote to serial frame: 0x' << iFrameID.to_s(16)
 		elsif (0x72 == iCommand)
 
 			# - 114 -  r - reset stopwatch
+puts ' - 114 -  r - reset stopwatch'
 			$oSssSapp.tellSkyTabReset(iFirstDataByte)
 
 		elsif (0x73 == iCommand)
 
 			# - 115 -  s - start stopwatch
+puts ' - 115 -  s - start stopwatch'
 			$oSssSapp.tellSkyTabStart(iFirstDataByte)
 
 		elsif (0x74 == iCommand)
@@ -937,6 +955,7 @@ p 'wrote to serial frame: 0x' << iFrameID.to_s(16)
 		elsif (0x7D == iCommand)
 
 			# - 125 - } - Response Checksum of EEPROM
+puts ' - 125 - } - Response Checksum of EEPROM'
 
 			# let the event manager know
 			@oEventManager.responseChecksumEEPROM(oFrame)
