@@ -10,10 +10,11 @@ SssSdebugMode = 7 if !defined? SssSdebugMode
 SBSerialSpaceLength = 29 if !defined? SBSerialSpaceLength # :doc:
 SBSerialMaxFrameLength = 35 if !defined? SBSerialMaxFrameLength
 SBSerialMaxDataLengthPerFrame = 28 if !defined? SBSerialMaxDataLengthPerFrame
-SBSerialBroadcastID = 254 if !defined? SBSerialBroadcastID
 
-SBSerialRaspberryPiID = 0xDD if !defined? SBSerialRaspberryPiID
 SssSNullSpacer = 0.chr * SBSerialSpaceLength if !defined? SssSNullSpacer
+
+SBSerialBroadcastID = 254 if !defined? SBSerialBroadcastID
+SBSerialRaspberryPiID = 0xDD if !defined? SBSerialRaspberryPiID
 
 SBethernetDefaultIP = '192.168.123.40' if !defined? SBethernetDefaultIP
 SBethernetDefaultIPbroadcast = '224.0.0.1' if !defined? SBethernetDefaultIPbroadcast

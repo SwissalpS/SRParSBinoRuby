@@ -214,11 +214,39 @@ p e if ![ EOFError, Errno::EAGAIN ].member? e.class
 	end # readEthernetToMe
 
 
-	def sendTo(sIP, sData)
+	def sendTo(mIPorID = nil, sData)
 
 		if (self.disconnected?)
 			return nil;
 		end # if not connected
+		sIP = nil
+
+		if (Fixnum == mIPorID.class)
+			if (0xFF > mIPorID)
+				# probably ID given
+				if (0 == mIPorID)
+					# SBAMM
+					sIP = '192.168.123.1'
+				elsif (4 > mIPorID)
+					# an FDD
+					sIP = '192.168.123.' << (10 * mIPorID).to_s(10)
+				elsif (SBSerialBroadcastID == mIPorID)
+					# broadcast -> sIP.nil?
+				elsif (SBSerialRaspberryPiID == mIPorID)
+					# to self! -> ignore
+					return nil
+				end # switch ID
+			else
+				# probably IP given as number
+				sIP = ((mIPorID >> 24) & 0xFF).to_s(10) << '.'
+				sIP << ((mIPorID >> 16) & 0xFF).to_s(10) << '.'
+				sIP << ((mIPorID >> 8) & 0xFF).to_s(10) << '.'
+				sIP << (mIPorID & 0xFF).to_s(10)
+			end # if ID or IP(as number)
+
+		end # if number given for target
+
+		sIP = @mPortOptions[:ethernetIPbroadcast] if mIPorID.nil?
 
 		return self.broadcastTo(sIP, sData)
 
@@ -290,7 +318,11 @@ p 'got passed with id: ' << iTargetID.to_s
 		sIP = $oSssSapp.oIOframeHandler.getIPstringForID(iTargetID)
 		# sIP could be nil at this point
 		# send the payload
-		self.sendTo(sIP, sData)
+		if (sIP.nil?)
+			self.sendTo(iTargetID, sData)
+		else
+			self.sendTo(sIP, sData)
+		end # if target has been 'seen' on Ethernet or not
 
 		iCountSent
 
@@ -350,9 +382,11 @@ puts 'byte # 0x' << "%02X" % iCount << ' hex: 0x' << "%02X" % iChar << ' binary:
 		sIP = $oSssSapp.oIOframeHandler.getIPstringForID(iTargetID)
 
 		# if no IP
-		sIP = @mPortOptions[:ethernetIPbroadcast] if sIP.nil?
-
-		self.sendTo(sIP, sData)
+		if (sIP.nil?)
+			self.sendTo(iTargetID, sData)
+		else
+			self.sendTo(sIP, sData)
+		end # if target has been 'seen' on Ethernet or not
 
 		return iCountSent;
 
