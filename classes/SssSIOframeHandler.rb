@@ -316,7 +316,7 @@ puts ' frame ID: ' << iByte.to_s(10)
 		elsif @oIncomingFrame.dataLength.nil?
 
 			# data length
-puts ' data length: ' << iByte.to_s(10)
+#puts ' data length: ' << iByte.to_s(10)
 
 			@oFletcher.addByte(iByte)
 			@oIncomingFrame.dataLength= iByte
@@ -348,20 +348,20 @@ puts ' data length: ' << iByte.to_s(10)
 
 					# check first if end reached!
 					if @oIncomingFrame.filled?
-puts ' checksum byte 0x' << iByte.to_s(16)
+#puts ' checksum byte 0x' << iByte.to_s(16)
 
 						# validate checksum and conclude command
 						self.validateChecksum(iByte);
 
 					elsif @oIncomingFrame.command.nil?
-puts ' command byte 0x' << iByte.to_s(16)
+#puts ' command byte 0x' << iByte.to_s(16)
 
 						# first data byte = command
 						@oFletcher.addByte(iByte)
 						@oIncomingFrame.command = iByte
 
 					else
-puts ' data byte 0x' << iByte.to_s(16)
+#puts ' data byte 0x' << iByte.to_s(16)
 
 						#self.eventsStage2(iByte)
 
@@ -428,7 +428,7 @@ puts ' data byte 0x' << iByte.to_s(16)
 
 			# possibly found a header
 			if (SBSerialSpaceLength <= @iCountSpace)
-puts 'found header'
+#puts 'found header'
 				# definitely a header
 				@iStatus = SssSbitMath.bitSet(@iStatus, 6);
 				# header not yet parsed
@@ -486,7 +486,7 @@ puts ' vc:byte one FAIL 0x' << iByte.to_s(16)
 				self.invalidate();
 
 			else
-puts ' vc:byte one OK 0x' << iByte.to_s(16)
+#puts ' vc:byte one OK 0x' << iByte.to_s(16)
 
 				# so far so good
 				@oIncomingFrame.checksumA= iByte
@@ -510,7 +510,7 @@ puts ' vc:byte two FAIL 0x' << iByte.to_s(16)
 				end # if debugging
 
 			else
-puts ' vc:byte two OK 0x' << iByte.to_s(16)
+#puts ' vc:byte two OK 0x' << iByte.to_s(16)
 
 				# ok, check passed
 				@oIncomingFrame.checksumB= iByte
@@ -777,7 +777,7 @@ p 'wrote to serial frame: 0x' << iFrameID.to_s(16)
 		# who is it from
 		iSender = oFrame.senderID
 		iFrameID = oFrame.frameID
-puts ' execute command 0x' << iCommand.to_s(16)
+print ' execute command 0x' << iCommand.to_s(16)
 
 		iFirstDataByte = oFrame.resetPointer().nextByte()
 
