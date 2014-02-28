@@ -1,9 +1,9 @@
-require 'SssSEMapp.rb'
+#require 'SssSEMapp.rb'
 require 'SssSfletcher16.rb'
 require 'SssSEMeventManager.rb'
 require 'SssSserialFrame.rb'
 require 'SssSbitMath.rb'
-require 'SssSonlineMarkerFile.rb'
+require 'SssSEMonlineMarkerFile.rb'
 
 SssSdebugMode = 7 if !defined? SssSdebugMode
 

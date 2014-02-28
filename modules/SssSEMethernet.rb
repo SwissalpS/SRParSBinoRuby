@@ -1,6 +1,6 @@
 require 'socket'
 require 'eventmachine'
-require 'SssSEMapp.rb'
+#require 'SssSEMapp.rb'
 require 'SssSEMeventManager.rb'
 require 'SssSEMframeHandler.rb'
 
