@@ -2,7 +2,7 @@
 #require 'SssSIOframeHandler.rb'
 #require 'SssSserial.rb'
 #require 'SssSethernet.rb'
-#require 'SssStriggerCommandMe.rb'
+require 'SssSEMtriggerCommandMe.rb'
 #require 'SssStriggerCurrentTime.rb'
 #require 'SssStriggerDemoID.rb'
 #require 'SssStriggerRaw.rb'
@@ -258,31 +258,31 @@ class SssSEMappClass
 			# these raise on error
 
 			# command me
-			@aPipes << SssStriggerCommandMe::new(self.get(:pathFileTriggerCommandMe, nil), self.get(:pathFileTriggerCommandCron, nil))
+			@aPipes << SssSEMtriggerCommandMe::new(self.get(:pathFileTriggerCommandMe, nil), self.get(:pathFileTriggerCommandCron, nil))
 
 			# main triggers
-			@aPipes << SssStriggerReset::new(self.get(:pathFileTriggerReset, nil))
-			@aPipes << SssStriggerStart::new(self.get(:pathFileTriggerStart, nil))
-			@aPipes << SssStriggerStop::new(self.get(:pathFileTriggerStop, nil))
-
-			# raw write access
-			@aPipes << SssStriggerRaw::new(self.get(:pathFileTriggerRaw, nil))
-
-			for iBike in (0...self.get(:numberOfBIKEs, 1)) do
-
-			  sPath = self.get(:pathFileTriggerRiderInfoBaseName, 'triggers/rider')  + iBike.to_s + '.info'
-			  @aPipes << SssStriggerRiderInfo::new(sPath, iBike)
-
-			end # for loop
-
-			# time set and display
-			@aPipes << SssStriggerCurrentTime::new(self.get(:pathFileTriggerCurrentTime, nil))
-
-			# broadcast all to start/stop demo loop
-			@aPipes << SssStriggerDemoID::new(self.get(:pathFileTriggerDemoID, nil))
-
-			# timer
-			@aPipes << SssStriggerTimer::new(self.get(:pathFileTriggerTimer, nil))
+			#@aPipes << SssStriggerReset::new(self.get(:pathFileTriggerReset, nil))
+			#@aPipes << SssStriggerStart::new(self.get(:pathFileTriggerStart, nil))
+			#@aPipes << SssStriggerStop::new(self.get(:pathFileTriggerStop, nil))
+			#
+			## raw write access
+			#@aPipes << SssStriggerRaw::new(self.get(:pathFileTriggerRaw, nil))
+			#
+			#for iBike in (0...self.get(:numberOfBIKEs, 1)) do
+			#
+			#  sPath = self.get(:pathFileTriggerRiderInfoBaseName, 'triggers/rider')  + iBike.to_s + '.info'
+			#  @aPipes << SssStriggerRiderInfo::new(sPath, iBike)
+			#
+			#end # for loop
+			#
+			## time set and display
+			#@aPipes << SssStriggerCurrentTime::new(self.get(:pathFileTriggerCurrentTime, nil))
+			#
+			## broadcast all to start/stop demo loop
+			#@aPipes << SssStriggerDemoID::new(self.get(:pathFileTriggerDemoID, nil))
+			#
+			## timer
+			#@aPipes << SssStriggerTimer::new(self.get(:pathFileTriggerTimer, nil))
 
 		rescue Exception => e
 
@@ -615,8 +615,8 @@ p 'for bike: ' << iBike.to_s
 		#self.initEthernet()
 
 		# start File watcher(s)
-		#self.dealloc() if self.initTriggers().nil?
-		#puts 'OK:trigger files initiated'
+		self.dealloc() if self.initTriggers().nil?
+		puts 'OK:trigger files initiated'
 
 		#if (@oSerial.nil? && @oEthernet.nil?)
 		#	puts 'Have neither Serial nor Ethernet connection!'
