@@ -1,7 +1,7 @@
 
 require 'SssSEMframeHandler.rb'
 #require 'SssSserial.rb'
-#require 'SssSethernet.rb'
+require 'SssSEMethernet.rb'
 require 'SssSEMtriggerCommandMe.rb'
 #require 'SssStriggerCommandMe.rb'
 #require 'SssStriggerCurrentTime.rb'
@@ -41,25 +41,6 @@ module SssSEMcheckPipes
 		SssSEMapp.checkPipes()
 	end # call
 end # SssSEMcheckPipes
-
-
-module SssSEMServer
-
-	def post_init
-		puts 'server is up connected'
-	end # post_init
-
-	def receive_data(sData)
-		aIP = self.get_peername[2, 6].unpack "nC4"
-		# or with Socket method
-		port, ip = Socket.unpack_sockaddr_in(self.get_peername)
-		
-		puts ' from: ' << aIP[1..4].join('.') << ':' << aIP[0].to_s
-		puts sData
-
-		#send_data('haha')
-	end # receive_data
-end # SssSEMServer
 
 ##
 # Main application class<br>
@@ -189,7 +170,7 @@ class SssSEMappClass
 			return YES
 		end # if use Ethernet
 
-		@oEthernet = SssSethernetClass.new()
+		@oEthernet = SssSEMethernetClass.new()
 		
 		if (NO)
 			puts 'FAIL:Ethernet BAD'
@@ -621,8 +602,6 @@ p 'for bike: ' << iBike.to_s
 		# output welcome
 		printInfo()
 
-		EM::open_datagram_socket('192.168.123.40', 12345, SssSEMServer)
-
 		#
 		self.initIOframeHandler()
 		
@@ -631,16 +610,16 @@ p 'for bike: ' << iBike.to_s
 		#self.initSerial()
 
 		# start listening to Ethernet messages
-		#self.initEthernet()
+		self.initEthernet()
 
 		# start File watcher(s)
 		self.dealloc() if self.initTriggers().nil?
 		puts 'OK:trigger files initiated'
 
-		#if (@oSerial.nil? && @oEthernet.nil?)
-		#	puts 'Have neither Serial nor Ethernet connection!'
-		#	self.dealloc()
-		#end # if have no connection
+		if (@oSerial.nil? && @oEthernet.nil?)
+			puts 'Have neither Serial nor Ethernet connection!'
+			self.dealloc()
+		end # if have no connection
 
 		EM::add_periodic_timer(
 				get(:iBroadcastDateInterval, SBbroadcastDateIntervalDefault)) { SssSEMapp.broadcastDate() }
