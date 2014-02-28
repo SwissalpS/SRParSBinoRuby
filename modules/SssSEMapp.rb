@@ -577,8 +577,18 @@ p 'for bike: ' << iBike.to_s
 		printInfo()
 
 		EventMachine::open_datagram_socket('192.168.123.40', 12345, SssSEMServer)
-		EventMachine::add_periodic_timer(2) { puts 'periodic timer2' }
-		EventMachine::add_periodic_timer(0.2) { puts 'periodic timer.2' }
+
+		EM::add_periodic_timer(
+				get(:iBroadcastDateInterval, SBBroadcastDateIntervalDefault) {
+					puts 'periodic timer2'
+					SssSEMapp.broadcastDate()
+		}
+
+		EM::add_periodic_timer(
+				get(:iBroadcastTimeInterval, SBBroadcastTimeIntervalDefault) {
+					puts 'periodic timer.2'
+					self.broadcastTime()
+		}
 
 		#
 		#self.initIOframeHandler()
@@ -594,10 +604,10 @@ p 'for bike: ' << iBike.to_s
 		#self.dealloc() if self.initTriggers().nil?
 		#puts 'OK:trigger files initiated'
 
-		if (@oSerial.nil? && @oEthernet.nil?)
-			puts 'Have neither Serial nor Ethernet connection!'
-			self.dealloc()
-		end # if have no connection
+		#if (@oSerial.nil? && @oEthernet.nil?)
+		#	puts 'Have neither Serial nor Ethernet connection!'
+		#	self.dealloc()
+		#end # if have no connection
 
 		puts 'OK:entering run-loop'
 		#begin
