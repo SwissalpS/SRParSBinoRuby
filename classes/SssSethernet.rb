@@ -203,9 +203,9 @@ class SssSethernetClass
 		return [nil, nil] if @oUDPsocketToMe.nil?
 
 		begin
-
-			sRead, aRemote = @oUDPsocketToMe.recvfrom_nonblock(1024) # @@bufferMaxLen);
-			#@oUDPsocketBroadcast.flush()
+			sRead = ''; aRemote = []
+			sRead, aRemote = @oUDPsocketToMe.recvfrom_nonblock(SBSerialMaxFrameLength + SBSerialSpaceLength) #1024) # @@bufferMaxLen);
+			@oUDPsocketBroadcast.flush()
 
 			return [nil, nil] if aRemote[3] == @mPortOptions[:ethernetIP]
 
