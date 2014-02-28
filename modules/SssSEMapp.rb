@@ -2,42 +2,45 @@
 #require 'SssSIOframeHandler.rb'
 #require 'SssSserial.rb'
 #require 'SssSethernet.rb'
-#require 'SssSEMtriggerCommandMe.rb'
-require 'SssStriggerCommandMe.rb'
-require 'SssStriggerCurrentTime.rb'
-require 'SssStriggerDemoID.rb'
-require 'SssStriggerRaw.rb'
-require 'SssStriggerReset.rb'
-require 'SssStriggerRiderInfo.rb'
-require 'SssStriggerStart.rb'
-require 'SssStriggerStop.rb'
-require 'SssStriggerTimer.rb'
+require 'SssSEMtriggerCommandMe.rb'
+#require 'SssStriggerCommandMe.rb'
+#require 'SssStriggerCurrentTime.rb'
+#require 'SssStriggerDemoID.rb'
+#require 'SssStriggerRaw.rb'
+#require 'SssStriggerReset.rb'
+#require 'SssStriggerRiderInfo.rb'
+#require 'SssStriggerStart.rb'
+#require 'SssStriggerStop.rb'
+#require 'SssStriggerTimer.rb'
 require 'eventmachine'
 
 YES = true if !defined? YES
 NO = false if !defined? NO
 
 # interval in seconds..
-SBBroadcastDateIntervalDefault = 51 * 60
-SBBroadcastTimeIntervalDefault = 5 * 60
+SBbroadcastDateIntervalDefault = 51 * 60
+SBbroadcastTimeIntervalDefault = 5 * 60
+SBidleIntervalDefault = 0.02
 
-module SssSEMBroadcastDate
-
-	def call(arg)
-		SssSEMapp.broadcastDate();
+module SssSEMbroadcastDate
+	def call
+		SssSEMapp.broadcastDate()
 	end # call
+end # SssSEMbroadcastDate
 
-end # SssSEMBroadcastDate
 
-
-module SssSEMBroadcastTime
-
-	def call(arg)
-		p arg
-		SssSEMapp.broadcastTime();
+module SssSEMbroadcastTime
+	def call
+		SssSEMapp.broadcastTime()
 	end # call
+end # SssSEMbroadcastTime
 
-end # SssSEMBroadcastTime
+
+module SssSEMcheckPipes
+	def call
+		SssSEMapp.checkPipes()
+	end # call
+end # SssSEMcheckPipes
 
 
 module SssSEMServer
@@ -164,6 +167,21 @@ class SssSEMappClass
 	end # initialize
 
 
+	def idle()
+
+		# listen to serial if it's up
+		nilOrNumberOfBytesReceived = @oSerial.checkIncoming() if !@oSerial.nil?
+
+		# listen to Ethernet if it's up
+		nilOrNumberOfBytesReceived = @oEthernet.checkIncoming() if !@oEthernet.nil?
+
+		# listen to file events
+		self.checkPipes()
+		
+	end # idle
+	protected :idle
+
+
 	def initEthernet()
 
 		if (!@bUseEthernet)
@@ -259,7 +277,7 @@ class SssSEMappClass
 			# these raise on error
 
 			# command me
-			@aPipes << SssStriggerCommandMe::new(self.get(:pathFileTriggerCommandMe, nil), self.get(:pathFileTriggerCommandCron, nil))
+			@aPipes << SssSEMtriggerCommandMe::new(self.get(:pathFileTriggerCommandMe, nil), self.get(:pathFileTriggerCommandCron, nil))
 
 			# main triggers
 			#@aPipes << SssStriggerReset::new(self.get(:pathFileTriggerReset, nil))
@@ -365,6 +383,14 @@ p 'broadcasting time'
 		#@oIOframeHandler.writeFramed(SBSerialBroadcastID, sData)
 p sData
 	end # broadcastDate
+
+
+	def checkPipes()
+
+		# check incomming commands from SkyTab or other scripts
+		@aPipes.each { |oPipe| oPipe.process if oPipe.hasData? }
+
+	end # checkPipes
 
 
 	def tellSkyTab(sInvocationPath, iBike)
@@ -597,14 +623,6 @@ p 'for bike: ' << iBike.to_s
 
 		EM::open_datagram_socket('192.168.123.40', 12345, SssSEMServer)
 
-		EM::add_periodic_timer(
-				get(:iBroadcastDateInterval, SBBroadcastDateIntervalDefault)) { SssSEMapp.broadcastDate() }
-
-		EM::add_periodic_timer(
-				get(:iBroadcastTimeInterval, SBBroadcastTimeIntervalDefault)) {
-					self.broadcastTime() }
-
-
 		#
 		#self.initIOframeHandler()
 		
@@ -623,6 +641,17 @@ p 'for bike: ' << iBike.to_s
 		#	puts 'Have neither Serial nor Ethernet connection!'
 		#	self.dealloc()
 		#end # if have no connection
+
+		EM::add_periodic_timer(
+				get(:iBroadcastDateInterval, SBbroadcastDateIntervalDefault)) { SssSEMapp.broadcastDate() }
+
+		EM::add_periodic_timer(
+				get(:iBroadcastTimeInterval, SBbroadcastTimeIntervalDefault)) {
+					self.broadcastTime() }
+
+		EM::add_periodic_timer(
+				get(:iIdleInterval, SBidleIntervalDefault)) {
+					self.idle() }
 
 		puts 'OK:entering run-loop'
 		#begin

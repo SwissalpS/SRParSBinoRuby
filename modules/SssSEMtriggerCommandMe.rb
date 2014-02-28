@@ -62,19 +62,19 @@ class SssSEMtriggerCommandMe < SssSEMtriggerBase
 			when 'q'
 				# quit
 				puts 'Got quit-signal from Trigger ' << sBasename
-				$oSssSapp.dealloc()
+				SssSEMapp.dealloc()
 
 			when 'r'
 				# restart system
 				puts 'Got restart-signal from Trigger ' << sBasename
 				self.deployTriggerSystemRestart()
-				$oSssSapp.dealloc()
+				SssSEMapp.dealloc()
 
 			when 's'
 				# shutdown system
 				puts 'Got shutdown-signal from Trigger ' << sBasename
 				self.deployTriggerSystemShutdown()
-				$oSssSapp.dealloc()
+				SssSEMapp.dealloc()
 
 			else
 
