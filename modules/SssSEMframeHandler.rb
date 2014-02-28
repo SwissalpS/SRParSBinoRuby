@@ -223,7 +223,7 @@ class SssSEMframeHandlerClass
 		# do we already have this?
 		if (@hOnlineClientHash[sID].nil?)
 			# new client
-			@hOnlineClientHash[sID] = { :ethernetIP => sIP, :serialID => iID, :firstSeen => iNow, :marker => SssSonlineMarkerFile.new(iID, sIP) }
+			@hOnlineClientHash[sID] = { :ethernetIP => sIP, :serialID => iID, :firstSeen => iNow, :marker => SssSEMonlineMarkerFile.new(iID, sIP) }
 		else
 			# update entry
 			if (!sIP.nil?)
