@@ -47,9 +47,8 @@ module SssSEMServer
 	end # post_init
 
 	def receive_data(data)
-		uiIP = self.get_peername
-		sIP = ((uiIP >> 24) & 0xFF).chr << '.' << ((uiIP >> 16) & 0xFF).chr << '.' << ((uiIP >> 8) & 0xFF).chr << '.' << (uiIP & 0xFF).chr
-		puts sIP
+		aIP = self.get_peername[2, 6].unpack "nC4"
+		puts ' from: ' << aIP.join('.')
 		#puts self.methods.sort
 		puts self.get_pid
 		puts self.get_status
