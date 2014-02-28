@@ -315,23 +315,17 @@ class SssSEMappClass
 
 	def broadcastDate()
 
-		oT = Time.now.utc
-		return if @oTnextBroadcastDate > oT
-
 p 'broadcasting date'
 
 		sData = 0x5C.chr << (((oT.day() - 1) << 2) + 0).chr << (oT.month() - 1).chr << (oT.year() - 2000).chr
 
-		@oIOframeHandler.writeFramed(SBSerialBroadcastID, sData)
-
-		@oTnextBroadcastDate = @oTnextBroadcastDate = Time.now.utc + get(:iBroadcastDateInterval, SBBroadcastDateIntervalDefault)
-
+		#@oIOframeHandler.writeFramed(SBSerialBroadcastID, sData)
+p sData
 	end # broadcastDate
 
 
 	def broadcastTime()
 
-		return if @oTnextBroadcastTime > Time.now.utc
 p 'broadcasting time'
 
 		iMillisSinceMidnight = iMSM = ((Time.now.to_f % 86400) * 1000).to_i
@@ -341,10 +335,8 @@ p 'broadcasting time'
 		sData << ((iMSM >> 8)  & 0xFF).chr
 		sData << (iMSM  & 0xFF).chr
 
-		@oIOframeHandler.writeFramed(SBSerialBroadcastID, sData)
-
-		@oTnextBroadcastTime = @oTnextBroadcastTime = Time.now.utc + get(:iBroadcastTimeInterval, SBBroadcastTimeIntervalDefault)
-
+		#@oIOframeHandler.writeFramed(SBSerialBroadcastID, sData)
+p sData
 	end # broadcastDate
 
 
@@ -578,13 +570,13 @@ p 'for bike: ' << iBike.to_s
 
 		EventMachine::open_datagram_socket('192.168.123.40', 12345, SssSEMServer)
 
-		EM::add_periodic_timer(
+		EventMachine::add_periodic_timer(
 				get(:iBroadcastDateInterval, SBBroadcastDateIntervalDefault) {
 					puts 'periodic timer2'
 					SssSEMapp.broadcastDate()
 		}
 
-		EM::add_periodic_timer(
+		EventMachine::add_periodic_timer(
 				get(:iBroadcastTimeInterval, SBBroadcastTimeIntervalDefault) {
 					puts 'periodic timer.2'
 					self.broadcastTime()
