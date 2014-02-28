@@ -118,6 +118,7 @@ class SssSethernetClass
 
 			@oUDPsocketToMe = UDPSocket.new
 			@oUDPsocketToMe.bind(@mPortOptions[:ethernetIP], @mPortOptions[:ethernetPort])
+			@oUDPsocketToMe.setsockopt(Socket::SOL_SOCKET, Socket::SO_KEEPALIVE, true)
 
 			puts 'OK:Ethernet bound to ' << @mPortOptions[:ethernetIP]
 
@@ -204,7 +205,7 @@ class SssSethernetClass
 
 		begin
 			sRead = ''; aRemote = []
-			sRead, aRemote = @oUDPsocketToMe.recvfrom_nonblock(SBSerialMaxFrameLength + SBSerialSpaceLength) #1024) # @@bufferMaxLen);
+			sRead, aRemote = @oUDPsocketToMe.recvfrom_nonblock(SBSerialMaxFrameLength + SBSerialSpaceLength, MSG_OOB) #1024) # @@bufferMaxLen);
 			@oUDPsocketBroadcast.flush()
 
 			return [nil, nil] if aRemote[3] == @mPortOptions[:ethernetIP]
