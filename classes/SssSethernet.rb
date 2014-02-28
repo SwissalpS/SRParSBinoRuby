@@ -2,27 +2,6 @@ require 'socket'
 require 'SssSapp.rb'
 require 'SssSEventManager.rb'
 require 'SssSIOframeHandler.rb'
-require 'eventmachine'
-
-
-module SssSEMServer
-
-	def post_init
-		puts 'client connected'
-	end # post_init
-
-	def receive_data(data)
-		puts data
-		#send_data('haha')
-	end # receive_data
-end # SssSEMServer
-
-EventMachine::run do
-
-	EventMachine::open_datagram_socket('192.168.123.40', 12345, SssSEMServer)
-	EventMachine::add_periodic_timer(1) { puts 'periodic timer' }
-
-end # EventMachine::run
 
 
 ##

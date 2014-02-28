@@ -1,0 +1,7 @@
+#!/usr/bin/ruby
+
+Dir.chdir('/gitSwissalpS/SRParSBinoRuby')
+
+$LOAD_PATH << '/gitSwissalpS/SRParSBinoRuby/modules'
+
+require('SssSEMapp.rb')
