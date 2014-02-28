@@ -358,6 +358,13 @@ p 'broadcasting time'
 			#puts 'OK: told SkyTab ' << sInvocationPath
 			return true
 
+			# something like this should be the correct approach
+#require 'open3'
+#stdin, stdout, stderr, wait_thr = Open3.popen3(@sPathSkyTabBin, sInvocationPath, <any other options>)
+#stdout.gets(nil)
+#stderr.gets(nil)
+#exit_code = wait_thr.value
+
 		rescue Exception => e
 
 			puts 'ERROR: could not tell SkyTab ' << sInvocationPath
