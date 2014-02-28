@@ -47,6 +47,9 @@ module SssSEMServer
 
 	def receive_data(data)
 		aIP = self.get_peername[2, 6].unpack "nC4"
+		# or with Socket method
+		port, ip = Socket.unpack_sockaddr_in(self.get_peername)
+		
 		puts ' from: ' << aIP[1..4].join('.') << ':' << aIP[0]
 		puts data
 
