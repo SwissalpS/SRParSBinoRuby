@@ -130,7 +130,7 @@ class SssSEMethernetClass
 		ensure
 
 		end
-		@oUDPsocketBroadcast =
+		
 		begin
 
 			@oUDPsocketToMe = EM::open_datagram_socket(@mPortOptions[:ethernetIP], @mPortOptions[:ethernetPort], SssSEMServer)
