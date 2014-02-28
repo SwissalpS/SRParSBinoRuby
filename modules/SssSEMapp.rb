@@ -43,15 +43,11 @@ module SssSEMServer
 
 	def post_init
 		puts 'server is up connected'
-		puts self.methods.sort
 	end # post_init
 
 	def receive_data(data)
 		aIP = self.get_peername[2, 6].unpack "nC4"
-		puts ' from: ' << aIP.join('.')
-		#puts self.methods.sort
-		puts self.get_pid
-		puts self.get_status
+		puts ' from: ' << aIP[1..4].join('.') << ':' << aIP[0]
 		puts data
 
 		#send_data('haha')
