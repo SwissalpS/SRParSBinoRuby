@@ -53,7 +53,7 @@ module SssSEMfileWatchIO
 end # SssSEMfileWatchIO
 
 
-class SssSEMtriggerBase
+class SssSEMtriggerBase < EventMachine::Connection
 #	include SssSEMfileWatch
 #	include SssSEMfileWatchIO
 
