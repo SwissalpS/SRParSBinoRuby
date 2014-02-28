@@ -6,7 +6,7 @@ class SssSserialFrame
 	@senderID = nil; attr_accessor :senderID
 	@senderIP = nil; attr_accessor :senderIP
 	@targetID = nil; attr_accessor :targetID
-	#@targetIP = nil; attr_accessor :targetIP
+	@targetIP = nil; attr_accessor :targetIP
 	@data = nil; attr_reader :data
 
 	@checksumA = nil; attr_accessor :checksumA
