@@ -2,6 +2,8 @@
 YES = true if !defined? YES
 NO = false if !defined? NO
 
+require 'eventmachine'
+
 ##
 # Baseclass for trigger-file-observers.
 # Needs to be subclassed to be usefull
