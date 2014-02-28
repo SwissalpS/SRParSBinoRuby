@@ -20,10 +20,30 @@ NO = false if !defined? NO
 SBBroadcastDateIntervalDefault = 51 * 60
 SBBroadcastTimeIntervalDefault = 5 * 60
 
+module SssSEMBroadcastDate
+
+	def call(arg)
+		SssSEMapp.broadcastDate();
+	end # call
+
+end # SssSEMBroadcastDate
+
+
+module SssSEMBroadcastTime
+
+	def call(arg)
+		p arg
+		SssSEMapp.broadcastTime();
+	end # call
+
+end # SssSEMBroadcastTime
+
+
 module SssSEMServer
 
 	def post_init
 		puts 'server is up connected'
+		puts self.methods.sort
 	end # post_init
 
 	def receive_data(data)
@@ -571,18 +591,20 @@ p 'for bike: ' << iBike.to_s
 		EventMachine::open_datagram_socket('192.168.123.40', 12345, SssSEMServer)
 
 		EventMachine::add_periodic_timer(
-				get(:iBroadcastDateInterval, SBBroadcastDateIntervalDefault) {
-					puts 'periodic timer2'
+				#get(:iBroadcastDateInterval, SBBroadcastDateIntervalDefault) {
+				22, {
+					puts 'periodic timer22'
 					SssSEMapp.broadcastDate()
 				}
 			)
 
 		EM::add_periodic_timer(
-				get(:iBroadcastTimeInterval, SBBroadcastTimeIntervalDefault) {
-					puts 'periodic timer.2'
+				#get(:iBroadcastTimeInterval, SBBroadcastTimeIntervalDefault) {
+				2) {
+					puts 'periodic timer2'
 					self.broadcastTime()
 				}
-			)
+
 
 		#
 		#self.initIOframeHandler()
