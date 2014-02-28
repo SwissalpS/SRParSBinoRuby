@@ -2,15 +2,16 @@
 #require 'SssSIOframeHandler.rb'
 #require 'SssSserial.rb'
 #require 'SssSethernet.rb'
-require 'SssSEMtriggerCommandMe.rb'
-#require 'SssStriggerCurrentTime.rb'
-#require 'SssStriggerDemoID.rb'
-#require 'SssStriggerRaw.rb'
-#require 'SssStriggerReset.rb'
-#require 'SssStriggerRiderInfo.rb'
-#require 'SssStriggerStart.rb'
-#require 'SssStriggerStop.rb'
-#require 'SssStriggerTimer.rb'
+#require 'SssSEMtriggerCommandMe.rb'
+require 'SssStriggerCommandMe.rb'
+require 'SssStriggerCurrentTime.rb'
+require 'SssStriggerDemoID.rb'
+require 'SssStriggerRaw.rb'
+require 'SssStriggerReset.rb'
+require 'SssStriggerRiderInfo.rb'
+require 'SssStriggerStart.rb'
+require 'SssStriggerStop.rb'
+require 'SssStriggerTimer.rb'
 require 'eventmachine'
 
 YES = true if !defined? YES
@@ -258,7 +259,7 @@ class SssSEMappClass
 			# these raise on error
 
 			# command me
-			@aPipes << SssSEMtriggerCommandMe::new(self.get(:pathFileTriggerCommandMe, nil), self.get(:pathFileTriggerCommandCron, nil))
+			@aPipes << SssStriggerCommandMe::new(self.get(:pathFileTriggerCommandMe, nil), self.get(:pathFileTriggerCommandCron, nil))
 
 			# main triggers
 			#@aPipes << SssStriggerReset::new(self.get(:pathFileTriggerReset, nil))

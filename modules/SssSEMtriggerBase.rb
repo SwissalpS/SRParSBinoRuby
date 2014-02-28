@@ -233,8 +233,9 @@ class SssSEMtriggerBase < EventMachine::Connection
 		@oFile = IO.new(rF, 'rb');
 
 		# attach to EventMachine
-		@oEMwatcher = EventMachine.watch(@oFile, self)
-		@oEMwatcher.notify_readable = true
+		# Expects a class-name or module-name, not an object even if it does inherit
+		#@oEMwatcher = EventMachine.watch(@oFile, self)
+		#@oEMwatcher.notify_readable = true
 
 		self
 
