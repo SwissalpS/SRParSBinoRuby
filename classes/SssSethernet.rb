@@ -102,10 +102,12 @@ class SssSethernetClass
 			@oUDPsocketBroadcast = UDPSocket.new
 			@oUDPsocketBroadcast.bind(@mPortOptions[:ethernetIPbroadcast], @mPortOptions[:ethernetPort])
 
+			puts 'OK:Ethernet bound to ' << @mPortOptions[:ethernetIPbroadcast]
+
 		rescue Exception => e
 
 			@oUDPsocketBroadcast = nil
-p 'error when binding to ' << @mPortOptions[:ethernetIPbroadcast] << ':' << @mPortOptions[:ethernetPort].to_s
+			p 'error when binding to ' << @mPortOptions[:ethernetIPbroadcast] << ':' << @mPortOptions[:ethernetPort].to_s
 			raise e
 
 		ensure;
@@ -117,10 +119,12 @@ p 'error when binding to ' << @mPortOptions[:ethernetIPbroadcast] << ':' << @mPo
 			@oUDPsocketToMe = UDPSocket.new
 			@oUDPsocketToMe.bind(@mPortOptions[:ethernetIP], @mPortOptions[:ethernetPort])
 
+			puts 'OK:Ethernet bound to ' << @mPortOptions[:ethernetIP]
+
 		rescue Exception => e
 
 			@oUDPsocketToMe = nil
-p 'error when binding to ' << @mPortOptions[:ethernetIP] << ':' << @mPortOptions[:ethernetPort].to_s
+			p 'error when binding to ' << @mPortOptions[:ethernetIP] << ':' << @mPortOptions[:ethernetPort].to_s
 			raise e
 
 		ensure;

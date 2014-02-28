@@ -128,7 +128,7 @@ class SssSappClass
 	def initEthernet()
 
 		if (!@bUseEthernet)
-			puts 'SKIP:Ethernet'
+			puts 'OK:SKIP Ethernet'
 			return YES
 		end # if use Ethernet
 
@@ -161,7 +161,7 @@ class SssSappClass
 	def initSerial()
 
 		if (!@bUseSerial)
-			puts 'SKIP:Serial'
+			puts 'OK:SKIP Serial'
 			return YES
 		end # if use serial
 
