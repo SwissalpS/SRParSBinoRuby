@@ -183,7 +183,7 @@ class SssSethernetClass
 		begin
 
 			sRead, aRemote = @oUDPsocketBroadcast.recvfrom_nonblock(1024) # @@bufferMaxLen);
-			@oUDPsocketBroadcast.flush()
+			#@oUDPsocketBroadcast.flush()
 			# filter out any from own IP (may be sent by other daemon or itself)
 			return [nil, nil] if aRemote[3] == @mPortOptions[:ethernetIP]
 
@@ -205,7 +205,7 @@ class SssSethernetClass
 		begin
 
 			sRead, aRemote = @oUDPsocketToMe.recvfrom_nonblock(1024) # @@bufferMaxLen);
-			@oUDPsocketBroadcast.flush()
+			#@oUDPsocketBroadcast.flush()
 
 			return [nil, nil] if aRemote[3] == @mPortOptions[:ethernetIP]
 
