@@ -232,7 +232,7 @@ class SssSEMtriggerBase
 
 		# attach to EventMachine
 		@oEMwatcher = EventMachine.watch(@oFile, self)
-  conn.notify_readable = true
+		@oEMwatcher.notify_readable = true
 
 		self
 
