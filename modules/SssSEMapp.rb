@@ -41,7 +41,7 @@ end # SssSEMServer
 #  -> SssSappClass.new('path/to/your/config.yaml').run()
 #
 #
-class SssSappClass
+class SssSEMappClass
 
   private
 
@@ -577,21 +577,22 @@ p 'for bike: ' << iBike.to_s
 		printInfo()
 
 		EventMachine::open_datagram_socket('192.168.123.40', 12345, SssSEMServer)
-		EventMachine::add_periodic_timer(1) { puts 'periodic timer' }
+		EventMachine::add_periodic_timer(2) { puts 'periodic timer2' }
+		EventMachine::add_periodic_timer(0.2) { puts 'periodic timer.2' }
 
 		#
-		self.initIOframeHandler()
+		#self.initIOframeHandler()
 		
 		# open serial port (first one that works)
 		#self.dealloc() if self.initSerial().nil?
-		self.initSerial()
+		#self.initSerial()
 
 		# start listening to Ethernet messages
-		self.initEthernet()
+		#self.initEthernet()
 
 		# start File watcher(s)
-		self.dealloc() if self.initTriggers().nil?
-		puts 'OK:trigger files initiated'
+		#self.dealloc() if self.initTriggers().nil?
+		#puts 'OK:trigger files initiated'
 
 		if (@oSerial.nil? && @oEthernet.nil?)
 			puts 'Have neither Serial nor Ethernet connection!'
@@ -599,22 +600,22 @@ p 'for bike: ' << iBike.to_s
 		end # if have no connection
 
 		puts 'OK:entering run-loop'
-		begin
-
-			# do whatever
-			self.loop();
-
-		rescue Exception => e
-
-			puts e.to_s
-			puts e.backtrace.to_s
-
-		ensure
-
-			# and quit
-			self.dealloc()
-
-		end # catch runtime errors
+		#begin
+		#
+		#	# do whatever
+		#	self.loop();
+		#
+		#rescue Exception => e
+		#
+		#	puts e.to_s
+		#	puts e.backtrace.to_s
+		#
+		#ensure
+		#
+		#	# and quit
+		#	self.dealloc()
+		#
+		#end # catch runtime errors
 
 	end # run
 
@@ -689,7 +690,7 @@ end # SssSEMappClass
 
 
 # Global singleton instance of SssSapp
-SssSEMapp = SssSEMappClass.new() if !SssSEMapp.defined?
+SssSEMapp = SssSEMappClass.new() if !defined? SssSEMapp
 
 # and launch
 EventMachine::run do
