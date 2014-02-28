@@ -48,6 +48,7 @@ module SssSEMServer
 
 	def receive_data(data)
 		puts data
+		puts self.methods.sort
 		#send_data('haha')
 	end # receive_data
 end # SssSEMServer
