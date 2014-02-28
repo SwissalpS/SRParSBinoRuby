@@ -336,6 +336,7 @@ class SssSEMappClass
 	def broadcastDate()
 
 p 'broadcasting date'
+		oT = Time.now.utc
 
 		sData = 0x5C.chr << (((oT.day() - 1) << 2) + 0).chr << (oT.month() - 1).chr << (oT.year() - 2000).chr
 
@@ -588,22 +589,14 @@ p 'for bike: ' << iBike.to_s
 		# output welcome
 		printInfo()
 
-		EventMachine::open_datagram_socket('192.168.123.40', 12345, SssSEMServer)
-
-		EventMachine::add_periodic_timer(
-				#get(:iBroadcastDateInterval, SBBroadcastDateIntervalDefault) {
-				22, {
-					puts 'periodic timer22'
-					SssSEMapp.broadcastDate()
-				}
-			)
+		EM::open_datagram_socket('192.168.123.40', 12345, SssSEMServer)
 
 		EM::add_periodic_timer(
-				#get(:iBroadcastTimeInterval, SBBroadcastTimeIntervalDefault) {
-				2) {
-					puts 'periodic timer2'
-					self.broadcastTime()
-				}
+				get(:iBroadcastDateInterval, SBBroadcastDateIntervalDefault)) { SssSEMapp.broadcastDate() }
+
+		EM::add_periodic_timer(
+				get(:iBroadcastTimeInterval, SBBroadcastTimeIntervalDefault)) {
+					self.broadcastTime() }
 
 
 		#
