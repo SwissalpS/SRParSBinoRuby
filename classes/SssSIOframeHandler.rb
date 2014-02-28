@@ -129,7 +129,7 @@ class SssSIOframeHandlerClass
 	# chance to filter debug messages: Raw view of byte-stream
 	def debugIncoming(mRead)
 
-		sOut = 'received: '
+		sOut = 'received ' << mRead.length.to_s << ' bytes'
 		mRead.each_byte do |iByte|
 
 			if 0 == iByte
@@ -145,6 +145,7 @@ class SssSIOframeHandlerClass
 		end # mRead
 
 		puts sOut
+		puts '------'
 
 	end # debugIncoming
 	protected :debugIncoming

@@ -185,14 +185,12 @@ class SssSethernetClass
 			sRead, aRemote = @oUDPsocketBroadcast.recvfrom_nonblock(1024) # @@bufferMaxLen);
 
 			# filter out any from own IP (may be sent by other daemon or itself)
-			return [nil, nil] if @mPortOptions[:ethernetIP] == aRemote[3]
-
 			return [nil, nil] if aRemote[3] == @mPortOptions[:ethernetIP]
 
 			return [SssSNullSpacer << sRead, aRemote[3]]
 
 		rescue Exception => e #IO::WaitReadable # this is raised when there's no data in the stream
-p e if ![ EOFError, Errno::EAGAIN ].member? e.class
+			p e if ![ EOFError, Errno::EAGAIN ].member? e.class
 			# don't wait for data
 			return [nil, nil]
 

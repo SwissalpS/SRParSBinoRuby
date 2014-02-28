@@ -440,12 +440,7 @@ p 'for bike: ' << iBike.to_s
 
 	# main run loop
 	def loop()
-		#return nil if @oSerial.nil?
 
-#		iByteCount = @oSerial.writeRawFile('/Volumes/Users/luke/Documents/Arduino/SBmobitecSender/commands/nameSetPeter.bin');#
-#puts 'wrote ' << iByteCount.to_s << ' byte(s) to serial'
-
-#	  iCount = 122;
 		fSleepFor = self.get(:loopSleepDuration, 0.002)
 		while (YES) do
 
@@ -462,32 +457,6 @@ p 'for bike: ' << iBike.to_s
 #			# unfortunately 1: this always returns three even if they don't have new data (at least on OS X)
 #			aReadPipes = IO.select(aPipeIOs)
 #
-#p aReadPipes.count
-#
-#			aReadPipes.each do |oFile|
-#
-#				# now is this serial or other?
-#				if @oSerial.oPort == oFile
-#p 'is serial port' # <<-- this never matched
-#					@oSerial.checkIncoming()
-#				else
-#					# hmm, loop again to find whose this is!
-#					@aPipes.each do |oPipe|
-#
-#						if oPipe.oFile == oFile
-#							oPipe.process if oPipe.hasData?
-#p 'match found' # <<-- this never matched
-#							break
-#						end # if found object
-##p 'comparing', oPipe
-#					end # foreach pipe check if this one is meant
-#
-#				end # if serial port or trigger file ready for reading
-#
-#			end # loop all with incomming
-
-
-
 
 			# listen to serial if it's up
 			nilOrNumberOfBytesReceived = @oSerial.checkIncoming() if !@oSerial.nil?
@@ -503,28 +472,6 @@ p 'for bike: ' << iBike.to_s
 
 			# broadcast the time from time to time
 			broadcastTime()
-
-
-#
-#			iCount -= 1
-#
-#			@oSerial.writeFramed(1, 'hahaha')
-#
-#			mRead = @oSerial.checkIncoming()
-#if (nil != mRead)
-#	puts 'serial in: ' . mRead.to_s;
-#end
-#
-#			mRead = @oPipe.checkIncoming();
-#if (nil != mRead)
-#	puts mRead;
-#end
-#
-#			if (0 == iCount)
-#
-#				return;
-#
-#			end # if counted down
 
 		end # while forever
 
