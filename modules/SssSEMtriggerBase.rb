@@ -2,7 +2,7 @@
 YES = true if !defined? YES
 NO = false if !defined? NO
 
-require 'eventmachine'
+#require 'eventmachine'
 
 ##
 # Baseclass for trigger-file-observers.
@@ -55,7 +55,7 @@ module SssSEMfileWatchIO
 end # SssSEMfileWatchIO
 
 
-class SssSEMtriggerBase < EventMachine::Connection
+class SssSEMtriggerBase #< EventMachine::Connection
 #	include SssSEMfileWatch
 #	include SssSEMfileWatchIO
 

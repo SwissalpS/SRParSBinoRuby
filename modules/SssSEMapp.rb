@@ -1,12 +1,12 @@
 
-#require 'SssSIOframeHandler.rb'
+require 'SssSEMframeHandler.rb'
 #require 'SssSserial.rb'
 #require 'SssSethernet.rb'
 require 'SssSEMtriggerCommandMe.rb'
 #require 'SssStriggerCommandMe.rb'
 #require 'SssStriggerCurrentTime.rb'
 #require 'SssStriggerDemoID.rb'
-#require 'SssStriggerRaw.rb'
+require 'SssSEMtriggerRaw.rb'
 #require 'SssStriggerReset.rb'
 #require 'SssStriggerRiderInfo.rb'
 #require 'SssStriggerStart.rb'
@@ -205,7 +205,7 @@ class SssSEMappClass
 
 	def initIOframeHandler()
 
-		@oIOframeHandler = SssSIOframeHandlerClass.new()
+		@oIOframeHandler = SssSEMframeHandlerClass.new()
 
 		self
 
@@ -283,10 +283,10 @@ class SssSEMappClass
 			#@aPipes << SssStriggerReset::new(self.get(:pathFileTriggerReset, nil))
 			#@aPipes << SssStriggerStart::new(self.get(:pathFileTriggerStart, nil))
 			#@aPipes << SssStriggerStop::new(self.get(:pathFileTriggerStop, nil))
-			#
-			## raw write access
-			#@aPipes << SssStriggerRaw::new(self.get(:pathFileTriggerRaw, nil))
-			#
+
+			# raw write access
+			@aPipes << SssSEMtriggerRaw::new(self.get(:pathFileTriggerRaw, nil))
+
 			#for iBike in (0...self.get(:numberOfBIKEs, 1)) do
 			#
 			#  sPath = self.get(:pathFileTriggerRiderInfoBaseName, 'triggers/rider')  + iBike.to_s + '.info'
@@ -624,7 +624,7 @@ p 'for bike: ' << iBike.to_s
 		EM::open_datagram_socket('192.168.123.40', 12345, SssSEMServer)
 
 		#
-		#self.initIOframeHandler()
+		self.initIOframeHandler()
 		
 		# open serial port (first one that works)
 		#self.dealloc() if self.initSerial().nil?
