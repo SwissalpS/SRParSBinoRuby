@@ -46,13 +46,13 @@ module SssSEMServer
 		puts 'server is up connected'
 	end # post_init
 
-	def receive_data(data)
+	def receive_data(sData)
 		aIP = self.get_peername[2, 6].unpack "nC4"
 		# or with Socket method
 		port, ip = Socket.unpack_sockaddr_in(self.get_peername)
 		
-		puts ' from: ' << aIP[1..4].join('.') << ':' << aIP[0]
-		puts data
+		puts ' from: ' << aIP[1..4].join('.') << ':' << aIP[0].to_s
+		puts sData
 
 		#send_data('haha')
 	end # receive_data
