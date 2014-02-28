@@ -1,6 +1,6 @@
 
-require 'SssSapp.rb'
-require 'SssStriggerBase.rb'
+require 'SssSEMapp.rb'
+require 'SssSEMtriggerBase.rb'
 
 # Sends incoming bytes as-is to SBAMM
 # read SssStriggerBase for ruby-side-usage.
@@ -10,7 +10,7 @@ require 'SssStriggerBase.rb'
 # Usage from php:
 #	file_put_contents('triggers/raw', sRawFrameDataToSend, FILE_APPEND);
 
-class SssStriggerRaw < SssStriggerBase
+class SssSEMtriggerRaw < SssSEMtriggerBase
 
 	def initialize(sPathFile = nil)
 
@@ -25,11 +25,11 @@ class SssStriggerRaw < SssStriggerBase
 	# controller calls hasData? if yes controller calls process
 	def process()
 
-		SssSapp.oIOframeHandler.writeRawBytes(@sBuffer)
+		SssSEMapp.oIOframeHandler.writeRawBytes(@sBuffer)
 
 		# clear buffer and return self
 		super()
 
 	end # process
 
-end # SssStriggerRaw
+end # SssSEMtriggerRaw

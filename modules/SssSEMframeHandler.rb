@@ -25,7 +25,7 @@ SBethernetDefaultPort = 12345 if !defined? SBethernetDefaultPort
 ##
 # intermediates communication and controls who sends what
 # also manages the SssSEventManager instance
-# Instantiated and controlled by SssSapp
+# Instantiated and controlled by SssSEMapp
 
 class SssSEMframeHandlerClass
 
@@ -84,7 +84,7 @@ class SssSEMframeHandlerClass
 
 		@iCountSpace = 0
 
-		@iMySerialID = SssSapp.get(:serialID, SBSerialRaspberryPiID)
+		@iMySerialID = SssSEMapp.get(:serialID, SBSerialRaspberryPiID)
 
 		# frame ids 7...222
 		@iNextFrameID = 7 + rand(215);
@@ -186,8 +186,8 @@ class SssSEMframeHandlerClass
 
 	def isOnlineEthernet?(iID)
 
-		return NO if SssSapp.oEthernet.nil?
-		return NO if SssSapp.oEthernet.disconnected?
+		return NO if SssSEMapp.oEthernet.nil?
+		return NO if SssSEMapp.oEthernet.disconnected?
 
 		sID = 'id' << iID.to_s
 		return NO if @hOnlineClientHash[sID].nil?
@@ -202,8 +202,8 @@ class SssSEMframeHandlerClass
 	def isOnlineSerial?(iID)
 
 		# NO if no serial connection at all
-		return NO if SssSapp.oSerial.nil?
-		return NO if SssSapp.oSerial.disconnected?
+		return NO if SssSEMapp.oSerial.nil?
+		return NO if SssSEMapp.oSerial.disconnected?
 
 		sID = 'id' << iID.to_s
 		return NO if @hOnlineClientHash[sID].nil?
@@ -702,10 +702,10 @@ puts ' vc:spacer?  0x' << iByte.to_s(16)
 
 			# send over Ethernet or Serial
 			if bEthernet
-				SssSapp.oEthernet.sendTo(iTo, aFrame)
+				SssSEMapp.oEthernet.sendTo(iTo, aFrame)
 			elsif bSerial
 p 'about to write to serial target: ' << iTo.to_s
-				SssSapp.oSerial.writeRawBytes(SssSNullSpacer << aFrame)
+				SssSEMapp.oSerial.writeRawBytes(SssSNullSpacer << aFrame)
 p 'wrote to serial frame: 0x' << iFrameID.to_s(16)
 			end # if Ethernet and/or serial
 
@@ -732,9 +732,9 @@ p 'wrote to serial frame: 0x' << iFrameID.to_s(16)
 	def writeRawBytes(mData = nil)
 
 		if (self.isOnlineEthernet?(SBSerialBroadcastID))
-			iCountSent = SssSapp.oEthernet.writeRawBytes(mData)
+			iCountSent = SssSEMapp.oEthernet.writeRawBytes(mData)
 		elsif (self.isOnlineSerial?(SBSerialBroadcastID))
-			iCountSent = SssSapp.oSerial.writeRawBytes(mData)
+			iCountSent = SssSEMapp.oSerial.writeRawBytes(mData)
 		else
 			p ' can not send raw bytes to either Ethernet nor Serial'
 			return nil
@@ -753,9 +753,9 @@ p 'wrote to serial frame: 0x' << iFrameID.to_s(16)
 	def writeRawFile(sPathFile = nil)
 
 		if (self.isOnlineEthernet?(SBSerialBroadcastID))
-			iCountSent = SssSapp.oEthernet.writeRawFile(sPathFile)
+			iCountSent = SssSEMapp.oEthernet.writeRawFile(sPathFile)
 		elsif (self.isOnlineSerial?(SBSerialBroadcastID))
-			iCountSent = SssSapp.oSerial.writeRawFile(sPathFile)
+			iCountSent = SssSEMapp.oSerial.writeRawFile(sPathFile)
 		else
 			p 'can not send raw file to either Ethernet nor Serial'
 			return nil
@@ -870,7 +870,7 @@ puts ' - 64 - @ - PONG'
 
 			# - 83 - S - Stop Stopwatch
 puts ' - 83 - S - Stop Stopwatch'
-			SssSapp.tellSkyTabStop(iFirstDataByte)
+			SssSEMapp.tellSkyTabStop(iFirstDataByte)
 
 		elsif (0x5C == iCommand)
 
@@ -901,7 +901,7 @@ puts ' - 100 - d - Duration'
 				iBike = oFrame.nextByte()
 
 				# tell database about the change
-				SssSapp.tellSkyTabDurationForBIKE(ulDuration, iBike)
+				SssSEMapp.tellSkyTabDurationForBIKE(ulDuration, iBike)
 
 			else
 
@@ -927,13 +927,13 @@ puts ' - 102 - f - EEPROM dump frame'
 
 			# - 114 -  r - reset stopwatch
 puts ' - 114 -  r - reset stopwatch'
-			SssSapp.tellSkyTabReset(iFirstDataByte)
+			SssSEMapp.tellSkyTabReset(iFirstDataByte)
 
 		elsif (0x73 == iCommand)
 
 			# - 115 -  s - start stopwatch
 puts ' - 115 -  s - start stopwatch'
-			SssSapp.tellSkyTabStart(iFirstDataByte)
+			SssSEMapp.tellSkyTabStart(iFirstDataByte)
 
 		elsif (0x74 == iCommand)
 

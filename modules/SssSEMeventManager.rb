@@ -323,7 +323,7 @@ class SssSEMeventManager
 	# return file object ready for random access
 	def fileForID(iID)
 
-		sPathBase = SssSapp.get(:pathEEPROMimages, '/var/tmp/EEPROMimages/')
+		sPathBase = SssSEMapp.get(:pathEEPROMimages, '/var/tmp/EEPROMimages/')
 
 		# ensure trailing slash
 		sPathBase += '/' if '/' != sPathBase[sPathBase.length() -1].chr
@@ -396,7 +396,7 @@ class SssSEMeventManager
 			# length
 			sData << ((oEvent.addressRange.last - oEvent.addressRange.first + 1) & 0xFF).chr
 
-			SssSapp.oIOframeHandler.writeFramed(iTarget, sData)
+			SssSEMapp.oIOframeHandler.writeFramed(iTarget, sData)
 
 			oEvent.iStatus = SssSEventStatusSent
 
@@ -416,7 +416,7 @@ class SssSEMeventManager
 			sData << ((oEvent.addressRange.last >> 8) & 0xFF).chr
 			sData << (oEvent.addressRange.last & 0xFF).chr
 
-			SssSapp.oIOframeHandler.writeFramed(iTarget, sData)
+			SssSEMapp.oIOframeHandler.writeFramed(iTarget, sData)
 
 			oEvent.iStatus = SssSEventStatusSent
 
@@ -459,7 +459,7 @@ class SssSEMeventManager
 
 			oFile.close
 
-			SssSapp.oIOframeHandler.writeFramed(iTarget, sData)
+			SssSEMapp.oIOframeHandler.writeFramed(iTarget, sData)
 
 			# are we done?
 			if oEvent.addressRange.last < oEvent.iPointer

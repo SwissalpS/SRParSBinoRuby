@@ -63,11 +63,11 @@ end # SssSEMServer
 
 ##
 # Main application class<br>
-# Use global *SssSapp* to access the singleton
+# Use global *SssSEMapp* to access the singleton
 # It reads ports list, if exists, from config/ports. One port per line.<br>
 # Then reads from config/settings.yaml or uses hard-coded defaults
 # To create your own instance, and provide a non-default path for the config file:
-#  -> SssSappClass.new('path/to/your/config.yaml').run()
+#  -> SssSEMappClass.new('path/to/your/config.yaml').run()
 #
 #
 class SssSEMappClass
@@ -743,7 +743,7 @@ p 'for bike: ' << iBike.to_s
 end # SssSEMappClass
 
 
-# Global singleton instance of SssSapp
+# Global singleton instance of SssSEMapp
 SssSEMapp = SssSEMappClass.new() if !defined? SssSEMapp
 
 # and launch
