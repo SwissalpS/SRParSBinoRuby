@@ -574,13 +574,15 @@ p 'for bike: ' << iBike.to_s
 				get(:iBroadcastDateInterval, SBBroadcastDateIntervalDefault) {
 					puts 'periodic timer2'
 					SssSEMapp.broadcastDate()
-		}
+				}
+			)
 
-		EventMachine::add_periodic_timer(
+		EM::add_periodic_timer(
 				get(:iBroadcastTimeInterval, SBBroadcastTimeIntervalDefault) {
 					puts 'periodic timer.2'
 					self.broadcastTime()
-		}
+				}
+			)
 
 		#
 		#self.initIOframeHandler()
