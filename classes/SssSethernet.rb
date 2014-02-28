@@ -1,13 +1,34 @@
-require 'socket';
+require 'socket'
 require 'SssSapp.rb'
 require 'SssSEventManager.rb'
 require 'SssSIOframeHandler.rb'
+require 'eventmachine'
+
+
+module SssSEMServer
+
+	def post_init
+		puts 'client connected'
+	end # post_init
+
+	def receive_data(data)
+		puts data
+		#send_data('haha')
+	end # receive_data
+end # SssSEMServer
+
+EventMachine::run do
+
+	EventMachine::open_datagram_socket('192.168.123.40', 12345, SssSEMServer)
+	EventMachine::add_periodic_timer(1) { puts 'periodic timer' }
+
+end # EventMachine::run
+
 
 ##
 # Listen to Ethernet messages and notifies SkyTab<br>
 # Also message SBAMM and SBAMFDDDs
 # Instantiated and controlled by SssSapp
-
 class SssSethernetClass
 
   protected
@@ -114,23 +135,23 @@ class SssSethernetClass
 
 		end
 
-		begin
-
-			@oUDPsocketToMe = UDPSocket.new
-			@oUDPsocketToMe.bind(@mPortOptions[:ethernetIP], @mPortOptions[:ethernetPort])
-			@oUDPsocketToMe.setsockopt(Socket::SOL_SOCKET, Socket::SO_KEEPALIVE, true)
-
-			puts 'OK:Ethernet bound to ' << @mPortOptions[:ethernetIP]
-
-		rescue Exception => e
-
-			@oUDPsocketToMe = nil
-			p 'error when binding to ' << @mPortOptions[:ethernetIP] << ':' << @mPortOptions[:ethernetPort].to_s
-			raise e
-
-		ensure;
-
-		end
+		#begin
+		#
+		#	@oUDPsocketToMe = UDPSocket.new
+		#	@oUDPsocketToMe.bind(@mPortOptions[:ethernetIP], @mPortOptions[:ethernetPort])
+		#	@oUDPsocketToMe.setsockopt(Socket::SOL_SOCKET, Socket::SO_KEEPALIVE, true)
+		#
+		#	puts 'OK:Ethernet bound to ' << @mPortOptions[:ethernetIP]
+		#
+		#rescue Exception => e
+		#
+		#	@oUDPsocketToMe = nil
+		#	p 'error when binding to ' << @mPortOptions[:ethernetIP] << ':' << @mPortOptions[:ethernetPort].to_s
+		#	raise e
+		#
+		#ensure;
+		#
+		#end
 
 	end # connect
 
