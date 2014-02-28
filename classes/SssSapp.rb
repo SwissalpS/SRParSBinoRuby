@@ -16,7 +16,8 @@ YES = true if !defined? YES
 NO = false if !defined? NO
 
 # interval in seconds..
-SBBroadcastDateIntervalDefault = 5 * 60
+SBBroadcastDateIntervalDefault = 51 * 60
+SBBroadcastTimeIntervalDefault = 5 * 60
 
 ##
 # Main application class<br>
@@ -56,6 +57,7 @@ class SssSappClass
   protected
 
 	@oTnextBroadcastDate = nil; attr_accessor :oTnextBroadcastDate
+	@oTnextBroadcastTime = nil; attr_accessor :oTnextBroadcastTime
 
   public
 
@@ -87,7 +89,10 @@ class SssSappClass
 		@oSerial = nil
 
 		# set next broadcast date into the past
-		@oTnextBroadcastDate = Time.now.utc - 23
+		@oTnextBroadcastDate = Time.now.utc - 230
+
+		# set next broadcast time into the past
+		@oTnextBroadcastTime = Time.now.utc - 23
 
 		# fetch settings
 		self.readConfig(sPathFileConfigYAML)
@@ -311,6 +316,25 @@ p 'broadcasting date'
 	end # broadcastDate
 
 
+	def broadcastTime()
+
+		return if @oTnextBroadcastTime > Time.now.utc
+p 'broadcasting time'
+
+		iMillisSinceMidnight = iMSM = ((Time.now.to_f % 86400) * 1000).to_i
+
+		sData = 0x74.chr << ((iMSM >> 24) & 0xFF).chr
+		sData << ((iMSM >> 16) & 0xFF).chr
+		sData << ((iMSM >> 8)  & 0xFF).chr
+		sData << (iMSM  & 0xFF).chr
+
+		@oIOframeHandler.writeFramed(SBSerialBroadcastID, sData)
+
+		@oTnextBroadcastTime = @oTnextBroadcastTime = Time.now.utc + get(:iBroadcastTimeInterval, SBBroadcastTimeIntervalDefault)
+
+	end # broadcastDate
+
+
 	def tellSkyTab(sInvocationPath, iBike)
 
 		if @sPathSkyTabBin.nil?
@@ -466,23 +490,19 @@ p 'for bike: ' << iBike.to_s
 
 
 			# listen to serial if it's up
-			if (!@oSerial.nil?)
-				nilOrNumberOfBytesReceived = @oSerial.checkIncoming()
-			end # if serial up
+			nilOrNumberOfBytesReceived = @oSerial.checkIncoming() if !@oSerial.nil?
 
 			# listen to Ethernet if it's up
-			if (!@oEthernet.nil?)
-#puts 'about to check ethernet'
-				nilOrNumberOfBytesReceived = @oEthernet.checkIncoming()
-#puts 'checked ethernet'
-			end # if Ethernet up
+			nilOrNumberOfBytesReceived = @oEthernet.checkIncoming() if !@oEthernet.nil?
 
 			# check incomming commands from SkyTab or other scripts
 			@aPipes.each { |oPipe| oPipe.process if oPipe.hasData? }
 
-
 			# broadcast the date from time to time
 			broadcastDate()
+
+			# broadcast the time from time to time
+			broadcastTime()
 
 
 #
