@@ -1,2 +1,0 @@
-#!/usr/bin/ruby
-puts `echo 'q' >> /gitSwissalpS/SRParSBinoRuby/triggers/command.me;`
