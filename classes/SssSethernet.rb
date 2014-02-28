@@ -205,7 +205,7 @@ class SssSethernetClass
 
 		begin
 			sRead = ''; aRemote = []
-			sRead, aRemote = @oUDPsocketToMe.recvfrom_nonblock(SBSerialMaxFrameLength + SBSerialSpaceLength, MSG_OOB) #1024) # @@bufferMaxLen);
+			sRead, aRemote = @oUDPsocketToMe.recvfrom_nonblock(SBSerialMaxFrameLength + SBSerialSpaceLength, Socket::MSG_OOB) #1024) # @@bufferMaxLen);
 			@oUDPsocketBroadcast.flush()
 
 			return [nil, nil] if aRemote[3] == @mPortOptions[:ethernetIP]
