@@ -1,7 +1,8 @@
 require 'socket'
+require 'eventmachine'
 require 'SssSEMapp.rb'
-require 'SssSEventManager.rb'
-require 'SssSIOframeHandler.rb'
+require 'SssSEMeventManager.rb'
+require 'SssSEMframeHandler.rb'
 
 
 module SssSEMServer
