@@ -30,7 +30,7 @@ module SssSEMServer
 		# or with Socket method
 		iPort, sIP = Socket.unpack_sockaddr_in(self.get_peername)
 		puts ' from: ' << sIP << ':' << iPort.to_s
-		puns sData.length.to_s << ' bytes'
+		puts sData.length.to_s << ' bytes'
 		
 		return if sIP == @sIPme
 
