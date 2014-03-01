@@ -7,17 +7,28 @@ require 'SssSEMframeHandler.rb'
 
 module SssSEMServer
 
+	@sIP = nil
+
+	def initialize(sIP = nil)
+		@sIP = sIP
+	end # initialize
+
+
 	def post_init
 		puts 'server is up connected'
 	end # post_init
 
+
 	def receive_data(sData)
 		aIP = self.get_peername[2, 6].unpack "nC4"
 		# or with Socket method
-		port, ip = Socket.unpack_sockaddr_in(self.get_peername)
+		iPort, sIP = Socket.unpack_sockaddr_in(self.get_peername)
 
 		puts ' from: ' << aIP[1..4].join('.') << ':' << aIP[0].to_s
-		puts sData
+
+		puts 'from self' if sIP == @sIP
+		
+		#puts sData
 
 		#send_data('haha')
 	end # receive_data
@@ -115,32 +126,37 @@ class SssSEMethernetClass
 		# if already connected
 		return nil if self.connected?
 
+		sIP = @mPortOptions[:ethernetIPbroadcast]
+		iPort = @mPortOptions[:ethernetPort]
+
 		begin
 
-			@oUDPsocketBroadcast = EM::open_datagram_socket(@mPortOptions[:ethernetIPbroadcast], @mPortOptions[:ethernetPort], SssSEMServer)
+			@oUDPsocketBroadcast = EM::open_datagram_socket(sIP, iPort, SssSEMServer, sIP)
 
-			puts 'OK:Ethernet bound to ' << @mPortOptions[:ethernetIPbroadcast]
+			puts 'OK:Ethernet bound to ' << sIP
 
 		rescue Exception => e
 
 			@oUDPsocketBroadcast = nil
-			p 'error when binding to ' << @mPortOptions[:ethernetIPbroadcast] << ':' << @mPortOptions[:ethernetPort].to_s
+			p 'error when binding to ' << sIP << ':' << iPort.to_s
 			raise e
 
 		ensure
 
 		end
 
+		sIP = @mPortOptions[:ethernetIP]
+
 		begin
 
-			@oUDPsocketToMe = EM::open_datagram_socket(@mPortOptions[:ethernetIP], @mPortOptions[:ethernetPort], SssSEMServer)
+			@oUDPsocketToMe = EM::open_datagram_socket(sIP, iPort, SssSEMServer, sIP)
 
-			puts 'OK:Ethernet bound to ' << @mPortOptions[:ethernetIP]
+			puts 'OK:Ethernet bound to ' << sIP
 
 		rescue Exception => e
 
 			@oUDPsocketToMe = nil
-			p 'error when binding to ' << @mPortOptions[:ethernetIP] << ':' << @mPortOptions[:ethernetPort].to_s
+			p 'error when binding to ' << sIP << ':' << iPort.to_s
 			raise e
 
 		ensure;
