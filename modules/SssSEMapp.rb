@@ -3,15 +3,14 @@ require 'SssSEMframeHandler.rb'
 #require 'SssSserial.rb'
 require 'SssSEMethernet.rb'
 require 'SssSEMtriggerCommandMe.rb'
-#require 'SssStriggerCommandMe.rb'
-#require 'SssStriggerCurrentTime.rb'
-#require 'SssStriggerDemoID.rb'
+require 'SssSEMtriggerCurrentTime.rb'
+require 'SssSEMtriggerDemoID.rb'
 require 'SssSEMtriggerRaw.rb'
-#require 'SssStriggerReset.rb'
-#require 'SssStriggerRiderInfo.rb'
-#require 'SssStriggerStart.rb'
-#require 'SssStriggerStop.rb'
-#require 'SssStriggerTimer.rb'
+require 'SssSEMtriggerReset.rb'
+require 'SssSEMtriggerRiderInfo.rb'
+require 'SssSEMtriggerStart.rb'
+require 'SssSEMtriggerStop.rb'
+require 'SssSEMtriggerTimer.rb'
 require 'eventmachine'
 
 YES = true if !defined? YES
@@ -74,7 +73,7 @@ class SssSEMappClass
 	@hS = {}; attr_reader :hS
 
 	##
-	# SssStriggerClass objects listening to files
+	# SssSEMtriggerClass objects listening to files
 	@aPipes = nil; attr_reader :aPipes
 
   protected
@@ -261,28 +260,28 @@ class SssSEMappClass
 			@aPipes << SssSEMtriggerCommandMe::new(self.get(:pathFileTriggerCommandMe, nil), self.get(:pathFileTriggerCommandCron, nil))
 
 			# main triggers
-			#@aPipes << SssStriggerReset::new(self.get(:pathFileTriggerReset, nil))
-			#@aPipes << SssStriggerStart::new(self.get(:pathFileTriggerStart, nil))
-			#@aPipes << SssStriggerStop::new(self.get(:pathFileTriggerStop, nil))
+			@aPipes << SssSEMtriggerReset::new(self.get(:pathFileTriggerReset, nil))
+			@aPipes << SssSEMtriggerStart::new(self.get(:pathFileTriggerStart, nil))
+			@aPipes << SssSEMtriggerStop::new(self.get(:pathFileTriggerStop, nil))
 
 			# raw write access
 			@aPipes << SssSEMtriggerRaw::new(self.get(:pathFileTriggerRaw, nil))
 
-			#for iBike in (0...self.get(:numberOfBIKEs, 1)) do
-			#
-			#  sPath = self.get(:pathFileTriggerRiderInfoBaseName, 'triggers/rider')  + iBike.to_s + '.info'
-			#  @aPipes << SssStriggerRiderInfo::new(sPath, iBike)
-			#
-			#end # for loop
-			#
-			## time set and display
-			#@aPipes << SssStriggerCurrentTime::new(self.get(:pathFileTriggerCurrentTime, nil))
-			#
-			## broadcast all to start/stop demo loop
-			#@aPipes << SssStriggerDemoID::new(self.get(:pathFileTriggerDemoID, nil))
-			#
-			## timer
-			#@aPipes << SssStriggerTimer::new(self.get(:pathFileTriggerTimer, nil))
+			for iBike in (0...self.get(:numberOfBIKEs, 1)) do
+
+			  sPath = self.get(:pathFileTriggerRiderInfoBaseName, 'triggers/rider')  + iBike.to_s + '.info'
+			  @aPipes << SssSEMtriggerRiderInfo::new(sPath, iBike)
+
+			end # for loop
+
+			# time set and display
+			@aPipes << SssSEMtriggerCurrentTime::new(self.get(:pathFileTriggerCurrentTime, nil))
+
+			# broadcast all to start/stop demo loop
+			@aPipes << SssSEMtriggerDemoID::new(self.get(:pathFileTriggerDemoID, nil))
+
+			# timer
+			@aPipes << SssSEMtriggerTimer::new(self.get(:pathFileTriggerTimer, nil))
 
 		rescue Exception => e
 
@@ -345,8 +344,8 @@ p 'broadcasting date'
 
 		sData = 0x5C.chr << (((oT.day() - 1) << 2) + 0).chr << (oT.month() - 1).chr << (oT.year() - 2000).chr
 
-		#@oIOframeHandler.writeFramed(SBSerialBroadcastID, sData)
-p sData
+		@oIOframeHandler.writeFramed(SBSerialBroadcastID, sData)
+
 	end # broadcastDate
 
 
@@ -361,7 +360,7 @@ p 'broadcasting time'
 		sData << ((iMSM >> 8)  & 0xFF).chr
 		sData << (iMSM  & 0xFF).chr
 
-		#@oIOframeHandler.writeFramed(SBSerialBroadcastID, sData)
+		@oIOframeHandler.writeFramed(SBSerialBroadcastID, sData)
 p sData
 	end # broadcastDate
 
