@@ -34,7 +34,10 @@ module SssSEMServer
 		
 		# filter out broadcasts we made as proxy for trigger files
 		# or time broadcasts etc.
-		return if @aIPignore.member?(sIP)
+		if @aIPignore.member?(sIP)
+			puts 'OK:ignore'
+			return
+		end # if ignore
 
 		SssSEMapp.oIOframeHandler.parseIncoming(SssSNullSpacer + sData, sIP)
 		sData = ''

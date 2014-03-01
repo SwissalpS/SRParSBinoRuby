@@ -230,6 +230,7 @@ class SssSEMframeHandlerClass
 			# update entry
 			if (!sIP.nil?)
 				if (@hOnlineClientHash[sID][:ethernetIP].nil?)
+					puts 'OK:marked as online on Ethernet: ' << sIP + ' ID: ' << iID.to_s
 					@hOnlineClientHash[sID][:ethernetIP] = sIP
 					@hOnlineClientHash[sID][:ethernetLastSeen] = iNow
 					@hOnlineClientHash[sID][:marker].goOnlineEthernet(sIP)
@@ -473,7 +474,7 @@ puts '  : frame ID: ' << iByte.to_s(10)
 			if (iByte != @oFletcher.checksum(SssSf16firstByte))
 
 				# does not match
-puts ' vc:byte one FAIL 0x' << iByte.to_s(16)
+puts 'KO:vc:byte one FAIL 0x' << iByte.to_s(16)
 
 				self.requestResend(iSender, iFrameID)
 
@@ -488,7 +489,7 @@ puts ' vc:byte one FAIL 0x' << iByte.to_s(16)
 				self.invalidate();
 
 			else
-#puts ' vc:byte one OK 0x' << iByte.to_s(16)
+#puts 'OK:vc:byte one OK 0x' << iByte.to_s(16)
 
 				# so far so good
 				@oIncomingFrame.checksumA= iByte
@@ -500,7 +501,7 @@ puts ' vc:byte one FAIL 0x' << iByte.to_s(16)
 			# second checksum byte
 
 			if (iByte != @oFletcher.checksum(SssSf16secondByte))
-puts ' vc:byte two FAIL 0x' << iByte.to_s(16)
+puts 'KO:vc:byte two FAIL 0x' << iByte.to_s(16)
 
 				self.requestResend(iSender, iFrameID);
 	# TODO: rewind if was loading to data buffer
@@ -512,7 +513,7 @@ puts ' vc:byte two FAIL 0x' << iByte.to_s(16)
 				end # if debugging
 
 			else
-#puts ' vc:byte two OK 0x' << iByte.to_s(16)
+#puts 'OK:vc:byte two OK 0x' << iByte.to_s(16)
 
 				# ok, check passed
 				@oIncomingFrame.checksumB= iByte
@@ -528,7 +529,7 @@ puts ' vc:byte two FAIL 0x' << iByte.to_s(16)
 			self.invalidate();
 
 		else
-puts ' vc:spacer?  0x' << iByte.to_s(16)
+puts '??:vc:spacer?  0x' << iByte.to_s(16)
 
 			# this byte should be 0x0 --> first spacer
 			self.invalidate();
