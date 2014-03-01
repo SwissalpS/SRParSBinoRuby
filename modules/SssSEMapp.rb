@@ -634,6 +634,10 @@ p 'for bike: ' << iBike.to_s
 				get(:iIdleInterval, SBidleIntervalDefault)) {
 					self.idle() }
 
+		# broadcast something to tickle responses and synchronize date & time
+		EM::add_timer(0.5) { self.broadcastTime() }
+		EM::add_timer(2) { self.broadcastDate() }
+
 		puts 'OK:entering run-loop'
 		#begin
 		#
