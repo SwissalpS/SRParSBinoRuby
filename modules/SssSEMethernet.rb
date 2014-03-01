@@ -25,7 +25,8 @@ module SssSEMServer
 		iPort, sIP = Socket.unpack_sockaddr_in(self.get_peername)
 
 		puts ' from: ' << aIP[1..4].join('.') << ':' << aIP[0].to_s
-
+		puts sIP
+		puts @sIP
 		puts 'from self' if sIP == @sIP
 		
 		#puts sData
