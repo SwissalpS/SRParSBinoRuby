@@ -129,6 +129,8 @@ class SssSEMframeHandlerClass
 	# chance to filter debug messages: Raw view of byte-stream
 	def debugIncoming(mRead)
 
+		return if YES
+
 		sOut = 'received ' << mRead.length.to_s << ' bytes'
 		mRead.each_byte do |iByte|
 
@@ -264,7 +266,7 @@ class SssSEMframeHandlerClass
 			# target ID
 
 			if (iMySerialID == iByte || SBSerialBroadcastID == iByte)
-puts ' for me'
+#puts ' for me'
 				# this is for us
 				@iStatus = SssSbitMath.bitSet(@iStatus, 5);
 				# we are busy?
@@ -278,7 +280,7 @@ puts ' for me'
 				@oIncomingFrame.targetIP= sIP if !sIP.nil?
 
 			else
-puts ' not for me, for: ' << iByte.to_s(10)
+puts '  :not for me, for ID: ' << iByte.to_s(10)
 				# not for us --> look for next frame
 				self.invalidate();
 
@@ -289,7 +291,7 @@ puts ' not for me, for: ' << iByte.to_s(10)
 			# sender ID
 
 			if (@iMySerialID > iByte)
-puts ' valid sender: ' << iByte.to_s(10)
+puts 'OK:valid sender ID: ' << iByte.to_s(10)
 				# valid sender ID
 
 				@oFletcher.addByte(iByte)
@@ -298,7 +300,7 @@ puts ' valid sender: ' << iByte.to_s(10)
 				self.markOnline(iByte, sIP)
 
 			else
-puts ' invalid sender: ' << iByte.to_s(10)
+puts 'KO:invalid sender ID: ' << iByte.to_s(10)
 				# invalid sender ID --> look for next frame
 	# TODO: debug
 				self.invalidate()
@@ -308,7 +310,7 @@ puts ' invalid sender: ' << iByte.to_s(10)
 		elsif @oIncomingFrame.frameID.nil?
 
 			# frame ID
-puts ' frame ID: ' << iByte.to_s(10)
+puts '  : frame ID: ' << iByte.to_s(10)
 
 			@oFletcher.addByte(iByte)
 			@oIncomingFrame.frameID= iByte

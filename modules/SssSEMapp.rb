@@ -342,8 +342,8 @@ class SssSEMappClass
 
 	def broadcastDate()
 
-p 'broadcasting date'
 		oT = Time.now.utc
+p 'broadcasting date' << oT.to_s
 
 		sData = 0x5C.chr << (((oT.day() - 1) << 2) + 0).chr << (oT.month() - 1).chr << (oT.year() - 2000).chr
 
@@ -354,9 +354,9 @@ p 'broadcasting date'
 
 	def broadcastTime()
 
-p 'broadcasting time'
-
 		iMillisSinceMidnight = iMSM = ((Time.now.to_f % 86400) * 1000).to_i
+
+p 'broadcasting time ' << iMillisSinceMidnight.to_s
 
 		sData = 0x74.chr << ((iMSM >> 24) & 0xFF).chr
 		sData << ((iMSM >> 16) & 0xFF).chr
@@ -364,7 +364,7 @@ p 'broadcasting time'
 		sData << (iMSM  & 0xFF).chr
 
 		@oIOframeHandler.writeFramed(SBSerialBroadcastID, sData)
-p sData
+
 	end # broadcastDate
 
 
