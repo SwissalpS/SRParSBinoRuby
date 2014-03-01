@@ -321,6 +321,9 @@ class SssSEMappClass
 
 		puts 'OK:Triggers halted'
 
+		# shutdown EventMachine
+		EM::stop_event_loop()
+
 		# remove pid file
 		sPathFilePID = self.get(:pathFilePID, @@_defaultPathFilePID)
 		File.delete(sPathFilePID) if File.exists? sPathFilePID

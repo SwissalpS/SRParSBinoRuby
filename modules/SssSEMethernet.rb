@@ -7,39 +7,40 @@ require 'SssSEMframeHandler.rb'
 
 module SssSEMServer
 
+	# the IP I'm bound to
 	@sIP = nil
-	@sIPme = nil
 
-	def initialize(sIP = nil, sIPme = nil)
+	# the IPs I ignore
+	@aIPignore = []
+
+	def initialize(sIP = nil, aIPignore = nil)
 		@sIP = sIP
-		@sIPme = sIPme
+		@aIPignore = (Array == aIPignore.class) ? aIPignore : []
 	end # initialize
 
 
 	def post_init
-		puts 'server is up connected'
+		puts 'OK:Ethernet bound to ' << @sIP
 	end # post_init
 
 
 	def receive_data(sData)
 
-		#aIP = self.get_peername[2, 6].unpack "nC4"
-		#puts ' from: ' << aIP[1..4].join('.') << ':' << aIP[0].to_s
-
-		send_data('haha')
 		# or with Socket method
 		iPort, sIP = Socket.unpack_sockaddr_in(self.get_peername)
-		puts ' from: ' << sIP << ':' << iPort.to_s
-		puts sData.length.to_s << ' bytes'
-		
-		return if sIP == @sIPme
-
 		return if sData.nil?
+
+		puts 'OK:()<-[]- ' << sData.length.to_s << ' bytes from: ' << sIP # << ':' << iPort.to_s
+		
+		# filter out broadcasts we made as proxy for trigger files
+		# or time broadcasts etc.
+		return if @aIPignore.member?(sIP)
 
 		SssSEMapp.oIOframeHandler.parseIncoming(SssSNullSpacer + sData, sIP)
 		sData = ''
 
 	end # receive_data
+
 end # SssSEMServer
 
 ##
@@ -104,6 +105,8 @@ class SssSEMethernetClass
 		oUDPSock.send(sData, 0, sIP, iPort)
 		oUDPSock.close()
 
+		puts 'OK:()-[]-> ' << sData.length.to_s << ' bytes to: ' << sIP
+
 		self
 
 	end # broadcastTo
@@ -117,14 +120,14 @@ class SssSEMethernetClass
 		return nil if self.connected?
 
 		iPort = @mPortOptions[:ethernetPort]
+
 		sIP = @mPortOptions[:ethernetIPbroadcast]
 		sIPme = @mPortOptions[:ethernetIP]
+		aIPignore = [sIPme]
 
 		begin
 
-			@oUDPsocketBroadcast = EM::open_datagram_socket(sIP, iPort, SssSEMServer, sIP, sIPme)
-
-			puts 'OK:Ethernet bound to ' << sIP
+			@oUDPsocketBroadcast = EM::open_datagram_socket(sIP, iPort, SssSEMServer, sIP, aIPignore)
 
 		rescue Exception => e
 
@@ -134,24 +137,21 @@ class SssSEMethernetClass
 
 		ensure
 
-		end
-
+		end # try, catch binding broadcast
 
 		begin
 
-			@oUDPsocketToMe = EM::open_datagram_socket(sIPme, iPort, SssSEMServer, sIPme, sIPme)
-
-			puts 'OK:Ethernet bound to ' << sIP
+			@oUDPsocketToMe = EM::open_datagram_socket(sIPme, iPort, SssSEMServer, sIPme, aIPignore)
 
 		rescue Exception => e
 
 			@oUDPsocketToMe = nil
-			p 'error when binding to ' << sIP << ':' << iPort.to_s
+			p 'error when binding to ' << sIPme << ':' << iPort.to_s
 			raise e
 
 		ensure;
 
-		end
+		end # try, catch binding self
 
 		return YES
 
@@ -184,10 +184,11 @@ class SssSEMethernetClass
 
 		puts 'OK: disconnecting Ethernet'
 
-		@oUDPsocketBroadcast.close() if !@oUDPsocketBroadcast.nil?
+		# TODO: shutdown cleanly
+		#@oUDPsocketBroadcast.close() if !@oUDPsocketBroadcast.nil?
 		@oUDPsocketBroadcast = nil
 
-		@oUDPsocketToMe.close() if !@oUDPsocketToMe.nil?
+		#@oUDPsocketToMe.close() if !@oUDPsocketToMe.nil?
 		@oUDPsocketToMe = nil
 
 	end # disconnect
@@ -244,16 +245,16 @@ class SssSEMethernetClass
 	# write a string of bytes over serial without modification or envelopement
 	# returns byte-count (mData.bytesize)
 	def writeRawBytes(mData = nil)
-p 'writeRawBytes'
+#p 'writeRawBytes'
 		if (self.disconnected?)
 			return nil;
 		end # if not connected
-p 'am connected'
+#p 'am connected'
 		# TODO: allow arrays too
 		if (String != mData.class)
 			return nil;
 		end # if invalid dada format
-p 'got string data'
+#p 'got string data'
 		iCountSent = 0
 		iDataLength = nil
 		iFrameID = nil
@@ -301,7 +302,7 @@ p e
 			return 0
 
 		end # try catch
-p 'got passed with id: ' << iTargetID.to_s
+p ' writeRawBytes to ID: ' << iTargetID.to_s
 		sIP = SssSEMapp.oIOframeHandler.getIPstringForID(iTargetID)
 		# sIP could be nil at this point
 		# send the payload
@@ -365,7 +366,7 @@ puts 'byte # 0x' << "%02X" % iCount << ' hex: 0x' << "%02X" % iChar << ' binary:
 			end
 
 		end
-
+p ' writeRawFile to ID: ' << iTargetID.to_s
 		sIP = SssSEMapp.oIOframeHandler.getIPstringForID(iTargetID)
 
 		# if no IP
