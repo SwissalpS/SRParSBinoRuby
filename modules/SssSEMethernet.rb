@@ -115,22 +115,22 @@ class SssSEMethernetClass
 		# if already connected
 		return nil if self.connected?
 
-		#begin
-		#
-		#	@oUDPsocketBroadcast = EM::open_datagram_socket(@mPortOptions[:ethernetIPbroadcast], @mPortOptions[:ethernetPort], SssSEMServer)
-		#
-		#	puts 'OK:Ethernet bound to ' << @mPortOptions[:ethernetIPbroadcast]
-		#
-		#rescue Exception => e
-		#
-		#	@oUDPsocketBroadcast = nil
-		#	p 'error when binding to ' << @mPortOptions[:ethernetIPbroadcast] << ':' << @mPortOptions[:ethernetPort].to_s
-		#	raise e
-		#
-		#ensure
-		#
-		#end
-		
+		begin
+
+			@oUDPsocketBroadcast = EM::open_datagram_socket(@mPortOptions[:ethernetIPbroadcast], @mPortOptions[:ethernetPort], SssSEMServer)
+
+			puts 'OK:Ethernet bound to ' << @mPortOptions[:ethernetIPbroadcast]
+
+		rescue Exception => e
+
+			@oUDPsocketBroadcast = nil
+			p 'error when binding to ' << @mPortOptions[:ethernetIPbroadcast] << ':' << @mPortOptions[:ethernetPort].to_s
+			raise e
+
+		ensure
+
+		end
+
 		begin
 
 			@oUDPsocketToMe = EM::open_datagram_socket(@mPortOptions[:ethernetIP], @mPortOptions[:ethernetPort], SssSEMServer)

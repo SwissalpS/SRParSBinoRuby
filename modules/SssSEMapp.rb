@@ -151,10 +151,10 @@ class SssSEMappClass
 	def idle()
 
 		# listen to serial if it's up
-		nilOrNumberOfBytesReceived = @oSerial.checkIncoming() if !@oSerial.nil?
+		#nilOrNumberOfBytesReceived = @oSerial.checkIncoming() if !@oSerial.nil?
 
 		# listen to Ethernet if it's up
-		nilOrNumberOfBytesReceived = @oEthernet.checkIncoming() if !@oEthernet.nil?
+		#nilOrNumberOfBytesReceived = @oEthernet.checkIncoming() if !@oEthernet.nil?
 
 		# listen to file events
 		self.checkPipes()
