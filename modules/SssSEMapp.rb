@@ -722,14 +722,17 @@ p 'for bike: ' << iBike.to_s
 end # SssSEMappClass
 
 
-# Global singleton instance of SssSEMapp
-SssSEMapp = SssSEMappClass.new() if !defined? SssSEMapp
+if !defined? SssSEMapp
+	# Global singleton instance of SssSEMapp
+	SssSEMapp = SssSEMappClass.new()
 
-# and launch
-EventMachine::run do
+	# and launch
+	EventMachine::run do
 
-	SssSEMapp.run();
+		SssSEMapp.run();
 
-end # EventMachine::run
+	end # EventMachine::run
 
-exit();
+	exit();
+
+end # if first time file is read, just in case

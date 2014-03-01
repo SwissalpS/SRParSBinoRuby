@@ -1,4 +1,4 @@
-#require 'SssSEMapp.rb'
+require 'SssSEMapp.rb'
 require 'SssSfletcher16.rb'
 require 'SssSEMeventManager.rb'
 require 'SssSserialFrame.rb'

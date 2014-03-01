@@ -1,5 +1,5 @@
 
-#require 'SssSEMapp.rb'
+require 'SssSEMapp.rb'
 require 'SssSEMframeHandler.rb'
 require 'SssSfletcher16.rb'
 
