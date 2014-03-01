@@ -30,12 +30,14 @@ module SssSEMServer
 		# or with Socket method
 		iPort, sIP = Socket.unpack_sockaddr_in(self.get_peername)
 		puts ' from: ' << sIP << ':' << iPort.to_s
+		puns sData.length.to_s << ' bytes'
 		
 		return if sIP == @sIPme
 
 		return if sData.nil?
 
 		SssSEMapp.oIOframeHandler.parseIncoming(SssSNullSpacer << sData, sIP)
+		sData = ''
 
 	end # receive_data
 end # SssSEMServer
