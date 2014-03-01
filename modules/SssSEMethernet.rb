@@ -8,9 +8,11 @@ require 'SssSEMframeHandler.rb'
 module SssSEMServer
 
 	@sIP = nil
+	@sIPme = nil
 
-	def initialize(sIP = nil)
+	def initialize(sIP = nil, sIPme = nil)
 		@sIP = sIP
+		@sIPme = sIPme
 	end # initialize
 
 
@@ -25,9 +27,8 @@ module SssSEMServer
 		iPort, sIP = Socket.unpack_sockaddr_in(self.get_peername)
 
 		puts ' from: ' << aIP[1..4].join('.') << ':' << aIP[0].to_s
-		puts sIP
-		puts @sIP
-		puts 'from self' if sIP == @sIP
+
+		puts '!!!!!from self' if sIP == @sIPme
 		
 		#puts sData
 
@@ -127,12 +128,13 @@ class SssSEMethernetClass
 		# if already connected
 		return nil if self.connected?
 
-		sIP = @mPortOptions[:ethernetIPbroadcast]
 		iPort = @mPortOptions[:ethernetPort]
+		sIP = @mPortOptions[:ethernetIPbroadcast]
+		sIPme = @mPortOptions[:ethernetIP]
 
 		begin
 
-			@oUDPsocketBroadcast = EM::open_datagram_socket(sIP, iPort, SssSEMServer, sIP)
+			@oUDPsocketBroadcast = EM::open_datagram_socket(sIP, iPort, SssSEMServer, sIP, sIPme)
 
 			puts 'OK:Ethernet bound to ' << sIP
 
@@ -146,11 +148,10 @@ class SssSEMethernetClass
 
 		end
 
-		sIP = @mPortOptions[:ethernetIP]
 
 		begin
 
-			@oUDPsocketToMe = EM::open_datagram_socket(sIP, iPort, SssSEMServer, sIP)
+			@oUDPsocketToMe = EM::open_datagram_socket(sIPme, iPort, SssSEMServer, sIPme, sIPme)
 
 			puts 'OK:Ethernet bound to ' << sIP
 
