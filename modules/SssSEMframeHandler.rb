@@ -226,11 +226,15 @@ class SssSEMframeHandlerClass
 		if (@hOnlineClientHash[sID].nil?)
 			# new client
 			@hOnlineClientHash[sID] = { :ethernetIP => sIP, :serialID => iID, :firstSeen => iNow, :marker => SssSEMonlineMarkerFile.new(iID, sIP) }
+			if (sIP.nil?)
+				puts 'OK:marked as online on Serial with ID: ' << iID.to_s
+			else
+				puts 'OK:marked as online on Ethernet with ID: ' << iID.to_s << ' and IP: ' << sIP
+			end # if got IP
 		else
 			# update entry
 			if (!sIP.nil?)
 				if (@hOnlineClientHash[sID][:ethernetIP].nil?)
-					puts 'OK:marked as online on Ethernet: ' << sIP + ' ID: ' << iID.to_s
 					@hOnlineClientHash[sID][:ethernetIP] = sIP
 					@hOnlineClientHash[sID][:ethernetLastSeen] = iNow
 					@hOnlineClientHash[sID][:marker].goOnlineEthernet(sIP)

@@ -35,7 +35,7 @@ module SssSEMServer
 		# filter out broadcasts we made as proxy for trigger files
 		# or time broadcasts etc.
 		if @aIPignore.member?(sIP)
-			puts 'OK:ignore'
+			puts 'OK: ignore'
 			return
 		end # if ignore
 
