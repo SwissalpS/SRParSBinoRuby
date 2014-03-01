@@ -26,6 +26,7 @@ module SssSEMServer
 		#aIP = self.get_peername[2, 6].unpack "nC4"
 		#puts ' from: ' << aIP[1..4].join('.') << ':' << aIP[0].to_s
 
+		send_data('haha')
 		# or with Socket method
 		iPort, sIP = Socket.unpack_sockaddr_in(self.get_peername)
 		puts ' from: ' << sIP << ':' << iPort.to_s
@@ -36,7 +37,6 @@ module SssSEMServer
 
 		SssSEMapp.oIOframeHandler.parseIncoming(SssSNullSpacer << sData, sIP)
 
-		#send_data('haha')
 	end # receive_data
 end # SssSEMServer
 
