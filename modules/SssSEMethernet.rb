@@ -40,7 +40,6 @@ module SssSEMServer
 		end # if ignore
 
 		SssSEMapp.oIOframeHandler.parseIncoming(SssSNullSpacer + sData, sIP)
-		sData = ''
 
 	end # receive_data
 

@@ -343,7 +343,7 @@ class SssSEMappClass
 	def broadcastDate()
 
 		oT = Time.now.utc
-p 'broadcasting date ' << oT.to_s
+puts '   broadcasting date ' << oT.to_s
 
 		sData = 0x5C.chr << (((oT.day() - 1) << 2) + 0).chr << (oT.month() - 1).chr << (oT.year() - 2000).chr
 
@@ -356,7 +356,7 @@ p 'broadcasting date ' << oT.to_s
 
 		iMillisSinceMidnight = iMSM = ((Time.now.to_f % 86400) * 1000).to_i
 
-p 'broadcasting milliseconds since midnight ' << iMillisSinceMidnight.to_s
+puts '   broadcasting milliseconds since midnight ' << iMillisSinceMidnight.to_s
 
 		sData = 0x74.chr << ((iMSM >> 24) & 0xFF).chr
 		sData << ((iMSM >> 16) & 0xFF).chr
@@ -639,22 +639,6 @@ p 'for bike: ' << iBike.to_s
 		EM::add_timer(2) { self.broadcastDate() }
 
 		puts 'OK:entering run-loop'
-		#begin
-		#
-		#	# do whatever
-		#	self.loop();
-		#
-		#rescue Exception => e
-		#
-		#	puts e.to_s
-		#	puts e.backtrace.to_s
-		#
-		#ensure
-		#
-		#	# and quit
-		#	self.dealloc()
-		#
-		#end # catch runtime errors
 
 	end # run
 
