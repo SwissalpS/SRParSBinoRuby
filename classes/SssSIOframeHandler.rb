@@ -705,7 +705,7 @@ puts ' vc:spacer?  0x' << iByte.to_s(16)
 				$oSssSapp.oEthernet.sendTo(iTo, aFrame)
 			elsif bSerial
 p 'about to write to serial target: ' << iTo.to_s
-				$oSssSapp.oSerial.writeRawBytes(SssSNullSpacer << aFrame)
+				$oSssSapp.oSerial.writeRawBytes(SssSNullSpacer + aFrame)
 p 'wrote to serial frame: 0x' << iFrameID.to_s(16)
 			end # if Ethernet and/or serial
 

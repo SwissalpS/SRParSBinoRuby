@@ -36,7 +36,7 @@ module SssSEMServer
 
 		return if sData.nil?
 
-		SssSEMapp.oIOframeHandler.parseIncoming(SssSNullSpacer << sData, sIP)
+		SssSEMapp.oIOframeHandler.parseIncoming(SssSNullSpacer + sData, sIP)
 		sData = ''
 
 	end # receive_data
