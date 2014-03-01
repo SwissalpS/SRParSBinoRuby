@@ -61,18 +61,18 @@ class SssSEMtriggerCommandMe < SssSEMtriggerBase
 		case i.chr
 			when 'q'
 				# quit
-				puts 'Got quit-signal from Trigger ' << sBasename
+				puts 'OK:ft:Got quit-signal from Trigger ' << sBasename
 				SssSEMapp.dealloc()
 
 			when 'r'
 				# restart system
-				puts 'Got restart-signal from Trigger ' << sBasename
+				puts 'OK:ft:Got restart-signal from Trigger ' << sBasename
 				self.deployTriggerSystemRestart()
 				SssSEMapp.dealloc()
 
 			when 's'
 				# shutdown system
-				puts 'Got shutdown-signal from Trigger ' << sBasename
+				puts 'OK:ft:Got shutdown-signal from Trigger ' << sBasename
 				self.deployTriggerSystemShutdown()
 				SssSEMapp.dealloc()
 

@@ -48,6 +48,8 @@ class SssSEMtriggerRiderInfo < SssSEMtriggerBase
 		sName = self.translateName(sName)
 		sCategory = self.translateCategory(sCategory)
 
+		puts 'OK:ft:Got rider info from Trigger '
+
 		SssSEMapp.setCurrentRiderInfo(sName, sCategory, sID.to_i, @iBike, sDuration.to_i)
 
 		# clear buffer and return self

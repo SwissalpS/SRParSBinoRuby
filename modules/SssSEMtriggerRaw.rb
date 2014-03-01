@@ -25,6 +25,8 @@ class SssSEMtriggerRaw < SssSEMtriggerBase
 	# controller calls hasData? if yes controller calls process
 	def process()
 
+		puts 'OK:ft:Got raw-bytes-signal from Trigger '
+
 		SssSEMapp.oIOframeHandler.writeRawBytes(@sBuffer)
 
 		# clear buffer and return self

@@ -71,7 +71,7 @@ class SssSEMtriggerTimer < SssSEMtriggerBase
 				# if not a valid duration, clear buffer
 				return super if (1 > i)
 
-				puts 'Got set-timer-duration-signal from Trigger ' << sBasename + ' for FDD ' << iFDD.to_s << ' value: ' << i.to_s
+				puts 'OK:ft:Got set-timer-duration-signal from Trigger ' << sBasename + ' for FDD ' << iFDD.to_s << ' value: ' << i.to_s
 
 				# append 4 bytes
 				sData << ((i >> 24) & 0xFF) << ((i >> 16) & 0xFF)
@@ -79,19 +79,20 @@ class SssSEMtriggerTimer < SssSEMtriggerBase
 
 			when 'v'
 				# start timer
-				puts 'Got start-timer-signal from Trigger ' << sBasename + ' for FDD ' << iFDD.to_s
+				puts 'OK:ft:Got start-timer-signal from Trigger ' << sBasename + ' for FDD ' << iFDD.to_s
 
 				sData = 'v'
 
 			when 'V'
 				# stop timer
-				puts 'Got stop-timer-signal from Trigger ' << sBasename + ' for FDD ' << iFDD.to_s
+				puts 'OK:ft:Got stop-timer-signal from Trigger ' << sBasename + ' for FDD ' << iFDD.to_s
 
 				sData = 'V'
 
 			else
 
 				# if not a valid command, clear buffer
+				puts 'KO:ft: Got invalid-timer signal from Trigger ' << sBasename
 				return super
 
 		end # switch case

@@ -55,6 +55,8 @@ class SssSEMtriggerCurrentTime < SssSEMtriggerBase
 		sData << ((i >> 24) & 0xFF) << ((i >> 16) & 0xFF)
 		sData << ((i >> 8) & 0xFF) << (i & 0xFF)
 
+		puts 'OK:ft:Got show-utc-time-signal from Trigger '
+
 		SssSEMapp.oIOframeHandler.writeFramed(iFDD, sData)
 
 		# start displaying time

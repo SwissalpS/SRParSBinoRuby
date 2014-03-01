@@ -45,7 +45,8 @@ class SssSEMtriggerReset < SssSEMtriggerBase
 		end # if greater than 2
 
 		sBasename = File::basename(@sPathFile)
-		puts 'Got reset-signal from Trigger ' << sBasename + ' for BIKE ' << iBike.to_s
+		
+		puts 'OK:ft:Got reset-signal from Trigger ' << sBasename + ' for BIKE ' << iBike.to_s
 
 		iSBAMMid = SssSEMapp.get(:idSBAMM, 0);
 		sData = 'r' << iBike.chr;

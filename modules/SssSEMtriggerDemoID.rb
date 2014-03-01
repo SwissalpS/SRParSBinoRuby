@@ -41,11 +41,13 @@ class SssSEMtriggerDemoID < SssSEMtriggerBase
 
 			# stop loop
 			sData = 'O'
+			puts 'OK:ft:Got stop-demo-loop-signal from Trigger '
 
 		else
 
 			# start loop
 			sData = 'o'
+			puts 'OK:ft:Got start-demo-loop-signal from Trigger '
 
 		end # if start or stop loop
 

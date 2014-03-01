@@ -44,7 +44,8 @@ class SssSEMtriggerStop < SssSEMtriggerBase
 		end # if greater than 2
 
 		sBasename = File::basename(@sPathFile)
-		puts 'Got stop-signal from Trigger ' << sBasename + ' for BIKE ' << iBike.to_s
+		
+		puts 'OK:ft:Got stop-signal from Trigger ' << sBasename + ' for BIKE ' << iBike.to_s
 
 		iSBAMMid = SssSEMapp.get(:idSBAMM, 0);
 		sData = 'S' << iBike.chr;
