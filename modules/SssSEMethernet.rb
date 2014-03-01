@@ -22,15 +22,19 @@ module SssSEMServer
 
 
 	def receive_data(sData)
-		aIP = self.get_peername[2, 6].unpack "nC4"
+
+		#aIP = self.get_peername[2, 6].unpack "nC4"
+		#puts ' from: ' << aIP[1..4].join('.') << ':' << aIP[0].to_s
+
 		# or with Socket method
 		iPort, sIP = Socket.unpack_sockaddr_in(self.get_peername)
-
-		puts ' from: ' << aIP[1..4].join('.') << ':' << aIP[0].to_s
-
-		puts '!!!!!from self' if sIP == @sIPme
+		puts ' from: ' << sIP << ':' << iPort.to_s
 		
-		#puts sData
+		return if sIP == @sIPme
+
+		return if sData.nil?
+
+		SssSEMapp.oIOframeHandler.parseIncoming(SssSNullSpacer << sData, sIP)
 
 		#send_data('haha')
 	end # receive_data
@@ -101,24 +105,6 @@ class SssSEMethernetClass
 		self
 
 	end # broadcastTo
-
-
-	# check if we have bytes comming in on ethernet<br>
-	# if not returns nil otherwise the count of bytes received after having
-	# filtered and loaded the bytes to the correct buffer
-	def checkIncoming()
-#puts 'ethernet::checkIncoming'
-		iCount = 0
-
-		sData, sIP = self.readEthernetBroadcast()
-		iCount += SssSEMapp.oIOframeHandler.parseIncoming(sData, sIP) if !sData.nil?
-
-		sData, sIP = self.readEthernetToMe()
-		iCount += SssSEMapp.oIOframeHandler.parseIncoming(sData, sIP) if !sData.nil?
-
-		return iCount
-
-	end # checkIncoming
 
 
 	# called by ::new()<br>
@@ -212,53 +198,6 @@ class SssSEMethernetClass
 	end # disconnected?
 
   protected
-
-	# read nonblocking from Ethernet. Returns nil or a string of bytes<br>
-	# called by #checkIncoming()
-	def readEthernetBroadcast()
-		# if not connected
-		return [nil, nil] if @oUDPsocketBroadcast.nil?
-
-		begin
-
-			sRead, aRemote = @oUDPsocketBroadcast.recvfrom_nonblock(1024) # @@bufferMaxLen);
-			#@oUDPsocketBroadcast.flush()
-			# filter out any from own IP (may be sent by other daemon or itself)
-			return [nil, nil] if aRemote[3] == @mPortOptions[:ethernetIP]
-
-			return [SssSNullSpacer << sRead, aRemote[3]]
-
-		rescue Exception => e #IO::WaitReadable # this is raised when there's no data in the stream
-			p e if ![ EOFError, Errno::EAGAIN ].member? e.class
-			# don't wait for data
-			return [nil, nil]
-
-		end # try
-
-	end # readEthernetBroadcast
-	def readEthernetToMe()
-
-		# if not connected
-		return [nil, nil] if @oUDPsocketToMe.nil?
-
-		begin
-			sRead = ''; aRemote = []
-			sRead, aRemote = @oUDPsocketToMe.recvfrom_nonblock(SBSerialMaxFrameLength + SBSerialSpaceLength, Socket::MSG_OOB) #1024) # @@bufferMaxLen);
-			@oUDPsocketBroadcast.flush()
-
-			return [nil, nil] if aRemote[3] == @mPortOptions[:ethernetIP]
-
-			return [SssSNullSpacer << sRead, aRemote[3]]
-
-		rescue Exception => e #IO::WaitReadable # this is raised when there's no data in the stream
-			p e if ![ EOFError, Errno::EAGAIN ].member? e.class
-			# don't wait for data
-			return [nil, nil]
-
-		end # try
-
-	end # readEthernetToMe
-
 
 	def sendTo(mIPorID = nil, sData)
 
