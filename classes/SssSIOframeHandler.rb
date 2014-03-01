@@ -129,6 +129,8 @@ class SssSIOframeHandlerClass
 	# chance to filter debug messages: Raw view of byte-stream
 	def debugIncoming(mRead)
 
+		return
+
 		sOut = 'received ' << mRead.length.to_s << ' bytes'
 		mRead.each_byte do |iByte|
 
@@ -289,7 +291,7 @@ puts ' not for me, for: ' << iByte.to_s(10)
 			# sender ID
 
 			if (@iMySerialID > iByte)
-puts ' valid sender: ' << iByte.to_s(10)
+puts ' valid sender ID: ' << iByte.to_s(10)
 				# valid sender ID
 
 				@oFletcher.addByte(iByte)
@@ -298,7 +300,7 @@ puts ' valid sender: ' << iByte.to_s(10)
 				self.markOnline(iByte, sIP)
 
 			else
-puts ' invalid sender: ' << iByte.to_s(10)
+puts ' invalid sender ID: ' << iByte.to_s(10)
 				# invalid sender ID --> look for next frame
 	# TODO: debug
 				self.invalidate()
