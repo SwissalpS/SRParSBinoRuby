@@ -200,7 +200,7 @@ class SssSEMeventManager
 
 		for iPos in oRange
 
-			@oFletcher.addByte(oFile.getc())
+			@oFletcher.addByte(oFile.getc()[0].ord)
 
 		end # for loop full range
 
