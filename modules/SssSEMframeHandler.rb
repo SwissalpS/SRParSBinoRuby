@@ -68,7 +68,7 @@ class SssSEMframeHandlerClass
 
  public
 
-	@oEventManager = nil
+	@oEventManager = nil; attr_reader :oEventManager
 
 	# for incoming traffic we use a seperate fletcher instance to avaid colusion
 	@oFletcher = nil
