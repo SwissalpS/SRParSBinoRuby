@@ -8,7 +8,11 @@ SssSEventTypeRequestEEPROMdump = 101
 SssSEventTypeRequestEEPROMchecksum = 125
 
 # match these with values from SBEEPROMSettings.h
-SBEEPROMShighestAddress = 0xFFF
+SBEEPROMaddressUpperMemoryBase = 0x030
+SBEEPROMaddressUpperMemoryLast = 0x0C9
+SBEEPROMaddressUppermostMemoryBase = 0x0CA
+SBEEPROMaddressUppermostMemoryLast = 0xFFF
+
 SBEEPROMSamountOfPages = 17
 SBEEPROMSmaxSizeFDDpageWithMeta = 0xE5
 SBEEPROMSmetaSizeFDDpage = 5
@@ -104,7 +108,7 @@ class SssSserialEvent
 
 		iLast -= 1 if newRange.exclude_end?
 
-		iLast = [SBEEPROMShighestAddress, iLast].min
+		iLast = [SBEEPROMaddressUppermostMemoryLast, iLast].min
 
 		@addressRange = iFirst..iLast
 
@@ -219,28 +223,32 @@ class SssSEMeventManager
 		return sOut if !(0..3).member? iID
 
 		# byte 0 - composition of IDs (mainly for id 0)
-		sOut << (180 + iID).chr
+		sOut << (0b11100100 + iID).chr
 
 		# byte 1 - serial port mapping
-		sOut << (0b01001110).chr
+		if (0 == iID)
+			sOut << (0b01001110).chr
+		else
+			sOut << (0b01001010).chr
+		end
 
 		# byte 2 - debug level
 		sOut << (0).chr
 
 		# byte 3 - year
 		oT = Time.now
-		sOut << ((oT.year() - 2000) & 0xFF).chr()
+		sOut << ((oT.year() - 2000) & 0b01111111).chr()
 
 		# byte 4 - month
-		sOut << ((oT.month() - 1) & 0xFF).chr()
+		sOut << ((oT.month() - 1) & 0b0011111).chr()
 
 		# byte 5 - day
-		sOut << ((oT.day() - 1) & 0xFF).chr()
+		sOut << ((oT.day() - 1) & 0b0011111).chr()
 
 		# byte 6 - randomizer analog pin
 		sOut << (0).chr
 
-		# byte 7..10 - serial delay between frames
+		# byte 7..10 - (serial/ethernet) delay between frames (will be multiplied by ID)
 		sOut << (0).chr << (0).chr << (0).chr << (50).chr
 
 		# byte 11..12 - serial baud indexes (each port uses 4 bits)
@@ -250,28 +258,34 @@ class SssSEMeventManager
 		sOut << SBSerialRaspberryPiID.chr
 
 		# byte 14 - active ports
-		sOut << (5).chr
+		# only ethernet no SD
+		sOut << (0b00010000).chr
+		# only ethernet and SD
+		#sOut << (0b00110000).chr
 
 		# byte 15 - reset loop
 		sOut << (0).chr
 
 		if (0 == iID)
 			# master (time-keeper)
-			iLastOctet = 10
+			iLastOctet = 1
 		elsif (SBSerialBroadcastID == iID)
+			# should never occur
 			iLastOctet = 40
 		else
 			iLastOctet = 10 * iID
 		end # translate serial ID to Ethernet MAC and IP last octet
 
 		# bytes 16..21 - Ethernet MAC address
-		sOut << ().chr << ().chr << ().chr << ().chr << ().chr << iLastOctet.chr
+		sOut << (0xBE).chr << (0x5B).chr << (0x20).chr << (0x14).chr << (0x77).chr << iLastOctet.chr
 
 		# bytes 22..25 - Ethernet IP address
 		sOut << (192).chr << (168).chr << (123).chr << iLastOctet.chr
 
 		# bytes 26..29 - Ethernet broadcast IP
-		sOut << (224).chr << (0).chr << (0).chr << (1).chr
+		#sOut << (224).chr << (0).chr << (0).chr << (1).chr
+		# since we can't actually broadcast to 'my net'
+		sOut << (192).chr << (168).chr << (123).chr << (40).chr
 
 		# bytes 30..33 - Ethernet gateway IP
 		sOut << (192).chr << (168).chr << (123).chr << (123).chr
@@ -279,12 +293,23 @@ class SssSEMeventManager
 		# bytes 34..37 - Ethernet subnet
 		sOut << (255).chr << (255).chr << (255).chr << (0).chr
 
-		#bytes 38..39 - Ethernet port
+		# bytes 38..39 - Ethernet port
 		sOut << (SBethernetDefaultPort >> 8).chr << (SBethernetDefaultPort & 0xFF).chr
 		
+		# SBAMM only byte 40 - reset Values & which BIKEs are active
+		#sOut << (0b00111001).chr
+		# while debugging without switch connected
+		sOut << (0b00000001).chr
+
+		# byte 41 - FDD to BIKE mapping
+		sOut << (0b00111001).chr
+
+		# byte 42 - number of decimals to show
+		sOut << (0b00000001).chr
+
 		sBlank = (0xFF).chr()
 
-		for i in 0x30..SBEEPROMShighestAddress do
+		for i in 0x30..SBEEPROMaddressUppermostMemoryLast do
 			sOut << sBlank
 		end # loop fill up rest with blanks
 
@@ -490,7 +515,7 @@ class SssSEMeventManager
 		iPage = [iPage, 0].max
 
 		# address where meta data starts
-		iFirst = 1 + (SBEEPROMShighestAddress - (SBEEPROMSmaxSizeFDDpageWithMeta * (iPage + 1)))
+		iFirst = 1 + (SBEEPROMaddressUppermostMemoryLast - (SBEEPROMSmaxSizeFDDpageWithMeta * (iPage + 1)))
 		iLast = iFirst + SBEEPROMSmaxSizeFDDpageWithMeta - 1
 
 		iFirst..iLast
