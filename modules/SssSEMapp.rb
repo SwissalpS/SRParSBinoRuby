@@ -58,8 +58,6 @@ class SssSEMappClass
 
 	@@_defaultPathFileConfig = 'config/settings.yaml';
 
-	@@_sharedInstance = nil
-
 	@aCurrentRideIDs = [ 0, 0 ]; attr_reader :aCurrentRideIDs
 
 	@sPathSkyTabBin = '/gitSwissalpS/SkyTab/SkyTab/bin/SkyTab'
@@ -77,9 +75,6 @@ class SssSEMappClass
 	@aPipes = nil; attr_reader :aPipes
 
   protected
-
-	@oTnextBroadcastDate = nil; attr_accessor :oTnextBroadcastDate
-	@oTnextBroadcastTime = nil; attr_accessor :oTnextBroadcastTime
 
   public
 
@@ -109,12 +104,6 @@ class SssSEMappClass
 		@oEthernet = nil
 		@oIOframeHandler = nil
 		@oSerial = nil
-
-		# set next broadcast date into the past
-		@oTnextBroadcastDate = Time.now.utc - 230
-
-		# set next broadcast time into the past
-		@oTnextBroadcastTime = Time.now.utc - 23
 
 		# fetch settings
 		self.readConfig(sPathFileConfigYAML)
@@ -148,12 +137,6 @@ class SssSEMappClass
 
 
 	def idle()
-
-		# listen to serial if it's up
-		#nilOrNumberOfBytesReceived = @oSerial.checkIncoming() if !@oSerial.nil?
-
-		# listen to Ethernet if it's up
-		#nilOrNumberOfBytesReceived = @oEthernet.checkIncoming() if !@oEthernet.nil?
 
 		# listen to file events
 		self.checkPipes()
@@ -486,51 +469,6 @@ p 'for bike: ' << iBike.to_s
 	end # tellSkyTabStop
 
 
-	# main run loop
-	def loop()
-
-		fSleepFor = self.get(:loopSleepDuration, 0.002)
-		while (YES) do
-
-			#sleep(0.00002) # 85%
-			#sleep(0.0002) # 47%
-			sleep(fSleepFor) # 10% cpu usage on OSX MBP 8 core
-
-			# TODO: use a system select function or something else that uses less cpu
-#			# references may have changed due to truncation
-#			# so we need to rebuild array each loop
-#			aPipeIOs = [@oSerial.oPort]
-#			@aPipes.each { |oPipe| aPipeIOs << oPipe.oFile }
-#
-#			# unfortunately 1: this always returns three even if they don't have new data (at least on OS X)
-#			aReadPipes = IO.select(aPipeIOs)
-#
-
-			# listen to serial if it's up
-			nilOrNumberOfBytesReceived = @oSerial.checkIncoming() if !@oSerial.nil?
-
-			# listen to Ethernet if it's up
-			nilOrNumberOfBytesReceived = @oEthernet.checkIncoming() if !@oEthernet.nil?
-
-			# check incomming commands from SkyTab or other scripts
-			@aPipes.each { |oPipe| oPipe.process if oPipe.hasData? }
-
-			# broadcast the date from time to time
-			broadcastDate()
-
-			# broadcast the time from time to time
-			broadcastTime()
-
-		end # while forever
-
-		fSleepFor = nilOrNumberOfBytesReceived = nil
-
-		self
-
-	end # loop
-	protected :loop
-
-
 	# fetch a value from the app-settings providing a default value
 	def get(mKey, mDefaultValue = nil)
 
@@ -713,6 +651,7 @@ end # SssSEMappClass
 
 
 if !defined? SssSEMapp
+
 	# Global singleton instance of SssSEMapp
 	SssSEMapp = SssSEMappClass.new()
 
