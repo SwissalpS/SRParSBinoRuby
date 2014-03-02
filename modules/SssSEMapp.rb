@@ -647,6 +647,16 @@ p 'for bike: ' << iBike.to_s
 
 	end # setCurrentRiderInfo
 
+
+	# called by trigger CommandMe upon e
+	def updateEEPROMcaches()
+
+		# loop all known devices requesting checksums
+		# or just ask all and find out which are online
+		@oIOframeHandler.oEventManager.addInitialSyncEvents()
+
+	end # updateEEPROMcaches
+
 end # SssSEMappClass
 
 

@@ -52,6 +52,10 @@ class SssSserialEvent
 	# address pointer used for multiple return frames
 	@iPointer = 0; attr_accessor :iPointer
 
+	# time-out time in utc
+	@oTimeOut = nil; attr_accessor :oTimeOut
+
+
 	def initialize(iTargetID = nil, iEventType = nil, iStatus = SssSEventStatusQued, addressRange = 0..0, iChecksumA = nil, iChecksumB = nil, iSyncPriority = SssSEventSyncPriorityRaspberryPi)
 
 		@iTargetID = iTargetID
@@ -143,7 +147,7 @@ class SssSEMeventManager
 
 		# SBAMM - id 0
 		iTarget = 0
-		oRange = 0..13
+		oRange = 0..42
 		iChecksumA, iChecksumB = self.checksumForRange(iTarget, oRange)
 
 		self.addEvent(SssSserialEvent.new(iTarget, SssSEventTypeRequestEEPROMchecksum, SssSEventStatusQued, oRange, iChecksumA, iChecksumB, SssSEventSyncPriorityRaspberryPi))
@@ -156,7 +160,7 @@ class SssSEMeventManager
 			self.addEvent(SssSserialEvent.new(iTarget, SssSEventTypeRequestEEPROMchecksum, SssSEventStatusQued, oRange, iChecksumA, iChecksumB, SssSEventSyncPriorityRaspberryPi))
 
 			for iPage in 0...SBEEPROMSamountOfPages do
-
+# TODO: this won't work with dynamically sized pages, or will it?
 				oRange = self.rangeForFDDpage(iPage)
 				iChecksumA, iChecksumB = self.checksumForRange(iTarget, oRange)
 
@@ -172,6 +176,9 @@ class SssSEMeventManager
 	def addEvent(oEvent)
 
 		return self if oEvent.class != SssSserialEvent
+
+		# set time-out
+		oEvent.oTimeOut = Time.new.utc + SssSEMapp.get(:iEventTimeOut, 15);
 
 		@aEvents << oEvent
 
@@ -309,7 +316,7 @@ class SssSEMeventManager
 
 		sBlank = (0xFF).chr()
 
-		for i in 0x30..SBEEPROMaddressUppermostMemoryLast do
+		for i in 0x2B..SBEEPROMaddressUppermostMemoryLast do
 			sOut << sBlank
 		end # loop fill up rest with blanks
 
@@ -386,11 +393,25 @@ class SssSEMeventManager
 
 		aMatches = []
 
+		aTimedOut = []
+
+		oTnow = Time.new.utc
+
 		@aEvents.each do |oEvent|
+
+			if (oTnow > oEvent)
+				puts 'KO:event timed out: '
+				p oEvent
+				next
+			end # if timed out event found
 
 			aMatches << oEvent if oEvent.matches?(iTarget, iType, iStatus)
 
 		end # loop collecting matching Events
+
+		aTimedOut.each do |oEvent|
+			self.deleteEvent(oEvent)
+		end # loop all timed out events removing them
 
 		aMatches
 
@@ -500,6 +521,9 @@ class SssSEMeventManager
 			end # if done with this upload task or not
 
 		end # if dump request or checksum request
+		
+		# reset time-out
+		oEvent.oTimeOut = Time.new.utc + SssSEMapp.get(:iEventTimeOut, 15);
 
 		sData = iType = iTarget = iFirst = iLast = nil
 
@@ -562,7 +586,7 @@ class SssSEMeventManager
 		end # if 'event' now satisfied
 
 		# cleanup
-		oFile = iSender = oEvent = aMatchingEvents = iByte = nil
+		oFile = iSender = aMatchingEvents = iByte = nil
 
 		self
 

@@ -59,6 +59,11 @@ class SssSEMtriggerCommandMe < SssSEMtriggerBase
 		sBasename = File::basename(@sPathFile)
 
 		case i.chr
+			when 'e'
+				# update EEPROM caches
+				puts 'OK:ft:Got e-signal from Trigger ' << sBasename
+				SssSEMapp.updateEEPROMcaches();
+
 			when 'q'
 				# quit
 				puts 'OK:ft:Got quit-signal from Trigger ' << sBasename
