@@ -507,6 +507,8 @@ puts '---iLast: 0x' << iLast.to_s(16)
 			oFile = self.fileForID(iTarget)
 			raise 'real bad error, can not read stupid file' if oFile.nil?
 
+			oFile.seek(iFirst, IO::SEEK_SET)
+
 			for iPos in iFirst..iLast
 
 				sChar = oFile.getc()
