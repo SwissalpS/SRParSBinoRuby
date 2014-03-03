@@ -377,19 +377,17 @@ puts '   broadcasting milliseconds since midnight ' << iMillisSinceMidnight.to_s
 
 		begin
 
-			# TODO: make this detectable if failed or not
-			`#{sCommand}`
-
-			# this does not really work
-			#puts 'OK: told SkyTab ' << sInvocationPath
-			return true
-
-			# something like this should be the correct approach
-#require 'open3'
-#stdin, stdout, stderr, wait_thr = Open3.popen3(@sPathSkyTabBin, sInvocationPath, <any other options>)
-#stdout.gets(nil)
-#stderr.gets(nil)
-#exit_code = wait_thr.value
+			# since we use EventMachine anyway
+			EM.system(sCommand) { |sOut,oRes|
+				puts sOut
+				if (oRes.exitstatus == 0)
+					puts 'OK: told SkyTab ' << sInvocationPath
+					return true
+				else
+					puts 'KO: told SkyTab ' << sInvocationPath
+					return false
+				end # if run OK or not
+			} # run system
 
 		rescue Exception => e
 
@@ -408,7 +406,7 @@ puts '   broadcasting milliseconds since midnight ' << iMillisSinceMidnight.to_s
 p 'got duration in millisecondos: ' << ulDuration.to_s
 p 'for bike: ' << iBike.to_s
 
-		if !(0..1).member? iBike
+		if !(0..2).member? iBike
 
 			puts 'ERROR: invalid BIKE ID'
 			return nil
