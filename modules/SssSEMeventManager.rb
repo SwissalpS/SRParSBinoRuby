@@ -200,11 +200,11 @@ class SssSEMeventManager
 		@oFletcher.reset()
 
 		# position file pointer
-		oFile.seek(oRange.first)
+		oFile.seek(oRange.first, IO::SEEK_SET)
 
 		for iPos in oRange
 
-			@oFletcher.addByte(oFile.getc()[0].ord)
+			@oFletcher.addByte(oFile.getbyte())
 
 		end # for loop full range
 
@@ -462,15 +462,12 @@ class SssSEMeventManager
 			sData = '{'
 
 			# start address
-puts '--+ addressFirst: 0x' << oEvent.addressRange.first.to_s(16)
 			sData << ((oEvent.addressRange.first >> 8) & 0xFF).chr
 			sData << (oEvent.addressRange.first & 0xFF).chr
-puts '--+ addressFirst: 0x' << oEvent.addressRange.first.to_s(16)
+
 			# last address
-puts '--+ addressLast: 0x' << oEvent.addressRange.last.to_s(16)
 			sData << ((oEvent.addressRange.last >> 8) & 0xFF).chr
 			sData << (oEvent.addressRange.last & 0xFF).chr
-puts '--+ addressLast: 0x' << oEvent.addressRange.last.to_s(16)
 
 			SssSEMapp.oIOframeHandler.writeFramed(iTarget, sData)
 
@@ -486,6 +483,7 @@ puts '--+ addressLast: 0x' << oEvent.addressRange.last.to_s(16)
 
 			# start address
 			iFirst = oEvent.iPointer
+puts '---iFirst: 0x' << iFirst.to_s(16)
 			sData << ((iFirst >> 8) & 0xFF).chr
 			sData << (iFirst & 0xFF).chr
 puts '---iFirst: 0x' << iFirst.to_s(16)
@@ -499,6 +497,7 @@ puts '---iFirst: 0x' << iFirst.to_s(16)
 puts '---iLast: 0x' << iLast.to_s(16)
 			sData << ((iLast >> 8) & 0xFF).chr
 			sData << (iLast & 0xFF).chr
+puts '---iLast: 0x' << iLast.to_s(16)
 
 			# length
 			sData << ((iLast - iFirst + 1) & 0xFF).chr
