@@ -2,7 +2,8 @@
 #require 'SssSEMapp.rb'
 require 'SssSEMtriggerBase.rb'
 
-# responds to 'q', 'r' or 's' commands: 'quit', 'restart system' or 'shutdown system'
+# responds to 'e', q', 'r', 's' or 'w' commands:
+# 'sync EEPROM images', 'quit', 'restart system', 'shutdown system' or 'write settings'
 # read SssSEMtriggerBase for ruby-side-usage.
 #
 # Usage from cli (quit SRParSBinoRuby):
@@ -80,6 +81,11 @@ class SssSEMtriggerCommandMe < SssSEMtriggerBase
 				puts 'OK:ft:Got shutdown-signal from Trigger ' << sBasename
 				self.deployTriggerSystemShutdown()
 				SssSEMapp.dealloc()
+
+			when 'w'
+				# write settings to disk
+				puts 'OK:ft:Got write-settings-signal from Trigger ' << sBasename
+				SssSEMapp.saveConfig()
 
 			else
 
