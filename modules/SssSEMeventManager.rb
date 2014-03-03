@@ -399,7 +399,7 @@ class SssSEMeventManager
 
 		@aEvents.each do |oEvent|
 
-			if (oTnow > oEvent)
+			if (oTnow > oEvent.oTimeOut)
 				puts 'KO:event timed out: '
 				p oEvent
 				next
