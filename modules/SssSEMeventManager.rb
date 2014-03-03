@@ -153,7 +153,7 @@ class SssSEMeventManager
 		oRangeSettings = 0..42
 		iChecksumA, iChecksumB = self.checksumForRange(iTarget, oRangeSettings)
 
-		self.addEvent(SssSserialEvent.new(iTarget, SssSEventTypeRequestEEPROMchecksum, SssSEventStatusQued, oRangeSettings, iChecksumA, iChecksumB, SssSEventSyncPriorityRaspberryPi))
+		self.addEvent(SssSserialEvent.new(iTarget, SssSEventTypeRequestEEPROMchecksum, SssSEventStatusQued, oRangeSettings, iChecksumA, iChecksumB, SssSEventSyncPriorityArduino))#SssSEventSyncPriorityRaspberryPi))
 
 		# SBAMFDDDs - ids 1..3
 #		for iTarget in 1..3 do
