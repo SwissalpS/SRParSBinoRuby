@@ -410,7 +410,7 @@ puts 'OK: frame ID: ' << iByte.to_s(10)
 	def pong(iTarget, iFrameID)
 
 		sData = '@' << iFrameID.chr
-p sData
+
 		self.writeFramed(iTarget, sData)
 
 	end # pong
@@ -572,7 +572,7 @@ puts '??:vc:spacer?  0x' << iByte.to_s(16)
 		iTotalFrames = 1;
 		iLengthData = mData.length();
 		if (SBSerialMaxDataLengthPerFrame < iLengthData)
-
+p 'more than one frame required'
 			# more than one frame
 # TODO: add prefix...
 			if (mSubsequentFrameDataPrefix.nil?)
