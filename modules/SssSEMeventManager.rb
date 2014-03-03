@@ -151,25 +151,25 @@ class SssSEMeventManager
 		iChecksumA, iChecksumB = self.checksumForRange(iTarget, oRange)
 
 		self.addEvent(SssSserialEvent.new(iTarget, SssSEventTypeRequestEEPROMchecksum, SssSEventStatusQued, oRange, iChecksumA, iChecksumB, SssSEventSyncPriorityRaspberryPi))
-/*
+
 		# SBAMFDDDs - ids 1..3
-		for iTarget in 1..3 do
+#		for iTarget in 1..3 do
+#
+#			iChecksumA, iChecksumB = self.checksumForRange(iTarget, oRange)
+#
+#			self.addEvent(SssSserialEvent.new(iTarget, SssSEventTypeRequestEEPROMchecksum, SssSEventStatusQued, oRange, iChecksumA, iChecksumB, SssSEventSyncPriorityRaspberryPi))
+#
+#			for iPage in 0...SBEEPROMSamountOfPages do
+## TODO: this won't work with dynamically sized pages, or will it?
+#				oRange = self.rangeForFDDpage(iPage)
+#				iChecksumA, iChecksumB = self.checksumForRange(iTarget, oRange)
+#
+#				self.addEvent(SssSserialEvent.new(iTarget, SssSEventTypeRequestEEPROMchecksum, SssSEventStatusQued, oRange, iChecksumA, iChecksumB, SssSEventSyncPriorityArduino))
+#
+#			end # loop each page
+#
+#		end # for loop FDDDs
 
-			iChecksumA, iChecksumB = self.checksumForRange(iTarget, oRange)
-
-			self.addEvent(SssSserialEvent.new(iTarget, SssSEventTypeRequestEEPROMchecksum, SssSEventStatusQued, oRange, iChecksumA, iChecksumB, SssSEventSyncPriorityRaspberryPi))
-
-			for iPage in 0...SBEEPROMSamountOfPages do
-# TODO: this won't work with dynamically sized pages, or will it?
-				oRange = self.rangeForFDDpage(iPage)
-				iChecksumA, iChecksumB = self.checksumForRange(iTarget, oRange)
-
-				self.addEvent(SssSserialEvent.new(iTarget, SssSEventTypeRequestEEPROMchecksum, SssSEventStatusQued, oRange, iChecksumA, iChecksumB, SssSEventSyncPriorityArduino))
-
-			end # loop each page
-
-		end # for loop FDDDs
-*/
 	end # addInitialSyncEvents
 
 
