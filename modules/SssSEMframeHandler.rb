@@ -409,7 +409,7 @@ puts 'OK: frame ID: ' << iByte.to_s(10)
 
 	def pong(iTarget, iFrameID)
 
-		sData = '@' << iFrameID
+		sData = '@' << iFrameID.chr
 
 		self.writeFramed(iTarget, sData)
 
