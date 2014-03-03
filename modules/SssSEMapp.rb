@@ -141,6 +141,8 @@ class SssSEMappClass
 		# listen to file events
 		self.checkPipes()
 		
+		@oIOframeHandler.oEventManager.executeNextStep();
+
 	end # idle
 	protected :idle
 
