@@ -75,7 +75,8 @@ class SssSserialEvent
 
 
 	def checksumMatch?(iChecksumA, iChecksumB)
-
+puts 'my checksum 0x' << @iChecksumA.to_s(16) << ' 0x' << @iChecksumB
+puts 'other checksum 0x' << iChecksumA.to_s(16) << ' 0x' << iChecksumB
 		(iChecksumA == @iChecksumA) && (iChecksumB == @iChecksumB)
 
 	end # checksumMatch?
@@ -153,23 +154,23 @@ class SssSEMeventManager
 		self.addEvent(SssSserialEvent.new(iTarget, SssSEventTypeRequestEEPROMchecksum, SssSEventStatusQued, oRangeSettings, iChecksumA, iChecksumB, SssSEventSyncPriorityRaspberryPi))
 
 		# SBAMFDDDs - ids 1..3
-		for iTarget in 1..3 do
-
-			iChecksumA, iChecksumB = self.checksumForRange(iTarget, oRangeSettings)
-
-			self.addEvent(SssSserialEvent.new(iTarget, SssSEventTypeRequestEEPROMchecksum, SssSEventStatusQued, oRangeSettings, iChecksumA, iChecksumB, SssSEventSyncPriorityRaspberryPi))
-
-			for iPage in 0...SBEEPROMSamountOfPages do
-# TODO: this won't work with dynamically sized pages, or will it?
-# it does dump all of the page space to file, so it does work. Rename the method so there is less confusion when we get to doing the pages
-				oRangePages = self.rangeForFDDpage(iPage)
-				iChecksumA, iChecksumB = self.checksumForRange(iTarget, oRangePages)
-
-				self.addEvent(SssSserialEvent.new(iTarget, SssSEventTypeRequestEEPROMchecksum, SssSEventStatusQued, oRangePages, iChecksumA, iChecksumB, SssSEventSyncPriorityArduino))
-
-			end # loop each page
-
-		end # for loop FDDDs
+#		for iTarget in 1..3 do
+## TODO: only ask those that have been seen online
+#			iChecksumA, iChecksumB = self.checksumForRange(iTarget, oRangeSettings)
+#
+#			self.addEvent(SssSserialEvent.new(iTarget, SssSEventTypeRequestEEPROMchecksum, SssSEventStatusQued, oRangeSettings, iChecksumA, iChecksumB, SssSEventSyncPriorityRaspberryPi))
+#
+#			for iPage in 0...SBEEPROMSamountOfPages do
+## TODO: this won't work with dynamically sized pages, or will it?
+## it does dump all of the page space to file, so it does work. Rename the method so there is less confusion when we get to doing the pages
+#				oRangePages = self.rangeForFDDpage(iPage)
+#				iChecksumA, iChecksumB = self.checksumForRange(iTarget, oRangePages)
+#
+#				self.addEvent(SssSserialEvent.new(iTarget, SssSEventTypeRequestEEPROMchecksum, SssSEventStatusQued, oRangePages, iChecksumA, iChecksumB, SssSEventSyncPriorityArduino))
+#
+#			end # loop each page
+#
+#		end # for loop FDDDs
 
 	end # addInitialSyncEvents
 
