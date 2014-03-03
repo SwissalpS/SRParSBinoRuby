@@ -151,7 +151,7 @@ class SssSEMeventManager
 		iChecksumA, iChecksumB = self.checksumForRange(iTarget, oRange)
 
 		self.addEvent(SssSserialEvent.new(iTarget, SssSEventTypeRequestEEPROMchecksum, SssSEventStatusQued, oRange, iChecksumA, iChecksumB, SssSEventSyncPriorityRaspberryPi))
-
+/*
 		# SBAMFDDDs - ids 1..3
 		for iTarget in 1..3 do
 
@@ -169,7 +169,7 @@ class SssSEMeventManager
 			end # loop each page
 
 		end # for loop FDDDs
-
+*/
 	end # addInitialSyncEvents
 
 
