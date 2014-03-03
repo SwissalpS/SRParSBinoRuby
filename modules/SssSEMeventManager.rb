@@ -439,15 +439,18 @@ class SssSEMeventManager
 			sData = 'e'
 
 			# start address
-			sData << ((oEvent.addressRange.first >> 8) & 0xFF).chr
-			sData << (oEvent.addressRange.first & 0xFF).chr
+			iFirst = oEvent.iPointer
+			sData << ((iFirst >> 8) & 0xFF).chr
+			sData << (iFirst & 0xFF).chr
 
-			# last address
-			sData << ((oEvent.addressRange.last >> 8) & 0xFF).chr
-			sData << (oEvent.addressRange.last & 0xFF).chr
+			# last address (either given range or fill max 1 frame)
+			# command, start address, length
+			# 1 byte  + 2 bytes		  + 1 byte
+			iEffectiveDataLength = SBSerialMaxDataLengthPerFrame - 4
+			iLast = [oEvent.addressRange.last, (iFirst + iEffectiveDataLength - 1)].min
 
 			# length
-			sData << ((oEvent.addressRange.last - oEvent.addressRange.first + 1) & 0xFF).chr
+			sData << ((iLast - iFirst + 1) & 0xFF).chr
 
 			SssSEMapp.oIOframeHandler.writeFramed(iTarget, sData)
 
@@ -489,15 +492,10 @@ puts '---iFirst: 0x' << iFirst.to_s(16)
 puts '---iFirst: 0x' << iFirst.to_s(16)
 
 			# last address (either given range or fill max 1 frame)
-			# command, start address, last address, length
-			# 1 byte  + 2 bytes		+ 2 bytes	  + 1 byte
-			iEffectiveDataLength = SBSerialMaxDataLengthPerFrame - 6
+			# command, start address, length
+			# 1 byte  + 2 bytes		  + 1 byte
+			iEffectiveDataLength = SBSerialMaxDataLengthPerFrame - 4
 			iLast = [oEvent.addressRange.last, (iFirst + iEffectiveDataLength - 1)].min
-
-puts '---iLast: 0x' << iLast.to_s(16)
-			sData << ((iLast >> 8) & 0xFF).chr
-			sData << (iLast & 0xFF).chr
-puts '---iLast: 0x' << iLast.to_s(16)
 
 			# length
 			sData << ((iLast - iFirst + 1) & 0xFF).chr
