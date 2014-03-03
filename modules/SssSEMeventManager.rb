@@ -75,10 +75,7 @@ class SssSserialEvent
 
 
 	def checksumMatch?(iChecksumA, iChecksumB)
-p @iChecksumA.class
-p iChecksumA.class
-puts 'my checksum 0x' << @iChecksumA.to_s(16) << ' 0x' << @iChecksumB.to_s(16)
-puts 'other checksum 0x' << iChecksumA.to_s(16) << ' 0x' << iChecksumB.to_s(16)
+
 		(iChecksumA == @iChecksumA) && (iChecksumB == @iChecksumB)
 
 	end # checksumMatch?
@@ -153,7 +150,7 @@ class SssSEMeventManager
 		oRangeSettings = 0..42
 		iChecksumA, iChecksumB = self.checksumForRange(iTarget, oRangeSettings)
 
-		self.addEvent(SssSserialEvent.new(iTarget, SssSEventTypeRequestEEPROMchecksum, SssSEventStatusQued, oRangeSettings, iChecksumA, iChecksumB, SssSEventSyncPriorityRaspberryPi))#SssSEventSyncPriorityArduino))
+		self.addEvent(SssSserialEvent.new(iTarget, SssSEventTypeRequestEEPROMchecksum, SssSEventStatusQued, oRangeSettings, iChecksumA, iChecksumB, SssSEventSyncPriorityRaspberryPi))
 
 		# SBAMFDDDs - ids 1..3
 #		for iTarget in 1..3 do
@@ -505,7 +502,6 @@ class SssSEMeventManager
 
 				sChar = oFile.getc()
 
-#puts '0x' << sChar[0].ord.to_s(16)
 				sData << sChar
 
 				oEvent.iPointer += 1
@@ -621,6 +617,7 @@ class SssSEMeventManager
 		if oEvent.checksumMatch?(oFrame.data[0], oFrame.data[1])
 
 			# ok, match no sync required
+			puts 'OK: checksums match'
 			oEvent.iStatus = SssSEventStatusDone
 
 		else
