@@ -57,7 +57,9 @@ class SssSEMtriggerCommandMe < SssSEMtriggerBase
 		return super if i.nil?
 
 		sBasename = File::basename(@sPathFile)
-
+p i
+p i.chr
+p i.to_s
 		case i.chr
 			when 'e'
 				# update EEPROM caches
