@@ -505,11 +505,9 @@ class SssSEMeventManager
 			for iPos in iFirst..iLast
 
 				sChar = oFile.getc()
-p sChar.class
-p sChar
-p sChar.chr()
-p sChar.to_s(16)
-				sData << sChar.chr()
+
+puts '0x' << sChar[0].to_s(16)
+				sData << sChar
 
 				oEvent.iPointer += 1
 
