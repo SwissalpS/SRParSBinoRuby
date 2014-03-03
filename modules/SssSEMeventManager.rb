@@ -506,7 +506,7 @@ class SssSEMeventManager
 
 				sChar = oFile.getc()
 
-puts '0x' << sChar[0].to_s(16)
+puts '0x' << sChar[0].ord.to_s(16)
 				sData << sChar
 
 				oEvent.iPointer += 1
