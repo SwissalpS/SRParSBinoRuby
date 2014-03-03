@@ -456,9 +456,6 @@ class SssSEMeventManager
 
 			oEvent.iStatus = SssSEventStatusSent
 
-			# make sure the pointer is ready for when the dump frame(s) come in
-			oEvent.iPointer = oEvent.addressRange.first
-
 		elsif SssSEventTypeRequestEEPROMchecksum == iType
 
 			# request checksum comparison for range
@@ -486,10 +483,8 @@ class SssSEMeventManager
 
 			# start address
 			iFirst = oEvent.iPointer
-puts '---iFirst: 0x' << iFirst.to_s(16)
 			sData << ((iFirst >> 8) & 0xFF).chr
 			sData << (iFirst & 0xFF).chr
-puts '---iFirst: 0x' << iFirst.to_s(16)
 
 			# last address (either given range or fill max 1 frame)
 			# command, start address, length
@@ -510,7 +505,7 @@ puts '---iFirst: 0x' << iFirst.to_s(16)
 
 				sChar = oFile.getc()
 
-puts '0x' << sChar[0].ord.to_s(16)
+#puts '0x' << sChar[0].ord.to_s(16)
 				sData << sChar
 
 				oEvent.iPointer += 1
@@ -590,6 +585,10 @@ puts '0x' << sChar[0].ord.to_s(16)
 			# no, this was the last one
 			# mark as done
 			oEvent.iStatus = SssSEventStatusDone
+
+		else
+
+			oEvent.iStatus = SssSEventStatusQued
 
 		end # if 'event' now satisfied
 
