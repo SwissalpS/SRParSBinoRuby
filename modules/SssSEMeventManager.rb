@@ -393,7 +393,7 @@ class SssSEMeventManager
 
 		aMatches = []
 
-		aTimedOut = []
+		aDeleteThese = []
 
 		oTnow = Time.new.utc
 
@@ -402,14 +402,17 @@ class SssSEMeventManager
 			if (oTnow > oEvent.oTimeOut)
 				puts 'KO:event timed out: '
 				p oEvent
+				aDeleteThese << oEvent
 				next
 			end # if timed out event found
 
 			aMatches << oEvent if oEvent.matches?(iTarget, iType, iStatus)
 
+			aDeleteThese << oEvent if oEvent.matches?(nil, nil, SssSEventStatusDone)
+
 		end # loop collecting matching Events
 
-		aTimedOut.each do |oEvent|
+		aDeleteThese.each do |oEvent|
 			self.deleteEvent(oEvent)
 		end # loop all timed out events removing them
 
@@ -511,12 +514,6 @@ class SssSEMeventManager
 			if oEvent.addressRange.last < oEvent.iPointer
 
 				oEvent.iStatus = SssSEventStatusDone
-
-			#else
-
-				# move range for next cycle
-				# no longer required as we us pointer now
-				#oEvent.addressRange = ((iLast + 1)..oEvent.addressRange.last)
 
 			end # if done with this upload task or not
 
