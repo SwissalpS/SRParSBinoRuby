@@ -57,10 +57,8 @@ class SssSEMtriggerCommandMe < SssSEMtriggerBase
 		return super if i.nil?
 
 		sBasename = File::basename(@sPathFile)
-p i
-p i.chr
-p i.to_s
-		case i.chr
+
+		case i
 			when 'e'
 				# update EEPROM caches
 				puts 'OK:ft:Got e-signal from Trigger ' << sBasename
@@ -86,9 +84,10 @@ p i.to_s
 			else
 
 				# if not a valid command, clear buffer
-				return super
 
 		end # switch case
+
+		super
 
 	end # process
 
