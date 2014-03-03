@@ -485,7 +485,7 @@ class SssSEMeventManager
 			# last address (either given range or fill max 1 frame)
 			# command, start address, last address, length
 			# 1 byte  + 2 bytes		+ 2 bytes	  + 1 byte
-			iEffectiveDataLength = SBSerialMaxDataLengthPerFrame - 4
+			iEffectiveDataLength = SBSerialMaxDataLengthPerFrame - 6
 			iLast = [oEvent.addressRange.last, (iFirst + iEffectiveDataLength - 1)].min
 
 			sData << ((iLast >> 8) & 0xFF).chr
