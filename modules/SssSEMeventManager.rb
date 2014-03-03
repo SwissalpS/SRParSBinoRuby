@@ -75,8 +75,10 @@ class SssSserialEvent
 
 
 	def checksumMatch?(iChecksumA, iChecksumB)
-puts 'my checksum 0x' << @iChecksumA.to_s(16) << ' 0x' << @iChecksumB
-puts 'other checksum 0x' << iChecksumA.to_s(16) << ' 0x' << iChecksumB
+p @iChecksumA.class
+p iChecksumA.class
+puts 'my checksum 0x' << @iChecksumA.to_s(16) << ' 0x' << @iChecksumB.to_s(16)
+puts 'other checksum 0x' << iChecksumA.to_s(16) << ' 0x' << iChecksumB.to_s(16)
 		(iChecksumA == @iChecksumA) && (iChecksumB == @iChecksumB)
 
 	end # checksumMatch?
