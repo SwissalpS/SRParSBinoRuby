@@ -377,15 +377,15 @@ puts '   broadcasting milliseconds since midnight ' << iMillisSinceMidnight.to_s
 
 		begin
 
+			bOK = NO
 			# since we use EventMachine anyway
 			EM.system(sCommand) { |sOut,oRes|
 				puts sOut
 				if (oRes.exitstatus == 0)
 					puts 'OK: told SkyTab ' << sInvocationPath
-					return true
+					bOK = YES
 				else
 					puts 'KO: told SkyTab ' << sInvocationPath
-					return false
 				end # if run OK or not
 			} # run system
 
@@ -394,9 +394,11 @@ puts '   broadcasting milliseconds since midnight ' << iMillisSinceMidnight.to_s
 			puts 'ERROR: could not tell SkyTab ' << sInvocationPath
 			puts e.to_s
 
-		end # catch
+			return nil
 
-		return nil
+		end # catch
+p bOK
+		return bOK
 
 	end # tellSkyTab
 
