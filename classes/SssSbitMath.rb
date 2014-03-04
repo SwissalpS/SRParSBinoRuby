@@ -100,6 +100,29 @@ class SssSbitMathClass
 
 	end # dealloc
 
+
+	def self.ipArrayToULong(aubIP)
+
+		ulIPtemp = aubIP[0];
+		ulIP = ulIPtemp << 24;
+		ulIPtemp = aubIP[1];
+		ulIP += ulIPtemp << 16;
+		ulIPtemp = aubIP[2];
+		ulIP += ulIPtemp << 8;
+		ulIPtemp = aubIP[3];
+		ulIP += ulIPtemp;
+
+		return ulIP;
+
+	end # ipArrayToULong
+
+
+	def ipArrayToULong(aubIP)
+
+		return SssSbitMathClass::ipArrayToULong(aubIP)
+
+	end # ipArrayToULong
+
 end # SssSbitMathClass
 
 SssSbitMath = SssSbitMathClass.new

@@ -204,7 +204,7 @@ end # reboots
 
 def resetLowerMemory()
 
-	oFrame = SssSserialFrame::new(0, 4, 88, 35, 1)
+	oFrame = SssSserialFrame::new(0, 4, 88, 35, 2, [0b00000111])
 	for iTarget in 0..3
 
 		oFrame.targetID = iTarget
@@ -215,8 +215,47 @@ def resetLowerMemory()
 end # resetLowerMemory
 
 
-def activePortsPermanent()
+def resetUpperMemory()
 
+	oFrame = SssSserialFrame::new(0, 4, 87, 35, 2, [0b00001011])
+	for iTarget in 0..3
+
+		oFrame.targetID = iTarget
+		writeFrameToFile(oFrame, SssSpathOutPermanent + iTarget.to_s + '_restoreDefaultsUpperMemory.frame')
+
+	end # loop target
+
+end # resetUpperMemory
+
+
+def resetUppermostMemory()
+
+	oFrame = SssSserialFrame::new(0, 4, 86, 35, 2, [0b00010011])
+	for iTarget in 0..3
+
+		oFrame.targetID = iTarget
+		writeFrameToFile(oFrame, SssSpathOutPermanent + iTarget.to_s + '_restoreDefaultsUppermostMemoryPleaseDont.frame')
+
+	end # loop target
+
+end # resetUppermostMemory
+
+
+def resetAllMemory()
+
+	oFrame = SssSserialFrame::new(0, 4, 85, 35, 2, [0b00011111])
+	for iTarget in 0..3
+
+		oFrame.targetID = iTarget
+		writeFrameToFile(oFrame, SssSpathOutPermanent + iTarget.to_s + '_restoreDefaultsAllMemoryPleaseDont.frame')
+
+	end # loop target
+
+end # resetAllMemory
+
+
+def activePortsPermanent()
+#TODO: ethernet and sd
 	# master assume id 0
 	# no debug but raspi
 	oFrame = SssSserialFrame::new(0, 4, 99, 40, 2, [0b110011])
@@ -251,7 +290,7 @@ end # activePortsPermanent
 
 
 def activePortsTemporary()
-
+#TODO: ethernet and sd
 	# master assume id 0
 	# no debug but raspi
 	oFrame = SssSserialFrame::new(0, 4, 99, 40, 2, [0b110000])
@@ -448,6 +487,9 @@ debugLevelsTemporary()
 setIDs()
 pings()
 resetLowerMemory()
+resetUpperMemory()
+resetUppermostMemory()
+resetAllMemory()
 reboots()
 activePortsPermanent()
 activePortsTemporary()
