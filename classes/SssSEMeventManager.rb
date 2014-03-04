@@ -154,7 +154,7 @@ class SssSEMeventManager
 
 		# SBAMFDDDs - ids 1..3
 		for iTarget in 1..3 do
-next
+
 			next if !SssSEMapp.oIOframeHandler.isOnlineEthernet?(iTarget)
 
 			iChecksumA, iChecksumB = self.checksumForRange(iTarget, oRangeSettings)
@@ -298,10 +298,10 @@ next
 		sOut << iLastOctet.chr << (123).chr << (168).chr << (192).chr
 
 		# bytes 26..29 - Ethernet broadcast IP
-		#sOut << (1).chr << (0).chr << (0).chr << (224).chr
-		# since we can't actually broadcast to 'my net'
 		# ! reversed byte order !
-		sOut << (40).chr << (123).chr << (168).chr << (192).chr
+		sOut << (1).chr << (0).chr << (0).chr << (224).chr
+		# since we can't actually broadcast to 'my net'
+		#sOut << (40).chr << (123).chr << (168).chr << (192).chr
 
 		# bytes 30..33 - Ethernet gateway IP
 		# ! reversed byte order !
