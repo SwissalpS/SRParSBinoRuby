@@ -261,9 +261,11 @@ next
 		sOut << (0).chr
 
 		# byte 7..10 - (serial/ethernet) delay between frames (will be multiplied by ID)
-		sOut << (0).chr << (0).chr << (0).chr << (50).chr
+		# ! reversed byte order !
+		sOut << (50).chr << (0).chr << (0).chr << (0).chr
 
 		# byte 11..12 - serial baud indexes (each port uses 4 bits)
+		# ! reversed byte order !
 		sOut << (238).chr << (238).chr
 
 		# byte 13 - serial id of RasPi = 0xDD
@@ -292,23 +294,28 @@ next
 		sOut << (0xBE).chr << (0x5B).chr << (0x20).chr << (0x14).chr << (0x77).chr << iLastOctet.chr
 
 		# bytes 22..25 - Ethernet IP address
-		sOut << (192).chr << (168).chr << (123).chr << iLastOctet.chr
+		# ! reversed byte order !
+		sOut << iLastOctet.chr << (123).chr << (168).chr << (192).chr
 
 		# bytes 26..29 - Ethernet broadcast IP
-		#sOut << (224).chr << (0).chr << (0).chr << (1).chr
+		#sOut << (1).chr << (0).chr << (0).chr << (224).chr
 		# since we can't actually broadcast to 'my net'
-		sOut << (192).chr << (168).chr << (123).chr << (40).chr
+		# ! reversed byte order !
+		sOut << (40).chr << (123).chr << (168).chr << (192).chr
 
 		# bytes 30..33 - Ethernet gateway IP
-		sOut << (192).chr << (168).chr << (123).chr << (123).chr
+		# ! reversed byte order !
+		sOut << (123).chr << (123).chr << (168).chr << (192).chr
 
 		# bytes 34..37 - Ethernet subnet
-		sOut << (255).chr << (255).chr << (255).chr << (0).chr
+		# ! reversed byte order !
+		sOut << (0).chr << (255).chr << (255).chr << (255).chr
 
 		# bytes 38..39 - Ethernet port
-		sOut << (SBethernetDefaultPort >> 8).chr << (SBethernetDefaultPort & 0xFF).chr
+		# ! reversed byte order !
+		sOut << (SBethernetDefaultPort & 0xFF).chr << (SBethernetDefaultPort >> 8).chr
 		
-		# SBAMM only byte 40 - reset Values & which BIKEs are active
+		# byte 40 - SBAMM only reset Values & which BIKEs are active
 		#sOut << (0b00111001).chr
 		# while debugging without switch connected
 		sOut << (0b00000001).chr
@@ -317,7 +324,7 @@ next
 		sOut << (0b00111001).chr
 
 		# byte 42 - number of decimals to show
-		sOut << (0b00000001).chr
+		sOut << (0b00001001).chr
 
 		sBlank = (0xFF).chr()
 
