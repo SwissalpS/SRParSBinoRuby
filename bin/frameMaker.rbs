@@ -476,9 +476,23 @@ def displayTime()
 
 	end # loop targets
 
-
 end # displayTime
 
+
+def ethernetSettings()
+
+	iTarget = 0
+	oFrame = SssSserialFrame::new(iTarget, 4, 76, 43, 20, [3, 192, 168, 123, 1, 224, 0, 0, 1, 192, 168, 123, 123, 255, 255, 255, 0, 48, 57])
+	writeFrameToFile(oFrame, SssSpathOutPermanent + iTarget.to_s + '_resetEthernet.frame')
+
+	for iTarget in 1..3
+
+		oFrame = SssSserialFrame::new(iTarget, 4, 76, 43, 20, [3, 192, 168, 123, 10 * iTarget, 224, 0, 0, 1, 192, 168, 123, 123, 255, 255, 255, 0, 48, 57])
+		writeFrameToFile(oFrame, SssSpathOutPermanent + iTarget.to_s + '_resetEthernet.frame')
+
+	end # loop targets
+
+end # ethernetSettings
 
 
 prepareDirs()
@@ -503,3 +517,4 @@ displayNameAndCategory()
 displayName()
 displayCategory()
 displayTime()
+ethernetSettings()
