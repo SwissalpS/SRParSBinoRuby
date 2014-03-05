@@ -233,15 +233,18 @@ class SssSEMframeHandlerClass
 			end # if got IP
 		else
 			# update entry
-			if (!sIP.nil?)
-				if (@hOnlineClientHash[sID][:ethernetIP].nil?)
-					@hOnlineClientHash[sID][:ethernetIP] = sIP
-					@hOnlineClientHash[sID][:ethernetLastSeen] = iNow
-					@hOnlineClientHash[sID][:marker].goOnlineEthernet(sIP)
-				end # if got IP now
-			else
+			if (sIP.nil?)
+				# no IP, must be serial
 				@hOnlineClientHash[sID][:serialLastSeen] = iNow
 				@hOnlineClientHash[sID][:marker].goOnlineSerial()
+			else
+				# has IP
+				if (@hOnlineClientHash[sID][:ethernetIP].nil?)
+					# first time from ethernet
+					@hOnlineClientHash[sID][:ethernetIP] = sIP
+				end # if got IP now
+				@hOnlineClientHash[sID][:ethernetLastSeen] = iNow
+				@hOnlineClientHash[sID][:marker].goOnlineEthernet(sIP)
 			end # if got an IP
 
 		end # if already seen
