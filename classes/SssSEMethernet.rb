@@ -209,34 +209,39 @@ class SssSEMethernetClass
 		if (self.disconnected?)
 			return nil;
 		end # if not connected
-		sIP = nil
 
-		if (Fixnum == mIPorID.class)
-			if (0xFF > mIPorID)
-				# probably ID given
-				if (0 == mIPorID)
-					# SBAMM
-					sIP = '192.168.123.1'
-				elsif (4 > mIPorID)
-					# an FDD
-					sIP = '192.168.123.' << (10 * mIPorID).to_s(10)
-				elsif (SBSerialBroadcastID == mIPorID)
-					# broadcast -> sIP.nil?
-				elsif (SBSerialRaspberryPiID == mIPorID)
-					# to self! -> ignore
-					return nil
-				end # switch ID
-			else
-				# probably IP given as number
-				sIP = ((mIPorID >> 24) & 0xFF).to_s(10) << '.'
-				sIP << ((mIPorID >> 16) & 0xFF).to_s(10) << '.'
-				sIP << ((mIPorID >> 8) & 0xFF).to_s(10) << '.'
-				sIP << (mIPorID & 0xFF).to_s(10)
-			end # if ID or IP(as number)
+		if (mIPorID.nil?)
+			sIP = @mPortOptions[:ethernetIPbroadcast]
+		else
+			if (Fixnum == mIPorID.class)
+				if (0xFF > mIPorID)
+					# probably ID given
+					sIP = SssSEMapp.oIOframeHandler.getIPstringForID(mIPorID);
+					if sIP.nil?
+						if (0 == mIPorID)
+							# SBAMM
+							sIP = '192.168.123.1'
+						elsif (4 > mIPorID)
+							# an FDD
+							sIP = '192.168.123.' << (10 * mIPorID).to_s(10)
+						elsif (SBSerialBroadcastID == mIPorID)
+							# broadcast -> sIP.nil?
+							sIP = @mPortOptions[:ethernetIPbroadcast]
+						elsif (SBSerialRaspberryPiID == mIPorID)
+							# to self! -> ignore
+							return nil
+						end # switch ID
+					end # if did not get an IP back
+				else
+					# probably IP given as number
+					sIP = ((mIPorID >> 24) & 0xFF).to_s(10) << '.'
+					sIP << ((mIPorID >> 16) & 0xFF).to_s(10) << '.'
+					sIP << ((mIPorID >> 8) & 0xFF).to_s(10) << '.'
+					sIP << (mIPorID & 0xFF).to_s(10)
+				end # if ID or IP(as number)
 
-		end # if number given for target
-
-		sIP = @mPortOptions[:ethernetIPbroadcast] if mIPorID.nil?
+			end # if number given for target
+		end # if mIPorID == nil or not
 
 		return self.broadcastTo(sIP, sData)
 
