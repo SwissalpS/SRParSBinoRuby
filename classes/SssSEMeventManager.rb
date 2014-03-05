@@ -316,9 +316,9 @@ class SssSEMeventManager
 		sOut << (SBethernetDefaultPort & 0xFF).chr << (SBethernetDefaultPort >> 8).chr
 		
 		# byte 40 - SBAMM only reset Values & which BIKEs are active
-		#sOut << (0b00111001).chr
+		#sOut << (0b00000001).chr
 		# while debugging without switch connected
-		sOut << (0b00000001).chr
+		sOut << (0b00111001).chr
 
 		# byte 41 - FDD to BIKE mapping
 		sOut << (0b00111001).chr
