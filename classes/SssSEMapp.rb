@@ -54,9 +54,9 @@ class SssSEMappClass
 
   private
 
-	@@_defaultPathFilePID = '/var/tmp/SRParSBinoRuby.pid'; # :doc: really? how can I force an attribute to be included?
+	@@_defaultPathFilePID = '/var/tmp/SRParSBinoRuby.pid' # :doc: really? how can I force an attribute to be included?
 
-	@@_defaultPathFileConfig = 'config/settings.yaml';
+	@@_defaultPathFileConfig = 'config/settings.yaml'
 
 	@aCurrentRideIDs = [ 0, 0 ]; attr_reader :aCurrentRideIDs
 
