@@ -127,6 +127,8 @@ class SssSEMappClass
 
 		end # if SkyTab bin exists
 
+		self.initDirs()
+
 		@bUseEthernet = self.get(:useEthernet, YES)
 
 		@bUseSerial = self.get(:useSerial, NO)
@@ -147,6 +149,25 @@ class SssSEMappClass
 
 	end # idle
 	protected :idle
+
+
+	def initDirs()
+
+		aPaths = []
+
+		sPathBase = self.get(:pathFileResponseBase, @@_defaultPathResponseBase) + 'durations'
+
+		aPaths << sPathBase + '0'
+		aPaths << sPathBase + '1'
+		aPaths << sPathBase + '2'
+
+		for sPath in aPaths
+			`mkdir -p #{sPath}`
+		end # loop all dirs
+
+		self
+
+	end # initDirs
 
 
 	def initEthernet()
