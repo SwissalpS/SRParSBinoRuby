@@ -58,7 +58,7 @@ class SssSEMappClass
 
 	@@_defaultPathFileConfig = 'config/settings.yaml'
 
-	@aCurrentRideIDs = [ 0, 0 ]; attr_reader :aCurrentRideIDs
+	@aCurrentRideIDs = [ 0, 0, 0 ]; attr_reader :aCurrentRideIDs
 
 	@sPathSkyTabBin = '/gitSwissalpS/SkyTab/SkyTab/bin/SkyTab'
 
@@ -99,7 +99,7 @@ class SssSEMappClass
 		@_initialized = NO
 
 		@aPipes = []
-		@aCurrentRideIDs = [ 0, 0 ]
+		@aCurrentRideIDs = [ 0, 0, 0 ]
 
 		@oEthernet = nil
 		@oIOframeHandler = nil
@@ -425,7 +425,7 @@ p 'for bike: ' << iBike.to_s
 
 	def tellSkyTabReset(iBike)
 
-		if !(0..1).member? iBike
+		if !(0..2).member? iBike
 
 			puts 'ERROR: invalid BIKE ID'
 			return nil
@@ -441,7 +441,7 @@ p 'for bike: ' << iBike.to_s
 
 	def tellSkyTabStart(iBike)
 
-		if !(0..1).member? iBike
+		if !(0..2).member? iBike
 
 			puts 'ERROR: invalid BIKE ID'
 			return nil
@@ -457,7 +457,7 @@ p 'for bike: ' << iBike.to_s
 
 	def tellSkyTabStop(iBike)
 
-		if !(0..1).member? iBike
+		if !(0..2).member? iBike
 
 			puts 'ERROR: invalid BIKE ID'
 			return nil
