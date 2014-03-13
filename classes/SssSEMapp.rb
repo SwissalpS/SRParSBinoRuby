@@ -58,6 +58,8 @@ class SssSEMappClass
 
 	@@_defaultPathFileConfig = 'config/settings.yaml'
 
+	@@_defaultPathResponseBase = '/gitSwissalpS/SRParSBinoRuby/notificationsFromArduinos/'
+
 	@aCurrentRideIDs = [ 0, 0, 0 ]; attr_reader :aCurrentRideIDs
 
 	@sPathSkyTabBin = '/gitSwissalpS/SkyTab/SkyTab/bin/SkyTab'
@@ -415,6 +417,8 @@ p 'for bike: ' << iBike.to_s
 
 		end # if invalid iBike
 
+		self.writeDuration(ulDuration, iBike)
+
 		sInvocationPath = '/cgi/hpi/end/' + ulDuration.to_s
 		sInvocationPath += '/' + @aCurrentRideIDs[iBike].to_s
 
@@ -432,6 +436,8 @@ p 'for bike: ' << iBike.to_s
 
 		end # if invalid iBike
 
+		self.writeReset(iBike)
+
 		sInvocationPath = '/cgi/hpi/reset' + iBike.to_s
 
 		return self.tellSkyTab(sInvocationPath, iBike)
@@ -448,6 +454,8 @@ p 'for bike: ' << iBike.to_s
 
 		end # if invalid iBike
 
+		self.writeStart(iBike)
+
 		sInvocationPath = '/cgi/hpi/start' + iBike.to_s
 
 		return self.tellSkyTab(sInvocationPath, iBike)
@@ -463,6 +471,8 @@ p 'for bike: ' << iBike.to_s
 			return nil
 
 		end # if invalid iBike
+
+		self.writeStop(iBike)
 
 		sInvocationPath = '/cgi/hpi/stop' + iBike.to_s
 
@@ -658,6 +668,91 @@ p 'for bike: ' << iBike.to_s
 		@oIOframeHandler.oEventManager.addInitialSyncEvents()
 
 	end # updateEEPROMcaches
+
+
+	def writeDuration(ulDuration, iBike)
+
+		sPathBase = self.get(:pathFileResponseBase, @@_defaultPathResponseBase)
+		sPathBase += '/' if '/' != sPathBase[sPathBase.length() -1].chr
+
+		sPathFile = sPathBase << 'durations' << iBike.to_s << '/' << @aCurrentRideIDs[iBike].to_s
+
+		self.writeTimeToFile(sPathFile)
+
+	end # writeDuration
+
+
+	def writeReset(iBike)
+
+		sPathBase = self.get(:pathFileResponseBase, @@_defaultPathResponseBase)
+		sPathBase += '/' if '/' != sPathBase[sPathBase.length() -1].chr
+
+		sPathFile = sPathBase << 'reset' << iBike.to_s
+
+		self.writeTimeToFile(sPathFile)
+
+	end # writeReset
+
+
+	def writeStart(iBike)
+
+		sPathBase = self.get(:pathFileResponseBase, @@_defaultPathResponseBase)
+		sPathBase += '/' if '/' != sPathBase[sPathBase.length() -1].chr
+
+		sPathFile = sPathBase << 'start' << iBike.to_s
+
+		self.writeTimeToFile(sPathFile)
+
+	end # writeStart
+
+
+	def writeStop(iBike)
+
+		sPathBase = self.get(:pathFileResponseBase, @@_defaultPathResponseBase)
+		sPathBase += '/' if '/' != sPathBase[sPathBase.length() -1].chr
+
+		sPathFile = sPathBase << 'stop' << iBike.to_s
+
+		self.writeTimeToFile(sPathFile)
+
+	end # writeStop
+
+
+	def writeTimeToFile(sPathFile, ulDuration = nil)
+
+		# delete if exists
+		if (File.exists?(sPathFile))
+
+			# remove it first
+			File.delete(sPathFile);
+
+			if (File.exists?(sPathFile))
+				raise 'KO:Can not delete file: ' << sPathFile
+			end # if file still exists
+
+		end # if trigger-file already exists
+
+		if ulDuration.nil?
+			sTime = Time.now.utc.to_s()
+		else
+			sTime = ulDuration.to_s()
+		end # if custom time or current
+
+		# attempt to create it and write current time
+		oF = File.new(sPathFile, 'wb')
+		oF.write(sTime)
+		oF.close()
+
+		if (!File.exists?(sPathFile))
+			raise 'KO:Can not create file: ' << sPathFile
+		end # if failed to create
+
+		# make it writeable for all
+		File.chmod(0666, sPathFile)
+
+		self
+
+	end # writeTimeToFile
 
 end # SssSEMappClass
 
