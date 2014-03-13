@@ -121,7 +121,7 @@ class SssSEMappClass
 
 		else
 
-			puts 'ERROR:SkyTab.bin not found at ' << @sPathSkyTabBin
+			puts 'KO:SkyTab.bin not found at ' << @sPathSkyTabBin
 
 			@sPathSkyTabBin = nil
 
@@ -329,6 +329,8 @@ class SssSEMappClass
 
 		puts 'OK:Triggers halted'
 
+		# remove output log?
+
 		# shutdown EventMachine
 		EM::stop_event_loop()
 
@@ -388,7 +390,7 @@ puts '   broadcasting milliseconds since midnight ' << iMillisSinceMidnight.to_s
 
 		if @sPathSkyTabBin.nil?
 
-			puts 'ERROR: SkyTab bin was not present at init'
+			puts 'KO: SkyTab bin was not present at init'
 			return nil
 
 		end # if no SkyTab
@@ -428,12 +430,12 @@ p bOK
 
 	def tellSkyTabDurationForBIKE(ulDuration, iBike)
 
-p 'got duration in millisecondos: ' << ulDuration.to_s
+p 'got duration in milliseconds: ' << ulDuration.to_s
 p 'for bike: ' << iBike.to_s
 
 		if !(0..2).member? iBike
 
-			puts 'ERROR: invalid BIKE ID'
+			puts 'KO: invalid BIKE ID'
 			return nil
 
 		end # if invalid iBike
