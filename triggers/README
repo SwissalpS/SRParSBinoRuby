@@ -1,0 +1,12 @@
+SRParSBinoRuby.git/triggers/README
+author: Luke aka SwissalpS@LukeZimmermann.com<br />
+licence: Creative Commons where not specified otherwise.<br />
+group: developers tools<br />
+version(date): 20140314_165008<br /><br />
+
+This directory is populated and watched by SRParSBinoRuby.
+
+Think of them as the 'INPUTS'
+
+You may want to read the comments of each trigger class for exact useage.
+Not all trigger files take the input the same way.

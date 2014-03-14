@@ -1,0 +1,9 @@
+SRParSBinoRuby.git/config/README
+author: Luke aka SwissalpS@LukeZimmermann.com<br />
+licence: Creative Commons where not specified otherwise.<br />
+group: developers tools<br />
+version(date): 20140314_163759<br /><br />
+
+This directory contains YAML configuration files.
+
+IMPORTANT: YAML is sensitive about whitespace. Use space-bar not tab.

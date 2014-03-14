@@ -1,0 +1,14 @@
+SRParSBinoRuby.git/onlineIDs/eth/README
+author: Luke aka SwissalpS@LukeZimmermann.com<br />
+licence: Creative Commons where not specified otherwise.<br />
+group: developers tools<br />
+version(date): 20140314_164306<br /><br />
+
+This directory contains files that identify when which device has been seen
+last over Ethernet connection.
+
+The filename is the Serial ID of the device.
+
+The creation or modification date is when the device was last seen.
+
+The file contains the IP of the device.
