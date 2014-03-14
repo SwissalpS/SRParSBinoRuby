@@ -136,6 +136,10 @@ class SssSEMappClass
 
 		@_initialized = YES;
 
+		if (0 < ARGV.length())
+			self.saveConfig() if ($*.member?('-w'))
+		end # if requested to write config
+
 		self
 
 	end # initialize
