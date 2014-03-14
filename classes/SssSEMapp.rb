@@ -515,6 +515,7 @@ p 'for bike: ' << iBike.to_s
 		# TODO: make it possible to traverse the tree
 		if @hS[mKey].nil?
 			puts 'US:unknown setting key: ' << mKey.to_s
+			@hS[mKey] = mDefaultValue
 			mDefaultValue
 		else
 			@hS[mKey]
