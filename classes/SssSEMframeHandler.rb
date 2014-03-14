@@ -121,7 +121,7 @@ class SssSEMframeHandlerClass
 		#end # loop all markers
 		@hOnlineClientHash = nil
 
-		nil;
+		nil
 
 	end # dealloc
 

@@ -109,25 +109,25 @@ class SssSEMtriggerBase #< EventMachine::Connection
 #puts 'hasData?'
 		begin
 
-			sRead = @oFile.read_nonblock(1024);
+			sRead = @oFile.read_nonblock(1024)
 
 		rescue Exception => e
 
-			sRead = nil;
+			sRead = nil
 
 		end
 
 		if (nil == sRead)
 
-			return NO;
+			return NO
 
 		else
 
-			@sBuffer.concat(sRead);
+			@sBuffer.concat(sRead)
 
-			self.observeSize(sRead.length());
+			self.observeSize(sRead.length())
 
-			return YES;
+			return YES
 
 		end # if got data
 

@@ -80,9 +80,9 @@ class SssSEMethernetClass
 				:ethernetPort => SssSEMapp.get(:ethernetPort, SBethernetDefaultPort)
 			};
 
-		@oPort = nil;
+		@oPort = nil
 
-		self.connect();
+		self.connect()
 
 		# make sure we can broadcast as long as we are connected
 		# TODO: get serial broadcast ID
@@ -96,7 +96,7 @@ class SssSEMethernetClass
 	def broadcastTo(sIP = nil, sData)
 
 		if (self.disconnected?)
-			return nil;
+			return nil
 		end # if not connected
 
 		sIP = @mPortOptions[:ethernetIPbroadcast] if sIP.nil?

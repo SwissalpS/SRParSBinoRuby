@@ -25,22 +25,22 @@ class SssSEMtriggerReset < SssSEMtriggerBase
 	# send 'r' command to SBAMM
 	def process()
 
-		iBike = 0;
+		iBike = 0
 
 		# only need to look at the first byte
-		i = @sBuffer[0];
+		i = @sBuffer[0]
 
 		# nil == i that would mean buffer is empty -> should never happen
 		return super if i.nil?
 
 		# convert byte-value to natural-value (echo '1' >> start)
-		i = i.chr.to_i;
+		i = i.chr.to_i
 
 		# if it's greater than 2, then third BIKE is meant
 		# NOTE: this sets the maximum amount of bikes, if you want more than 3...
 		if (2 < i)
 
-			iBike = 2;
+			iBike = 2
 
 		else
 
@@ -52,8 +52,8 @@ class SssSEMtriggerReset < SssSEMtriggerBase
 		
 		puts 'OK:ft:Got reset-signal from Trigger ' << sBasename + ' for BIKE ' << iBike.to_s
 
-		iSBAMMid = SssSEMapp.get(:idSBAMM, 0);
-		sData = 'r' << iBike.chr;
+		iSBAMMid = SssSEMapp.get(:idSBAMM, 0)
+		sData = 'r' << iBike.chr
 
 		SssSEMapp.oIOframeHandler.writeFramed(iSBAMMid, sData)
 

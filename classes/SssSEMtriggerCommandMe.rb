@@ -52,7 +52,7 @@ class SssSEMtriggerCommandMe < SssSEMtriggerBase
 	def process()
 
 		# first byte holds the command
-		i = @sBuffer[0];
+		i = @sBuffer[0]
 
 		# nil == i that would mean buffer is empty -> should never happen
 		return super if i.nil?
