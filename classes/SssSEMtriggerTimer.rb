@@ -48,9 +48,10 @@ class SssSEMtriggerTimer < SssSEMtriggerBase
 		i = i.chr.to_i
 
 		# no broadcast possible as we are using natural chars instead of byte-value
+		# and are looking at only 1 char
+#TODO: allow 0 to 9 and map eg 9 to broadcast
 		# abort if not a valid ID
-# TODO: why? really?
-		#return super if !((1..3).member?(i)) # if invalid ID
+		return super if !((0..3).member?(i)) # if invalid ID
 
 		# target serial ID
 		iFDD = i

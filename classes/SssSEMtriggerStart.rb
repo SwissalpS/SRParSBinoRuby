@@ -41,6 +41,10 @@ class SssSEMtriggerStart < SssSEMtriggerBase
 
 			iBike = 2
 
+		else
+
+			iBike = i
+
 		end # if greater than 2
 		
 		sBasename = File::basename(@sPathFile)
