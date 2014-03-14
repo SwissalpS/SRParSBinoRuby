@@ -39,13 +39,13 @@ class SssSEMtriggerTimer < SssSEMtriggerBase
 	def process()
 
 		# first byte holds the address
-		i = @sBuffer[0];
+		i = @sBuffer[0]
 
 		# nil == i that would mean buffer is empty -> should never happen
 		return super if i.nil?
 
 		# convert byte-value to natural-value
-		i = i.chr.to_i;
+		i = i.chr.to_i
 
 		# no broadcast possible as we are using natural chars instead of byte-value
 		# abort if not a valid ID

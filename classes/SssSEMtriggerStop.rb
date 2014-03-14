@@ -25,10 +25,10 @@ class SssSEMtriggerStop < SssSEMtriggerBase
 	# controller calls hasData? if yes controller calls process
 	def process()
 
-		iBike = 0;
+		iBike = 0
 
 		# only need to look at the first byte
-		i = @sBuffer[0];
+		i = @sBuffer[0]
 
 		# nil == i that would mean buffer is empty -> should never happen
 		return super if i.nil?
@@ -39,7 +39,7 @@ class SssSEMtriggerStop < SssSEMtriggerBase
 		# NOTE: limits to 3 BIKEs
 		if (2 < i)
 
-			iBike = 2;
+			iBike = 2
 
 		end # if greater than 2
 
@@ -47,8 +47,8 @@ class SssSEMtriggerStop < SssSEMtriggerBase
 		
 		puts 'OK:ft:Got stop-signal from Trigger ' << sBasename + ' for BIKE ' << iBike.to_s
 
-		iSBAMMid = SssSEMapp.get(:idSBAMM, 0);
-		sData = 'S' << iBike.chr;
+		iSBAMMid = SssSEMapp.get(:idSBAMM, 0)
+		sData = 'S' << iBike.chr
 
 		SssSEMapp.oIOframeHandler.writeFramed(iSBAMMid, sData)
 
