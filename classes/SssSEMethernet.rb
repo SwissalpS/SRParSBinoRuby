@@ -126,7 +126,7 @@ class SssSEMethernetClass
 
 		sIP = @mPortOptions[:ethernetIPbroadcast]
 		sIPme = @mPortOptions[:ethernetIP]
-		aIPignore = [sIPme]
+		aIPignore = SssSEMapp.get(:ethernetIPsIgnore, [sIPme])
 
 		begin
 
@@ -135,8 +135,8 @@ class SssSEMethernetClass
 		rescue Exception => e
 
 			@oUDPsocketBroadcast = nil
-			p 'error when binding to ' << sIP << ':' << iPort.to_s
-			raise e
+			puts 'KO:error when binding to ' << sIP << ':' << iPort.to_s
+			#raise e
 
 		ensure
 
@@ -149,8 +149,8 @@ class SssSEMethernetClass
 		rescue Exception => e
 
 			@oUDPsocketToMe = nil
-			p 'error when binding to ' << sIPme << ':' << iPort.to_s
-			raise e
+			puts 'KO:error when binding to ' << sIPme << ':' << iPort.to_s
+			#raise e
 
 		ensure;
 
