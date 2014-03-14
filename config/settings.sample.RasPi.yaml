@@ -1,0 +1,38 @@
+--- 
+:serialID: 221
+:ethernetIP: 192.168.123.40
+:ethernetIPbroadcast: 224.0.0.1
+:ethernetIPgateway: 192.168.123.123
+:ethernetIPsIgnore: 
+- 192.168.123.40
+:ethernetIPsubnet: 255.255.255.0
+:ethernetPort: 12345
+:iBroadcastDateInterval: 3060
+:iBroadcastTimeInterval: 300
+:iIdleInterval: 0.02
+:numberOfBIKEs: 3
+:pathFileOnlineEthernetBase: /gitSwissalpS/SRParSBinoRuby/onlineIDs/eth/
+:pathFilePID: /var/tmp/SRParSBinoRuby.pid
+:pathFileResponseBase: /gitSwissalpS/SRParSBinoRuby/notificationsFromArduinos/
+:pathFileTriggerCommandCron: 
+:pathFileTriggerCommandMe: 
+:pathFileTriggerCurrentTime: 
+:pathFileTriggerDemoID: 
+:pathFileTriggerRaw: 
+:pathFileTriggerReset: 
+:pathFileTriggerRiderInfoBaseName: triggers/rider
+:pathFileTriggerStart: 
+:pathFileTriggerStop: 
+:pathFileTriggerTimer: 
+:pathSkyTabBin: /gitSwissalpS/SkyTab/SkyTab/bin/SkyTab
+:serialPortsToTry: 
+- /dev/ttys0
+- /dev/ttys000
+- /dev/ttys001
+- /dev/ttys002
+- /dev/ttys003
+- /dev/tty.Bluetooth-Modem
+- /dev/tty.Bluetooth-PDA-Sync
+- /dev/ttyAMA0
+:useEthernet: true
+:useSerial: false
