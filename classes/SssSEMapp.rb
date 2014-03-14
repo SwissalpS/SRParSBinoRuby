@@ -11,7 +11,8 @@ require 'SssSEMtriggerRiderInfo.rb'
 require 'SssSEMtriggerStart.rb'
 require 'SssSEMtriggerStop.rb'
 require 'SssSEMtriggerTimer.rb'
-require 'eventmachine'
+# now handled by SssSgems.rb included by SssSEMethernet.rb
+#require 'eventmachine'
 
 YES = true if !defined? YES
 NO = false if !defined? NO

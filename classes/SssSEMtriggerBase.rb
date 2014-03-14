@@ -75,6 +75,8 @@ class SssSEMtriggerBase #< EventMachine::Connection
 	# path and filename to the trigger-file
 	@sPathFile; attr_reader :sPathFile
 
+	# the OS being used
+	@sOS = SssSos::os()
 
 	# create a new watcher for file sPathFile
 	def initialize(sPathFile)
@@ -86,6 +88,8 @@ class SssSEMtriggerBase #< EventMachine::Connection
 		@sBuffer = ''
 
 		@sPathFile = sPathFile
+
+		@sOS = SssSos::os()
 
 		self.truncate()
 
@@ -107,6 +111,7 @@ class SssSEMtriggerBase #< EventMachine::Connection
 	# calls #observeSize()
 	def hasData?()
 #puts 'hasData?'
+
 		begin
 
 			sRead = @oFile.read_nonblock(1024)

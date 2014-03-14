@@ -1,5 +1,4 @@
-require 'socket'
-require 'eventmachine'
+require 'SssSgems.rb'
 require 'SssSEMapp.rb'
 require 'SssSEMeventManager.rb'
 require 'SssSEMframeHandler.rb'
@@ -93,11 +92,13 @@ class SssSEMethernetClass
 	end # initialize
 
 
-	def broadcastTo(sIP = nil, sData)
+	def broadcastTo(sIP = nil, sData = nil)
 
 		if (self.disconnected?)
 			return nil
 		end # if not connected
+
+		return nil if sData.nil?()
 
 		sIP = @mPortOptions[:ethernetIPbroadcast] if sIP.nil?
 		iPort = @mPortOptions[:ethernetPort]
@@ -204,11 +205,13 @@ class SssSEMethernetClass
 
   protected
 
-	def sendTo(mIPorID = nil, sData)
+	def sendTo(mIPorID = nil, sData = nil)
 
 		if (self.disconnected?)
 			return nil;
 		end # if not connected
+
+		return nil if sData.nil?()
 
 		if (mIPorID.nil?)
 			sIP = @mPortOptions[:ethernetIPbroadcast]

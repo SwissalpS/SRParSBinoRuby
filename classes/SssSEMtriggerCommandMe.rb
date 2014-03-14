@@ -57,6 +57,9 @@ class SssSEMtriggerCommandMe < SssSEMtriggerBase
 		# nil == i that would mean buffer is empty -> should never happen
 		return super if i.nil?
 
+		# OS X has different handling
+		i = i.chr() if (:macosx == @sOS)
+
 		sBasename = File::basename(@sPathFile)
 
 		case i
