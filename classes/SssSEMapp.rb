@@ -704,7 +704,7 @@ p 'for bike: ' << iBike.to_s
 		sPathBase = self.get(:pathFileResponseBase, @@_defaultPathResponseBase)
 		sPathBase += '/' if '/' != sPathBase[sPathBase.length() -1].chr
 
-		sPathFile = sPathBase << 'durations' << iBike.to_s << '/' << @aCurrentRideIDs[iBike].to_s
+		sPathFile = sPathBase + 'durations' + iBike.to_s + '/' + @aCurrentRideIDs[iBike].to_s
 
 		self.writeTimeToFile(sPathFile)
 
@@ -716,7 +716,7 @@ p 'for bike: ' << iBike.to_s
 		sPathBase = self.get(:pathFileResponseBase, @@_defaultPathResponseBase)
 		sPathBase += '/' if '/' != sPathBase[sPathBase.length() -1].chr
 
-		sPathFile = sPathBase << 'reset' << iBike.to_s
+		sPathFile = sPathBase + 'reset' + iBike.to_s
 
 		self.writeTimeToFile(sPathFile)
 
@@ -728,7 +728,7 @@ p 'for bike: ' << iBike.to_s
 		sPathBase = self.get(:pathFileResponseBase, @@_defaultPathResponseBase)
 		sPathBase += '/' if '/' != sPathBase[sPathBase.length() -1].chr
 
-		sPathFile = sPathBase << 'start' << iBike.to_s
+		sPathFile = sPathBase + 'start' + iBike.to_s
 
 		self.writeTimeToFile(sPathFile)
 
@@ -740,7 +740,7 @@ p 'for bike: ' << iBike.to_s
 		sPathBase = self.get(:pathFileResponseBase, @@_defaultPathResponseBase)
 		sPathBase += '/' if '/' != sPathBase[sPathBase.length() -1].chr
 
-		sPathFile = sPathBase << 'stop' << iBike.to_s
+		sPathFile = sPathBase + 'stop' + iBike.to_s
 
 		self.writeTimeToFile(sPathFile)
 
@@ -762,7 +762,7 @@ p 'for bike: ' << iBike.to_s
 		end # if trigger-file already exists
 
 		if ulDuration.nil?
-			sTime = Time.now.utc.to_s()
+			sTime = Time.now.utc.to_f().to_s()
 		else
 			sTime = ulDuration.to_s()
 		end # if custom time or current
