@@ -401,7 +401,7 @@ puts '   broadcasting milliseconds since midnight ' << iMillisSinceMidnight.to_s
 		end # if no SkyTab
 
 		sCommand = @sPathSkyTabBin
-		sCommand += iBike.to_s if !iBike.nil?
+		#sCommand += iBike.to_s if !iBike.nil?
 
 		sCommand += ' '  + sInvocationPath + '?o=SRParSBinoCLIrelayArduino'
 
@@ -449,6 +449,7 @@ p 'for bike: ' << iBike.to_s
 
 		sInvocationPath = '/cgi/hpi/end/' + ulDuration.to_s
 		sInvocationPath += '/' + @aCurrentRideIDs[iBike].to_s
+		sInvocationPath += '/' + iBike.to_s
 
 		return self.tellSkyTab(sInvocationPath, iBike)
 
@@ -466,7 +467,7 @@ p 'for bike: ' << iBike.to_s
 
 		self.writeReset(iBike)
 
-		sInvocationPath = '/cgi/hpi/reset' + iBike.to_s
+		sInvocationPath = '/cgi/hpi/reset/' + iBike.to_s
 
 		return self.tellSkyTab(sInvocationPath, iBike)
 
@@ -484,7 +485,7 @@ p 'for bike: ' << iBike.to_s
 
 		self.writeStart(iBike)
 
-		sInvocationPath = '/cgi/hpi/start' + iBike.to_s
+		sInvocationPath = '/cgi/hpi/start/' + iBike.to_s
 
 		return self.tellSkyTab(sInvocationPath, iBike)
 
@@ -502,7 +503,7 @@ p 'for bike: ' << iBike.to_s
 
 		self.writeStop(iBike)
 
-		sInvocationPath = '/cgi/hpi/stop' + iBike.to_s
+		sInvocationPath = '/cgi/hpi/stop/' + iBike.to_s
 
 		return self.tellSkyTab(sInvocationPath, iBike)
 
